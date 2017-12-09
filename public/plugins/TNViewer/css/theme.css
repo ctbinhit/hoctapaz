@@ -1,0 +1,38 @@
+@import url(../fonts.css);
+.jquery-tnviewer {
+  border: 1px solid #CCC;
+  position: relative; }
+  .jquery-tnviewer .jquery-bviewer-toolbar {
+    background: #28a19e;
+    color: #FFF;
+    position: relative; }
+    .jquery-tnviewer .jquery-bviewer-toolbar i#prev {
+      padding: 5px; }
+      .jquery-tnviewer .jquery-bviewer-toolbar i#prev:hover {
+        cursor: pointer; }
+    .jquery-tnviewer .jquery-bviewer-toolbar i#next {
+      padding: 5px; }
+      .jquery-tnviewer .jquery-bviewer-toolbar i#next:hover {
+        cursor: pointer; }
+    .jquery-tnviewer .jquery-bviewer-toolbar .jquery-bviewer-brand {
+      position: absolute;
+      right: 5px;
+      top: 3px; }
+      .jquery-tnviewer .jquery-bviewer-toolbar .jquery-bviewer-brand:after {
+        clear: both; }
+  .jquery-tnviewer canvas {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+    width: 100%; }
+  .jquery-tnviewer .jquery-tnviewer-footer {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    font-size: 8pt;
+    color: #999; }
+
+/*# sourceMappingURL=theme.css.map */

@@ -1,0 +1,104 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Aug 6, 2017, 2:22:27 PM
+    Author     : PC
+*/
+
+.tn-obj-plane{
+    position: absolute;
+    right: 10px;
+    z-index: 3333;
+    top: 0px;
+    animation: planeAnimated1 1s normal infinite;
+    -ms-animation: planeAnimated1 1s normal infinite;
+    -moz-animation: planeAnimated1 1s normal infinite;
+    -webkit-animation: planeAnimated1 1s normal infinite;
+    animation-direction: alternate;
+}
+
+.tn-obj-plane .tn-obj-left{
+    float: left;
+    background: url('../images/plane_2.png') 100% 100% no-repeat;
+    animation: planeAnimated 0.2s ease infinite;
+    -ms-animation: planeAnimated 0.2s ease infinite;
+    -moz-animation: planeAnimated 0.2s ease infinite;
+    -webkit-animation: planeAnimated 0.2s ease infinite;
+    animation-direction: alternate;
+    transform: rotateX(0deg);
+}
+
+.tn-obj-plane .tn-obj-right{
+    float:right;
+    background: url('../images/plane_1.png') 100% 100% no-repeat;
+}
+
+@keyframes planeAnimated {
+    from {
+        transform: rotateX(0deg);
+    }
+    to {
+        transform: rotateX(180deg);
+    }
+}
+@-webkit-keyframes planeAnimated {
+    from {
+        transform: rotateX(0deg);
+    }
+    to {
+        transform: rotateX(180deg);
+    }
+}
+@-ms-keyframes planeAnimated {
+    from {
+        transform: rotateX(0deg);
+    }
+    to {
+        transform: rotateX(180deg);
+    }
+}
+@-moz-keyframes planeAnimated {
+    from {
+        transform: rotateX(0deg);
+    }
+    to {
+        transform: rotateX(180deg);
+    }
+}
+
+/* === */
+@keyframes planeAnimated1 {
+    from {
+        top: 0px;
+    }
+    to {
+        top: 10px;
+    }
+}
+@-webkit-keyframes planeAnimated1 {
+    from {
+        top: 0px;
+    }
+    to {
+        top: 10px;
+    }
+}
+@-ms-keyframes planeAnimated1 {
+    from {
+        top: 0px;
+    }
+    to {
+        top: 10px;
+    }
+}
+@-moz-keyframes planeAnimated1 {
+    from {
+        top: 0px;
+    }
+    to {
+        top: 10px;
+    }
+}

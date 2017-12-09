@@ -1,0 +1,133 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Nov 5, 2017, 12:15:43 PM
+    Author     : PC
+*/
+ul.r_tabs {
+  list-style: none;
+  width: 100%;
+  margin: 10px 0px 10px 0px;
+  background: #3b9ab4;
+  padding: 5px; }
+  ul.r_tabs li {
+    display: inline-block;
+    padding: 5px 10px;
+    background: #ff620c; }
+    ul.r_tabs li.active {
+      background: #0B8342; }
+      ul.r_tabs li.active i {
+        -webkit-animation: float 2s linear infinite;
+        animation: float 2s linear infinite; }
+    ul.r_tabs li a {
+      color: #FFF;
+      text-decoration: none; }
+
+.documents .document {
+  width: calc(50% - 10px);
+  height: 130px;
+  float: left;
+  margin: 5px;
+  position: relative;
+  font-size: 12pt;
+  border: 1px solid #F3F3F3; }
+  .documents .document:hover .document-icon i {
+    color: #ff620c;
+    transform: rotateZ(-15deg); }
+  .documents .document:hover .document-icon .document-overlay {
+    left: 0%; }
+  .documents .document:hover .document-overlay {
+    right: 0%;
+    z-index: 1; }
+    .documents .document:hover .document-overlay i {
+      color: #FFF; }
+    .documents .document:hover .document-overlay .pan_buy {
+      height: 50%;
+      font-size: 9pt;
+      font-weight: bold;
+      transition: .7s ease-in; }
+      .documents .document:hover .document-overlay .pan_buy:hover {
+        background: #FFF;
+        top: -5px;
+        color: #ff620c; }
+        .documents .document:hover .document-overlay .pan_buy:hover i {
+          color: #ff620c; }
+    .documents .document:hover .document-overlay .pan_view {
+      width: 100%;
+      height: 50%;
+      background: #0B8342;
+      font-size: 9pt;
+      font-weight: bold;
+      transition: .7s ease-in; }
+      .documents .document:hover .document-overlay .pan_view:hover {
+        background: #FFF;
+        top: -5px;
+        color: #0B8342; }
+        .documents .document:hover .document-overlay .pan_view:hover i {
+          color: #0B8342; }
+  .documents .document .document-overlay {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    right: -100%;
+    top: 0px;
+    transition: .7s ease;
+    background: #0B8342; }
+    .documents .document .document-overlay .document-overlay-text {
+      color: #ff620c;
+      font-size: 80%;
+      padding: 10px;
+      font-weight: bold; }
+  .documents .document .document-photo {
+    float: left;
+    width: 30%; }
+    .documents .document .document-photo img {
+      width: 100%; }
+  .documents .document .document-icon {
+    float: left;
+    width: 30%;
+    height: 100%;
+    text-align: center;
+    position: relative;
+    overflow: hidden; }
+    .documents .document .document-icon a {
+      color: #FFF;
+      text-decoration: none; }
+    .documents .document .document-icon i {
+      transition: .5s ease;
+      margin: 25px auto 0px auto; }
+    .documents .document .document-icon .document-overlay {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      left: -100%;
+      top: 0px;
+      transition: .7s ease;
+      background: #ff620c;
+      color: #FFF; }
+  .documents .document .document-info {
+    position: relative;
+    float: right;
+    width: 70%;
+    height: 100%;
+    overflow: hidden; }
+    .documents .document .document-info .document-title {
+      font-weight: bold;
+      padding: 5px;
+      border-bottom: 1px solid #F1F1F1;
+      color: #ff620c; }
+    .documents .document .document-info .document-info-right {
+      position: absolute;
+      right: 2px;
+      bottom: 2px;
+      font-size: 70%; }
+    .documents .document .document-info ul.document-info-list {
+      list-style: none; }
+      .documents .document .document-info ul.document-info-list li {
+        padding: 0.2px 5px;
+        font-size: 70%; }
+
+/*# sourceMappingURL=tailieuhoc.css.map */

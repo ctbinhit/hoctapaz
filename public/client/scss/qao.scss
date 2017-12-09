@@ -1,0 +1,207 @@
+@import "platform/platform.min";
+@import "platform/coulor.min";
+
+.qao-area{
+
+    .qao-items{
+        display: flex;
+        flex-direction: column;
+
+        .qao-item{
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+            width: 100%;
+            margin: 10px 0px 0px 0px;
+            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+            border: 1px solid #d2d6de;
+
+            .qao-state-bars{
+                width: 100%;
+                background: #FFF;
+                border-bottom: 1px solid #F1F1F1;
+
+                ul{
+                    list-style: none;
+                    margin: 0px 0px 0px 0px;
+
+                    li{
+                        padding: 4px 10px;
+                        font-size: 8pt;
+                        font-weight: bold;
+                        color: $main-color;
+                        display: inline-block;
+                    }
+
+                }
+
+            }
+
+            .qao-wrapper{
+                position: relative;
+                display: flex;
+                padding: 5px 0px;
+
+                .qao-item-photo{
+                    flex-basis: 100px;
+                    text-align: center;
+                    img{
+                        width: 80px;
+                        height: 80px;
+                        border-radius: 50%;
+                    }
+                }
+
+                .qao-item-info{
+                    flex-grow: 1;
+                    width: calc(100% - 80px);
+                    position: relative;
+
+                    .qao-item-title{
+                        margin: 0px;
+                        padding: 2px 10px;
+                        font-size: 10pt;
+                        font-weight: bold;
+                        color: $main-color;
+                    }
+
+                    .qao-item-readmore{
+                        position: absolute;
+                        font-size: 8pt;
+                        background: $main-color;
+                        padding: 5px 10px;
+                        right: 5px;
+                        bottom: 5px;
+                        a{
+                            color: #FFF;
+                            text-decoration: none;
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+    .pan-question{
+        margin-bottom: 10px !important;
+        background: #F1F1F1;
+
+        .q-header{
+            display: flex;
+            border-bottom: 1px solid #999;
+
+            .q-photo{
+                flex-basis: 60px;
+                height: 60px;
+                img{
+                    width: 50px;
+                    margin: 5px;
+                    border-radius: 50%;
+                }
+            }
+
+            .q-info{
+                padding: 5px;
+                flex-grow: 1;
+
+                .q-name{
+
+                }
+
+                .q-date{
+                    font-size: 8pt;
+                }
+
+            }
+
+
+        }
+
+        .q-body{
+            padding: 10px 15px;
+        }
+
+        .q-footer{
+            text-align: right;
+            font-size: 8pt;
+            font-weight: bold;
+            padding: 4px 7px;
+
+            .q-date{
+                display: block;
+
+            }
+
+        }
+
+        .q-comment{
+            padding: 5px;
+            .q-wrap{
+                #js-q-cmt{
+                    float: left;
+                    padding: 4px;
+                    width: 85%;
+                    outline: none;
+                }
+                #js-q-cmt-b{
+                    float: right;
+                    width: 15%;
+                    padding: 4.4px;
+                    color: $main-color;
+                }
+            }
+
+
+
+
+
+
+        }
+    }
+
+    .pan-cmts{
+
+        .js-cmt{
+            margin-bottom: 10px !important;
+            background: #f8f8f8;
+            box-shadow: 0 1px 1px rgba(3, 3, 3, 0.1);
+
+            .js-cmt-header{
+                display: flex;
+                padding: 4px 0px;
+                border-bottom: 1px solid #999;
+
+                .js-cmt-header-photo{
+                    flex-basis: 100px;
+                    text-align: center;
+                    img{
+                        width: 80px;
+                        height: 80px;
+                        border-radius: 50%;
+                    }
+                }
+                .js-cmt-header-info{
+                    flex-grow: 1;
+
+                    h6.cmt-user{
+                        font-weight: bold;
+                        font-size: 10pt;
+                        color: $main-color;
+                    }
+                    div.cmt-date{
+                        font-weight: 7pt;
+                        color: #999;
+                    }
+                }
+            }
+
+            .js-cmt-body{
+                padding: 10px;
+            }
+
+        }
+
+    }
+}
+

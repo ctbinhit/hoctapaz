@@ -1,0 +1,52 @@
+@import "../fonts.css";
+
+.jquery-tnviewer{
+    border: 1px solid #CCC;
+    position: relative;
+
+    .jquery-bviewer-toolbar{
+        background: #28a19e;
+        color: #FFF;
+        position: relative;
+
+        i#prev{
+            padding: 5px;
+            &:hover{
+                cursor: pointer;
+            }
+        }
+        i#next{
+            padding: 5px;
+            &:hover{
+                cursor: pointer;
+            }
+        }
+        .jquery-bviewer-brand{
+            position: absolute;
+            right: 5px;
+            top: 3px;
+            &:after{
+                clear:both;
+            }
+        }
+    }
+
+    canvas{
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        -o-user-select: none;
+        user-select: none;
+        width: 100%;
+    }
+
+    .jquery-tnviewer-footer{
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        font-size: 8pt;
+        color: #999;
+    }
+
+}

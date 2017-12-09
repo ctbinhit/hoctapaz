@@ -1,0 +1,49 @@
+
+@mixin animation ($delay, $duration, $animation,$interation_count: infinite, $direction: forward, $fillmode: both) {
+    -webkit-animation-delay: $delay;
+    -webkit-animation-duration: $duration;
+    -webkit-animation-name: $animation;
+    -webkit-animation-fill-mode: $fillmode;
+    -webkit-animation-direction: $direction;
+    -webkit-animation-iteration-count: $interation_count;
+
+    -moz-animation-delay: $delay;
+    -moz-animation-duration: $duration;
+    -moz-animation-name: $animation;
+    -moz-animation-fill-mode: $fillmode;
+    -moz-animation-direction: $direction;
+    -moz-animation-iteration-count: $interation_count;
+
+    animation-delay: $delay;
+    animation-duration: $duration;
+    animation-name: $animation;
+    animation-fill-mode: $fillmode;
+    animation-direction: $direction;
+    animation-iteration-count: $interation_count;
+}
+
+@mixin keyframe ($animation_name) {
+    @-webkit-keyframes #{$animation_name} {
+        @content;
+    }
+
+    @-moz-keyframes #{$animation_name} {
+        @content;
+    }
+
+    @-o-keyframes #{$animation_name} {
+        @content;
+    }
+
+    @keyframes #{$animation_name} {
+        @content;
+    }
+}
+
+@mixin box-shadow ($p1,$p2,$p3: 2px,$color: rgba(0,0,0,0.5)){
+    -moz-box-shadow: $p1 $p2 $p3 $color;
+    -webkit-box-shadow: $p1 $p2 $p3 $color;
+    box-shadow: $p1 $p2 $p3 $color;
+}
+
+

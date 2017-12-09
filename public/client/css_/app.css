@@ -1,0 +1,38 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Sep 30, 2017, 10:54:12 AM
+    Author     : PC
+*/
+.articles .article {
+  position: relative;
+}
+.articles .article .article-image img {
+  width: 100%;
+  height: auto;
+}
+
+.products .product {
+  position: relative;
+}
+.products .product .product-image {
+  width: 100%;
+}
+.products .product .product-image img {
+  width: 100%;
+}
+.products .product .product-info .product-title {
+  font-weight: bold;
+}
+.products .product .product-info ul.product-list li.price {
+  color: #999;
+}
+.products .product .product-info ul.product-list li.price span {
+  font-weight: bold;
+  color: #F00;
+}
+
+/*# sourceMappingURL=app.css.map */

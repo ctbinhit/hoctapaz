@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": "AAAA;;;;EAIE;AACF;;;EAGE",
+"sources": ["../../scss/platform/animated.min.scss"],
+"names": [],
+"file": "animated.min.css"
+}

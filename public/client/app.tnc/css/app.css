@@ -1,0 +1,47 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Oct 7, 2017, 4:30:12 PM
+    Author     : PC
+*/
+.jquery-app-chat {
+  position: fixed;
+  bottom: 0px;
+  right: 10px;
+  width: 250px;
+  box-shadow: 1px 1px 5px #333;
+  z-index: 6666;
+  border-radius: 5px 5px 0px 0px; }
+  .jquery-app-chat div.jquery-app-chat-title {
+    color: #FFF;
+    background: #00167f;
+    padding: 8px;
+    text-align: left;
+    position: relative; }
+    .jquery-app-chat div.jquery-app-chat-title:hover {
+      cursor: pointer; }
+  .jquery-app-chat span.jquery-app-btn-toggle-lfs {
+    position: absolute;
+    right: 10px; }
+    .jquery-app-chat span.jquery-app-btn-toggle-lfs:hover {
+      cursor: pointer; }
+  .jquery-app-chat div.jquery-app-chat-list-friends {
+    background: #FFF;
+    padding: 10px 0px 10px 0px;
+    display: none;
+    border-radius: 5px 5px 0px 0px; }
+    .jquery-app-chat div.jquery-app-chat-list-friends ul {
+      list-style: none;
+      margin: 0;
+      padding: 0; }
+      .jquery-app-chat div.jquery-app-chat-list-friends ul li {
+        text-align: left;
+        padding: 0px 10px;
+        margin: 0px; }
+        .jquery-app-chat div.jquery-app-chat-list-friends ul li i.jquery-app-chat-status {
+          color: green; }
+
+/*# sourceMappingURL=app.css.map */

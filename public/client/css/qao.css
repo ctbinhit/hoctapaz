@@ -1,0 +1,122 @@
+.qao-area .qao-items {
+  display: flex;
+  flex-direction: column; }
+  .qao-area .qao-items .qao-item {
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    margin: 10px 0px 0px 0px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+    border: 1px solid #d2d6de; }
+    .qao-area .qao-items .qao-item .qao-state-bars {
+      width: 100%;
+      background: #FFF;
+      border-bottom: 1px solid #F1F1F1; }
+      .qao-area .qao-items .qao-item .qao-state-bars ul {
+        list-style: none;
+        margin: 0px 0px 0px 0px; }
+        .qao-area .qao-items .qao-item .qao-state-bars ul li {
+          padding: 4px 10px;
+          font-size: 8pt;
+          font-weight: bold;
+          color: #ff620c;
+          display: inline-block; }
+    .qao-area .qao-items .qao-item .qao-wrapper {
+      position: relative;
+      display: flex;
+      padding: 5px 0px; }
+      .qao-area .qao-items .qao-item .qao-wrapper .qao-item-photo {
+        flex-basis: 100px;
+        text-align: center; }
+        .qao-area .qao-items .qao-item .qao-wrapper .qao-item-photo img {
+          width: 80px;
+          height: 80px;
+          border-radius: 50%; }
+      .qao-area .qao-items .qao-item .qao-wrapper .qao-item-info {
+        flex-grow: 1;
+        width: calc(100% - 80px);
+        position: relative; }
+        .qao-area .qao-items .qao-item .qao-wrapper .qao-item-info .qao-item-title {
+          margin: 0px;
+          padding: 2px 10px;
+          font-size: 10pt;
+          font-weight: bold;
+          color: #ff620c; }
+        .qao-area .qao-items .qao-item .qao-wrapper .qao-item-info .qao-item-readmore {
+          position: absolute;
+          font-size: 8pt;
+          background: #ff620c;
+          padding: 5px 10px;
+          right: 5px;
+          bottom: 5px; }
+          .qao-area .qao-items .qao-item .qao-wrapper .qao-item-info .qao-item-readmore a {
+            color: #FFF;
+            text-decoration: none; }
+.qao-area .pan-question {
+  margin-bottom: 10px !important;
+  background: #F1F1F1; }
+  .qao-area .pan-question .q-header {
+    display: flex;
+    border-bottom: 1px solid #999; }
+    .qao-area .pan-question .q-header .q-photo {
+      flex-basis: 60px;
+      height: 60px; }
+      .qao-area .pan-question .q-header .q-photo img {
+        width: 50px;
+        margin: 5px;
+        border-radius: 50%; }
+    .qao-area .pan-question .q-header .q-info {
+      padding: 5px;
+      flex-grow: 1; }
+      .qao-area .pan-question .q-header .q-info .q-date {
+        font-size: 8pt; }
+  .qao-area .pan-question .q-body {
+    padding: 10px 15px; }
+  .qao-area .pan-question .q-footer {
+    text-align: right;
+    font-size: 8pt;
+    font-weight: bold;
+    padding: 4px 7px; }
+    .qao-area .pan-question .q-footer .q-date {
+      display: block; }
+  .qao-area .pan-question .q-comment {
+    padding: 5px; }
+    .qao-area .pan-question .q-comment .q-wrap #js-q-cmt {
+      float: left;
+      padding: 4px;
+      width: 85%;
+      outline: none; }
+    .qao-area .pan-question .q-comment .q-wrap #js-q-cmt-b {
+      float: right;
+      width: 15%;
+      padding: 4.4px;
+      color: #ff620c; }
+.qao-area .pan-cmts .js-cmt {
+  margin-bottom: 10px !important;
+  background: #f8f8f8;
+  box-shadow: 0 1px 1px rgba(3, 3, 3, 0.1); }
+  .qao-area .pan-cmts .js-cmt .js-cmt-header {
+    display: flex;
+    padding: 4px 0px;
+    border-bottom: 1px solid #999; }
+    .qao-area .pan-cmts .js-cmt .js-cmt-header .js-cmt-header-photo {
+      flex-basis: 100px;
+      text-align: center; }
+      .qao-area .pan-cmts .js-cmt .js-cmt-header .js-cmt-header-photo img {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%; }
+    .qao-area .pan-cmts .js-cmt .js-cmt-header .js-cmt-header-info {
+      flex-grow: 1; }
+      .qao-area .pan-cmts .js-cmt .js-cmt-header .js-cmt-header-info h6.cmt-user {
+        font-weight: bold;
+        font-size: 10pt;
+        color: #ff620c; }
+      .qao-area .pan-cmts .js-cmt .js-cmt-header .js-cmt-header-info div.cmt-date {
+        font-weight: 7pt;
+        color: #999; }
+  .qao-area .pan-cmts .js-cmt .js-cmt-body {
+    padding: 10px; }
+
+/*# sourceMappingURL=qao.css.map */

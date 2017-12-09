@@ -1,0 +1,140 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Aug 6, 2017, 2:21:21 PM
+    Author     : PC
+*/
+
+@font-face {
+    font-family: 'utm-avobold'; 
+    src: url('UTMAvoBold.ttf');
+    src: url('UTMAvoBold.eot') format('embedded-opentype'),
+        url('UTMAvoBold.woff2') format('woff2'),
+        url('UTMAvoBold.woff') format('woff'),
+        url('UTMAvoBold.ttf') format('truetype'),
+        url('UTMAvoBold.svg#RobotoBold') format('svg');
+}
+
+@font-face {
+    font-family: 'utm-micra'; 
+    src: url('UTMMicra.ttf');
+    src: url('UTMMicra.eot') format('embedded-opentype'),
+        url('UTMMicra.woff2') format('woff2'),
+        url('UTMMicra.woff') format('woff'),
+        url('UTMMicra.ttf') format('truetype'),
+        url('UTMMicra.svg#RobotoBold') format('svg');
+}
+
+@font-face {
+    font-family: 'utm-alexander'; 
+    src: url('UTMAlexander.ttf');
+    src: url('UTMAlexander.eot') format('embedded-opentype'),
+        url('UTMAlexander.woff2') format('woff2'),
+        url('UTMAlexander.woff') format('woff'),
+        url('UTMAlexander.ttf') format('truetype'),
+        url('UTMAlexander.svg#RobotoBold') format('svg');
+}
+
+@font-face {
+    font-family: 'utm-swiss-condensed'; 
+    src: url('UTMSwissCondensed.ttf');
+    src: url('UTMSwissCondensed.eot') format('embedded-opentype'),
+        url('UTMSwissCondensed.woff2') format('woff2'),
+        url('UTMSwissCondensed.woff') format('woff'),
+        url('UTMSwissCondensed.ttf') format('truetype'),
+        url('UTMSwissCondensed.svg#RobotoBold') format('svg');
+}
+
+@font-face {
+    font-family: 'utm-helve'; 
+    src: url('UTMHelve.ttf');
+    src: url('UTMHelve.eot') format('embedded-opentype'),
+        url('UTMHelve.woff2') format('woff2'),
+        url('UTMHelve.woff') format('woff'),
+        url('UTMHelve.ttf') format('truetype'),
+        url('UTMHelve.svg#RobotoBold') format('svg');
+}
+
+@font-face {
+    font-family: 'utm-helvebold'; 
+    src: url('UTMHelveBold.ttf');
+    src: url('UTMHelveBold.eot') format('embedded-opentype'),
+        url('UTMHelveBold.woff2') format('woff2'),
+        url('UTMHelveBold.woff') format('woff'),
+        url('UTMHelveBold.ttf') format('truetype'),
+        url('UTMHelveBold.svg#RobotoBold') format('svg');
+}
+
+@font-face {
+    font-family: 'utm-khuccamta'; 
+    src: url('UTMKhuccamta.ttf');
+    src: url('UTMKhuccamta.eot') format('embedded-opentype'),
+        url('UTMKhuccamta.woff2') format('woff2'),
+        url('UTMKhuccamta.woff') format('woff'),
+        url('UTMKhuccamta.ttf') format('truetype'),
+        url('UTMKhuccamta.svg#RobotoBold') format('svg');
+}
+
+@font-face {
+    font-family: 'opensans-bold'; 
+    src: url('OpenSansBold.ttf');
+    src: url('OpenSansBold.eot') format('embedded-opentype'),
+        url('OpenSansBold.woff2') format('woff2'),
+        url('OpenSansBold.woff') format('woff'),
+        url('OpenSansBold.ttf') format('truetype'),
+        url('OpenSansBold.svg#RobotoBold') format('svg');
+}
+
+@font-face {
+    font-family: 'roboto-bold'; 
+    src: url('RobotoBold.ttf');
+    src: url('RobotoBold.eot') format('embedded-opentype'),
+        url('RobotoBold.woff2') format('woff2'),
+        url('RobotoBold.woff') format('woff'),
+        url('RobotoBold.ttf') format('truetype'),
+        url('RobotoBold.svg#RobotoBold') format('svg');
+}
+
+@font-face {
+    font-family: 'utm-nokia'; 
+    src: url('UTMNokia.ttf');
+    src: url('UTMNokia.eot') format('embedded-opentype'),
+        url('UTMNokia.woff2') format('woff2'),
+        url('UTMNokia.woff') format('woff'),
+        url('UTMNokia.ttf') format('truetype'),
+        url('UTMNokia.svg#RobotoBold') format('svg');
+}
+
+@font-face {
+    font-family: 'utm-nguyen-ha-one'; 
+    src: url('UTMNguyenHa01.ttf');
+    src: url('UTMNguyenHa01.eot') format('embedded-opentype'),
+        url('UTMNguyenHa01.woff2') format('woff2'),
+        url('UTMNguyenHa01.woff') format('woff'),
+        url('UTMNguyenHa01.ttf') format('truetype'),
+        url('UTMNguyenHa01.svg') format('svg');
+}
+
+@font-face {
+    font-family: 'fira-sans-light'; 
+    src: url('FiraSansLight.ttf');
+    src: url('FiraSansLight.eot') format('embedded-opentype'),
+        url('FiraSansLight.woff2') format('woff2'),
+        url('FiraSansLight.woff') format('woff'),
+        url('FiraSansLight.ttf') format('truetype'),
+        url('FiraSansLight.svg') format('svg');
+}
+
+@font-face {
+    font-family: 'c'; 
+    src: url('UTMPenumbra.ttf');
+    src: url('UTMPenumbra.eot') format('embedded-opentype'),
+        url('UTMPenumbra.woff2') format('woff2'),
+        url('UTMPenumbra.woff') format('woff'),
+        url('UTMPenumbra.ttf') format('truetype'),
+        url('UTMPenumbra.svg') format('svg');
+}
+
