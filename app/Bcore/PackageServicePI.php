@@ -11,12 +11,4 @@ class PackageServicePI extends ProfessorController {
         parent::__construct();
     }
 
-//    public static function has_package($class_name) {
-//        if (class_exists($class_name)) {
-//            return true;
-//        } else {
-//            return false;
-//        }
-//    }
-
 }

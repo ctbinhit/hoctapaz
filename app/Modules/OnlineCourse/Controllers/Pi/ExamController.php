@@ -20,6 +20,9 @@ use Carbon\Carbon,
     Session,
     Illuminate\Support\Facades\Config;
 use App\Bcore\System\AjaxResponse;
+use App\Bcore\Services\NotificationService;
+use App\Bcore\Services\UserServiceV2;
+use App\Bcore\System\UserType;
 
 class ExamController extends PackageServicePI {
 
@@ -46,7 +49,7 @@ class ExamController extends PackageServicePI {
     public function get_index(Request $request) {
         $this->DVController = $this->registerDVC($this->ControllerName);
         $ExamModel = ExamModel::where([
-                    ['id_user', UserService::id()],
+                    ['id_user', UserServiceV2::current_userId(UserType::professor())],
                     ['state', ExamState::free()],
                     ['deleted_at', null]
                 ])->paginate(5);
@@ -60,7 +63,7 @@ class ExamController extends PackageServicePI {
     public function get_app_phongthi(Request $request) {
         $this->DVController = $this->registerDVC($this->ControllerName);
         $ExamModel = ExamModel::where([
-                    ['id_user', UserService::id()],
+                    ['id_user',  UserServiceV2::current_userId(UserType::professor())],
                     ['state', ExamState::de_thi()],
                     ['deleted_at', null]
                 ])->paginate(5);
@@ -74,7 +77,7 @@ class ExamController extends PackageServicePI {
     public function get_app_dethithu(Request $request) {
         $this->DVController = $this->registerDVC($this->ControllerName);
         $ExamModel = ExamModel::where([
-                    ['id_user', UserService::id()],
+                    ['id_user',  UserServiceV2::current_userId(UserType::professor())],
                     ['state', ExamState::thi_thu()],
                     ['deleted_at', null]
                 ])->paginate(5);
@@ -281,45 +284,24 @@ class ExamController extends PackageServicePI {
     public function post_save(Request $request) {
 
         if (!$request->has('question_count')) {
-            $request->session()->flash('message_type', 'error');
-            $request->session()->flash('message', __('message.coloixayratrongquatrinhxuly'));
+            NotificationService::alertRight('Không tìm thấy danh sách câu trả lời, có lỗi xảy ra trong quá trình tạo bài thi.', 'danger');
             goto resultArea;
         }
-
-        // ----- Check err ---------------------------------------------------------------------------------------------
-        if (!isset(session('user')['id'])) {
-            $request->session()->flash('message_type', 'error');
-            $request->session()->flash('message', __('message.loitaikhoan'));
-            goto resultArea;
-        }
-//        if (!$request->has('id_category2')) {
-//            $request->session()->flash('message_type', 'error');
-//            $request->session()->flash('message', __('message.chuachondanhmuc'));
-//            return redirect()->back()->withInput();
-//        }
-//        if (!$request->input('id_category')) {
-//            $request->session()->flash('message_type', 'error');
-//            $request->session()->flash('message', __('message.chuachondanhmuc'));
-//            return redirect()->back()->withInput();
-//        }
 
         if ($request->input('name') == null) {
-            $request->session()->flash('message_type', 'warning');
-            $request->session()->flash('message', __('message.vuilongnhapten'));
+            NotificationService::alertRight('Thiếu tên bài thi, vui lòng kiểm tra đầy đủ thông tin trước khi thêm', 'warning');
             return redirect()->back()->withInput();
         }
 
         // ----- Time access -------------------------------------------------------------------------------------------
         if (!$request->has('time_h') || !$request->has('time_m') || !$request->has('time_s')) {
-            $request->session()->flash('message_type', 'error');
-            $request->session()->flash('message', __('message.loithoigian'));
+            NotificationService::alertRight('Có lỗi xảy ra trong quá trình tạo bài thi, vui lòng kiểm tra lại thông tin.', 'warning');
             goto resultArea;
         }
 
         $question_count = (int) $request->input('question_count');
         if (!is_numeric($question_count)) {
-            $request->session()->flash('message_type', 'error');
-            $request->session()->flash('message', __('message.coloixayratrongquatrinhxuly'));
+            NotificationService::alertRight('Lỗi định dạng câu hỏi, vui lòng thử lại sau!', 'warning');
             goto resultArea;
         }
 
@@ -349,8 +331,8 @@ class ExamController extends PackageServicePI {
                 return back()->withInput();
             }
         } else {
-            $request->session()->flash('message_type', 'error');
-            $request->session()->flash('message', __('message.vuilongchonfile'));
+            NotificationService::alertRight('File mà bạn upload có vẻ không khả dụng, vui lòng thử lại hoặc báo cáo '
+                    . 'quản trị để được khắc phục.', 'warning', 'Lỗi file');
             return redirect()->back()->withInput();
         }
 
@@ -392,27 +374,36 @@ class ExamController extends PackageServicePI {
         } else {
             // ----- ADD -----------------------------------------------------------------------------------------------
             $ExamModel = new ExamModel();
-            $ExamModel->id_user = session('user')['id'];
+            $ExamModel->id_user = UserServiceV2::current_userId(\App\Bcore\System\UserType::professor());
         }
 
-        $ExamModel->id_category = $request->input('id_category');
-        $ExamModel->name = $request->input('name');
-        $ExamModel->time = (int) ($request->input('time_h') * 60 * 60) + (int) ($request->input('time_m') * 60) + (int) $request->input('time_s');
-        $ExamModel->views = 0;
-        $ExamModel->name_meta = str_slug($request->input('name'), '-');
-        $ExamModel->description = $request->input('description');
-        $ExamModel->state = ExamState::free();
+        try {
+            $ExamModel->id_category = $request->input('id_category');
+            $ExamModel->name = $request->input('name');
+            $ExamModel->time = (int) ($request->input('time_h') * 60 * 60) + (int) ($request->input('time_m') * 60) + (int) $request->input('time_s');
+            $ExamModel->views = 0;
+            $ExamModel->name_meta = str_slug($request->input('name'), '-');
+            $ExamModel->description = $request->input('description');
+            $ExamModel->state = ExamState::free();
 
-        // ----- SEO ---------------------------------------------------------------------------------------------------
-        $ExamModel->seo_title = $request->input('seo_title');
-        $ExamModel->seo_description = $request->input('seo_description');
-        $ExamModel->seo_keywords = $request->input('seo_keywords');
-        $r = $ExamModel->save();
+            // ----- SEO ---------------------------------------------------------------------------------------------------
+            $ExamModel->seo_title = $request->input('seo_title');
+            $ExamModel->seo_description = $request->input('seo_description');
+            $ExamModel->seo_keywords = $request->input('seo_keywords');
 
-        // Insert | Update thành công => Insert | Update ExamDetail
-        if (!$r) {
-            $request->session()->flash('message_type', 'error');
-            $request->session()->flash('message', __('message.coloixayratrongquatrinhxuly'));
+
+
+            $r = $ExamModel->save();
+
+            // Insert | Update thành công => Insert | Update ExamDetail
+            if (!$r) {
+                $request->session()->flash('message_type', 'error');
+                $request->session()->flash('message', __('message.coloixayratrongquatrinhxuly'));
+                goto resultArea;
+            }
+        } catch (\Exception $ex) {
+            NotificationService::alertRight('Có lỗi xảy ra trong quá trình tạo đề thi, vui lòng kiểm tra lại.', 'danger');
+            return $ex->getMessage();
             goto resultArea;
         }
 
@@ -428,7 +419,9 @@ class ExamController extends PackageServicePI {
                             ->folder($this->storage_folder . '/documents')
                             ->set_file($pdf)->upload();
             if ($uploaded->file_uploaded() != null) {
-                if (!$this->_SETTING_ACCOUNT['google-drive']->active) {
+
+
+                if (true) {
                     goto uploadPDFToGoogleStorageArea;
                 } else {
                     goto skip_uploadPDFToGoogleStorageArea;
@@ -457,7 +450,7 @@ class ExamController extends PackageServicePI {
                 $FileModel->url_encode = md5($FileModel->url);
                 $FileModel->sync_google = @$FileGooglePath;
                 $FileModel->name = $pdf->getClientOriginalName();
-                $FileModel->id_user = session('user')['id'];
+                $FileModel->id_user = UserServiceV2::current_userId(\App\Bcore\System\UserType::professor());
                 $ModelSaved = $FileModel->save();
                 if ($ModelSaved) {
                     if ($FileModel->db_deletedDoc($ExamModel->id, $FileModel->id, 'm1_exam', 'document')) {
@@ -542,7 +535,6 @@ class ExamController extends PackageServicePI {
     // ===== PRIVATE FUNCTIONS =========================================================================================
 
 
-
     private function save_add($pIdExam, $request = null) {
         if ($request == null || $pIdExam == null) {
             return -1;
@@ -611,10 +603,6 @@ class ExamController extends PackageServicePI {
             case '5efd453f68aac1ffc4156e76a7aebdfa': return $this->create_examCustomMode($request); //Mode 2
             case 'c98b5521a0f9123f84e93c16a12b5b2c': return $this->create_examTestMode($request); //Mode 3
         }
-    }
-
-    private function create_mode($request) {
-        
     }
 
     private function create_examOnlineMode($request) {

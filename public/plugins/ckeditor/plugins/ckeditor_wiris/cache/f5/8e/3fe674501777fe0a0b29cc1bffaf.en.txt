@@ -1,0 +1,1 @@
+{"result":{"text":"1 squared square root of 2 plus 2"},"status":"ok"}

@@ -126,8 +126,9 @@
                         <div class="form-group">
                             <label for="file" class="control-label col-lg-2 col-md-2 col-sm-3 col-xs-12">File đã upload:</label>
                             <div class="col-lg-10 col-md-10 col-sm-9 col-xs-12">
+                                <embed style="width: 100%;height: 500px;" src="{{route('document',$item->url_encode)}}#toolbar=0&navpanes=0&scrollbar=0"></embed>
                                 @if($item->mimetype=='application/pdf')
-                                <div class="jquery-tnviewer">
+<!--                                <div class="jquery-tnviewer">
                                     <div class="jquery-bviewer-toolbar">
                                         <i id="prev" class="fa fa-arrow-left"></i>
                                         <i id="next" class="fa fa-arrow-right"></i>
@@ -137,9 +138,9 @@
                                     </div>
                                     <canvas oncontextmenu="return false;" id="the-canvas"></canvas>
                                     <span class="jquery-tnviewer-footer">Developed by ToanNang Co., Ltd</span>
-                                </div>
+                                </div>-->
                                 @else
-                                <embed style="width: 100%;height: 500px;" src="http://docs.google.com/viewer?url{{route('document',$item->url_encode)}}"></embed>
+<!--                                <embed style="width: 100%;height: 500px;" src="https://docs.google.com/viewer?url{{route('document',$item->url_encode)}}"></embed>-->
                                 @endif
                             </div>
                         </div>
@@ -172,6 +173,7 @@
                     </div>
                 </div>
             </div>
+            
             <div class="col-md-12">
                 <div class="x_panel">
                     <div class="x_title">
@@ -293,8 +295,13 @@ $(document).ready(function(){
             var e_seo_keywords = $(this_form).find('#seo_keywords').val();
             
             var e_uservip = $('#js-mselect').val();
-            
+  
             $('#allow_uservip').val(e_uservip);
+         
+            if(e_uservip == null){
+                $.alert(jquery_alert_options({title: 'Thông báo',type:'red',content: 'Vui lòng chọn danh sách loại VIP.'}));
+                return;
+            }
          
             var form_input = [
                 e_name,e_uservip,

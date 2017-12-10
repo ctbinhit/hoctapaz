@@ -1,31 +1,31 @@
 @push('stylesheet')
-<link href="{!! asset('public/plugins/TNViewer/css/theme.css') !!}" rel="stylesheet" />
+<!--<link href="{!! asset('public/plugins/TNViewer/css/theme.css') !!}" rel="stylesheet" />-->
 @endpush
 @push('scripts')
 
-<script src="{!! asset('public/plugins/TNViewer/build/pdf.js') !!}"></script>
+<!--<script src="{!! asset('public/plugins/TNViewer/build/pdf.js') !!}"></script>-->
 <script>
     $(document).ready(function () {
-        if ($('.jquery-tnviewer').length > 0) {
-            var url = $('#pdf_url').val();
-            PDFJS.workerSrc = $('#pdf_worker').val();
-            var pdfDoc = null,
-                    pageNum = 1,
-                    pageRendering = false,
-                    pageNumPending = null,
-                    scale = 1.5,
-                    canvas = document.getElementById('the-canvas'),
-                    ctx = canvas.getContext('2d');
-
-            document.getElementById('prev').addEventListener('click', onPrevPage);
-            document.getElementById('next').addEventListener('click', onNextPage);
-
-            PDFJS.getDocument(url).then(function (pdfDoc_) {
-                pdfDoc = pdfDoc_;
-                document.getElementById('page_count').textContent = pdfDoc.numPages;
-                renderPage(pageNum);
-            });
-        }
+//        if ($('.jquery-tnviewer').length > 0) {
+//            var url = $('#pdf_url').val();
+//            PDFJS.workerSrc = $('#pdf_worker').val();
+//            var pdfDoc = null,
+//                    pageNum = 1,
+//                    pageRendering = false,
+//                    pageNumPending = null,
+//                    scale = 1.5,
+//                    canvas = document.getElementById('the-canvas'),
+//                    ctx = canvas.getContext('2d');
+//
+//            document.getElementById('prev').addEventListener('click', onPrevPage);
+//            document.getElementById('next').addEventListener('click', onNextPage);
+//
+//            PDFJS.getDocument(url).then(function (pdfDoc_) {
+//                pdfDoc = pdfDoc_;
+//                document.getElementById('page_count').textContent = pdfDoc.numPages;
+//                renderPage(pageNum);
+//            });
+//        }
 
 
         function renderPage(num) {

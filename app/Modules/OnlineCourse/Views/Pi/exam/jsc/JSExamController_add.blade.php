@@ -102,16 +102,16 @@
                         e.preventDefault();
                         $.alert({
                             title: 'Lưu ý!',
-                            content: 'Thời gian chỉ được nhập số nguyên dương!',
+                            content: 'Thời gian chỉ được nhập số nguyên dương!'
                         });
                         return;
                     }
 
-                    if ($('#id_category_lv1').val() == -1) {
+                    if ($('#id_category').val() === -1) {
                         e.preventDefault();
                         $.alert({
                             title: 'Lưu ý!',
-                            content: 'Vui lòng chọn danh mục cấp 1!',
+                            content: 'Vui lòng chọn danh mục cấp 1!'
                         });
                         $('#id_category_lv1').parents('.form-group').addClass('has-warning');
                         return;
@@ -119,21 +119,9 @@
                         $('#id_category_lv1').parents('.form-group').removeClass('has-warning');
                     }
 
-                    if ($('#id_category_lv2').val() == -1) {
-                        e.preventDefault();
-                        $.alert({
-                            title: 'Lưu ý!',
-                            content: 'Vui lòng chọn danh mục cấp 2!',
-                        });
-                        $('#id_category_lv2').parents('.form-group').addClass('has-warning');
-                        return;
-                    } else {
-                        $('#id_category_lv2').parents('.form-group').removeClass('has-warning');
-                    }
-
                     var time_start = $('#time_start').val();
                     var time_end = $('#time_end').val();
-                    if (time_start == '' || time_end == '') {
+                    if (time_start == '' || time_end === '') {
                         e.preventDefault();
                         $.alert({
                             title: 'Cảnh báo',
@@ -156,44 +144,7 @@
                         e.preventDefault();
                     }
                 });
-                // Cate1 selected change
 
-                $(JSExamController.elements.select.cate1).on('change', function () {
-                    if ($(this).val() != -1) {
-                        $.ajax({
-                            url: $('#route_ajax').val(),
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            beforeSend: function (xhr) {
-                                $('#label_id_category_lv2').html('<i class="fa fa-refresh faa-spin animated"></i>');
-                            },
-                            type: 'POST',
-                            dataType: 'json',
-                            data: {
-                                action: 'loadCate2',
-                                id: $(JSExamController.elements.select.cate1).val()
-                            }, success: function (data) {
-                                if (data.result == true && data.data != null) {
-                                    var str = '';
-                                    $.each(data.data, function (k, v) {
-                                        str += '<option value="' + v.id + '">' + v.name + '</option>';
-                                    });
-                                    $(JSExamController.elements.select.cate2).html(str);
-                                }
-
-
-                            }
-                            , error: function (data) {
-                                console.log(data);
-                            }, complete: function (jqXHR, textStatus) {
-                                $('#label_id_category_lv2').html('');
-                            }
-                        });
-                    } else {
-                        $(JSExamController.elements.select.cate2).html('');
-                    }
-                });
                 $(JSExamController.elements.button.qc_add).on('click', function () {
 
                     $QCV = JSExamController.require.QC();

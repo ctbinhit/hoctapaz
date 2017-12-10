@@ -49,30 +49,6 @@
                                         <textarea rows="5" name="content" id="content" class="form-control" placeholder="Nội dung..."></textarea>
                                     </div>
                                 </div>
-                                <script>
-                                    function onSubmit(this_btn) {
-                                        if ($('#id_category').val() == -1) {
-                                            $.alert(jquery_alert_options({
-                                                title: 'Thông báo', type: 'red',
-                                                content: 'Vui lòng chọn danh mục trước khi đăng câu hỏi.'
-                                            }));
-                                            return false;
-                                        }
-
-                                        $(this_btn).parents('form').submit();
-                                    }
-
-                                    function verifyCallback(response) {
-                                        if (response === null) {
-                                            $.alert(jquery_alert_options({
-                                                title: 'Thông báo', type: 'red',
-                                                content: 'Bạn vui lòng hoàn tất captcha trước khi gửi yêu cầu.'
-                                            }));
-                                        } else {
-                                            $('#js-form-add-qa-btn-submit').removeAttr('disabled');
-                                        }
-                                    }
-                                </script>
                                 <div class="form-group">
                                     <div class="col-lg-6 col-md-6 col-sm-9 col-xs-12">
                                         <div class="g-recaptcha" 
@@ -82,15 +58,12 @@
                                              data-callback="verifyCallback"
                                              data-sitekey="6Ld2djkUAAAAADYLTSwWn-YzrOix0IqbiAqjOPve"></div>
                                     </div>
-
                                     <div class="col-lg-6">
                                         <a href="{{url()->previous()}}" class="btn btn-default"><i class="fa fa-arrow-left"></i> Quay lại</a>
                                         <button id="js-form-add-qa-btn-submit" onclick="onSubmit(this)" disabled="" type="button" class="btn btn-primary"><i class="fa fa-plus"></i> Tạo ngay</button>
                                     </div>
                                 </div>
-
                             </form>
-
                         </div>
                     </div>
                 </div>
@@ -101,18 +74,45 @@
 @endsection
 
 @push('stylesheet')
-<link rel="stylesheet" href="{{asset('public/client/css/qao.css')}}"/>
+<link rel="stylesheet" href="{{asset('public/client/css/qao.css')}}" />
 @endpush
 
 @push('scripts')
-<script src="{{asset('public/client/plugins/ckeditors/math/ckeditor.js')}}"></script>
+<!-- Google captcha -->
+<script src='https://www.google.com/recaptcha/api.js'></script>
+<!-- CKEditor -->
+<script src="{{asset('public/bower_components/ckeditor/ckeditor.js')}}"></script>
+<!--<script src="{{asset('public/plugins/ckeditor/plugins/ckeditor_wiris/integration/WIRISplugins.js')}}"></script><script>CKEDITOR.dtd.$removeEmpty['span'] = false;</script>-->
 <script>
                                             CKEDITOR.editorConfig = function (config) {
                                                 config.height = '500px';
                                             };
                                             CKEDITOR.replace('content');
 </script>
-<script src='https://www.google.com/recaptcha/api.js'></script>
+<!-- /Ckeditor -->
 
+<script>
+    function onSubmit(this_btn) {
+        if ($('#id_category').val() == -1) {
+            $.alert(jquery_alert_options({
+                title: 'Thông báo', type: 'red',
+                content: 'Vui lòng chọn danh mục trước khi đăng câu hỏi.'
+            }));
+            return false;
+        }
+        $(this_btn).parents('form').submit();
+    }
+
+    function verifyCallback(response) {
+        if (response === null) {
+            $.alert(jquery_alert_options({
+                title: 'Thông báo', type: 'red',
+                content: 'Bạn vui lòng hoàn tất captcha trước khi gửi yêu cầu.'
+            }));
+        } else {
+            $('#js-form-add-qa-btn-submit').removeAttr('disabled');
+        }
+    }
+</script>
 @endpush
 

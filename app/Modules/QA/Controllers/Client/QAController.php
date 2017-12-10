@@ -16,6 +16,7 @@ use App\Bcore\Services\PeopleService;
 use App\Bcore\Services\NotificationService;
 use App\Bcore\System\AjaxResponse;
 use App\Bcore\System\DataType;
+use View;
 
 class QAController extends PackageService {
 
@@ -23,10 +24,11 @@ class QAController extends PackageService {
 
     public function __construct() {
         parent::__construct();
+
+        View::share( 'base_categories', CategoryService::get_baseCategories('hoctap', 'exam'));
     }
 
     public function get_index($category = null, Request $request) {
-
         SeoService::seo_title('Hỏi đáp trực tuyến');
         SeoService::seo_description('Hỏi đáp trực tuyến, hàng nghìn học viên sẽ cùng giải đáp giúp bạn.');
 

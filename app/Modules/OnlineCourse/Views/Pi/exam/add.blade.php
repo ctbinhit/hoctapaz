@@ -6,10 +6,23 @@
 
 <div class="page-title">
     <div class="title_left">
-        <h3>{{__('label.them')}} {{ @$title }}</h3>
+        <h3><i class="fa fa-plus"></i> {{__('label.them')}} {{ @$title }}</h3>
     </div>
 </div>
 <div class="clearfix"></div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="x_panel">
+            <div class="x_content">
+                <a href="{{url()->previous()}}" class="btn btn-app"><i class="fa fa-arrow-left"></i> Quay lại</a>
+                <a href="{{route('admin_index')}}" class="btn btn-app"><i class="fa fa-dashboard"></i> Dashboard</a>
+                <a href="{{url()->full()}}" class="btn btn-app"><i class="fa fa-refresh"></i> Tải lại</a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <form class="form-horizontal form-label-left" onsubmit="return;" id="frm_exam_add" action="{{route('_mdle_oc_pi_exam_save')}}" method="POST" enctype="multipart/form-data">
     <div class="row">
 
@@ -32,16 +45,17 @@
         <input type="hidden" name="id" id="id" value="{{ @$item->id }}" />
         <input type="hidden" name="route_ajax" id="route_ajax" value="{{route('_mdle_oc_pi_exam_ajax')}}" />
         <input type="hidden" name="QCCreated" id="QCCreated" value="{{ isset($item->id)?true:false }}" />
-
         <input type="hidden" name="time_start" id="time_start"/>
         <input type="hidden" name="time_end" id="time_end"/>
+
         @if(@$UI->fieldGroup([
         'views','ordinal_number','photo'
         ]))
+
         <div class="col-md-8 col-xs-12">
             <div class="x_panel">
                 <div class="x_title">
-                    <h2>{{ __('label.thongtinchung')}} <small> Thông tin bài thi</small></h2>
+                    <h2><i class="fa fa-edit"></i> {{ __('label.thongtinchung')}} <small> Thông tin bài thi</small></h2>
 
                     <div class="clearfix"></div>
                 </div>
@@ -69,7 +83,7 @@
                                 <div class="form-group">
                                     <label class="control-label col-md-2 col-sm-2 col-xs-12">{{__('label.danhmuc')}}</label>
                                     <div class="col-md-10 col-sm-10 col-xs-12">
-                                        <select class="form-control" name="id_category">
+                                        <select class="form-control" name="id_category" id="id_category">
                                             @foreach($categories as $k=>$v)
                                             @if($v->can_select==0)
                                             <optgroup label="{!!$v->name!!}"></optgroup>
@@ -81,16 +95,16 @@
                                         </select>
                                     </div>
                                 </div>
-<!--                                <div class="form-group">
-                                    <label id="label_id_category_lv2" class="control-label col-md-2 col-sm-2 col-xs-12"></label>
-                                    <div class="col-md-10 col-sm-10 col-xs-12">
-                                        <select class="form-control" name="id_category2" id="id_category_lv2">
-                                            <option value="-1">- Môn học -</option>
-                                        </select>
-                                        <div id="suggestions-container" style="position: relative; float: left; width: 100%; margin: 10px;">
-                                            {!!$UI->field_note('ordinal_number',true)!!}</div>
-                                    </div>
-                                </div>-->
+                                <!--                                <div class="form-group">
+                                                                    <label id="label_id_category_lv2" class="control-label col-md-2 col-sm-2 col-xs-12"></label>
+                                                                    <div class="col-md-10 col-sm-10 col-xs-12">
+                                                                        <select class="form-control" name="id_category2" id="id_category_lv2">
+                                                                            <option value="-1">- Môn học -</option>
+                                                                        </select>
+                                                                        <div id="suggestions-container" style="position: relative; float: left; width: 100%; margin: 10px;">
+                                                                            {!!$UI->field_note('ordinal_number',true)!!}</div>
+                                                                    </div>
+                                                                </div>-->
                                 @endif
                                 <div class="form-group">
                                     <label for="jquery-bootstrap-drp-exam-date-range" class="control-label col-lg-2 col-md-2 col-sm-3 col-xs-12">TG diễn ra:</label>
@@ -135,7 +149,7 @@
         <div class="col-md-8 col-xs-12">
             <div class="x_panel">
                 <div class="x_title">
-                    <h2>{{__('schools.tailieu')}} <small> Upload tài liệu PDF | DOC</small></h2>
+                    <h2><i class="fa fa-file-pdf-o"></i> {{__('schools.tailieu')}} <small> Upload tài liệu PDF | DOC</small></h2>
                     <div class="clearfix"></div>
                 </div>
                 <div class="x_content">
@@ -175,7 +189,7 @@
         <div class="col-md-4 col-xs-12">
             <div class="x_panel">
                 <div class="x_title">
-                    <h2>{{__('schools.taotracnghiem')}} <small> Tạo câu hỏi trắc nghiệm</small></h2>
+                    <h2><i class="fa fa-check-square-o"></i> {{__('schools.taotracnghiem')}} <small> Tạo câu hỏi trắc nghiệm</small></h2>
                     <div class="clearfix"></div>
                 </div>
                 <div class="x_content">
@@ -223,7 +237,7 @@
         <div class="col-md-12 col-xs-12">
             <div class="x_panel">
                 <div class="x_title">
-                    <h2>{{__('label.seo')}} <small> Nội dung seo</small></h2>
+                    <h2><i class="fa fa-share-alt"></i> {{__('label.seo')}} <small> Nội dung seo</small></h2>
                     <div class="clearfix"></div>
                 </div>
                 <div class="x_content">
@@ -268,8 +282,6 @@
 @endsection
 
 @push('stylesheet')
-<!-- Select2 -->
-<link href="{!! asset('public/admin_assets/vendors/select2/dist/css/select2.min.css')!!}" rel="stylesheet">
 
 <style>
     .JSExamController-question-ul{
@@ -313,7 +325,7 @@
             options: {
                 loop: true,
                 letterDelay: 30,
-                startOnFocus: false,
+                startOnFocus: false
             }
         });
     });
@@ -324,7 +336,7 @@
             var that = this;
             $('#' + $(this).data('input')).click();
             $('#' + $(this).data('input')).on('change', function (evt) {
-                if (this.value == '') {
+                if (this.value === '') {
 
                 } else {
                     $('.jquery-input-file-remove[data-input="photo"]').removeAttr('disabled');
@@ -341,7 +353,7 @@
     });
 </script>
 <!-- CK Editor & CK Finder -->
-<script src="{!! asset('public/admin_assets/plugins/ckeditor/ckeditor.js') !!}"></script>
+
 <script>
 //$(document).ready(function () {
 //    var editor =     CKEDITOR.replace('mota', {
@@ -351,18 +363,11 @@
 //        filebrowserImageUploadUrl: '',
 //        filebrowserFlashUploadUrl: ''
 //    })    ;
-//});</script>
-
-<!-- bootstrap-progressbar -->
-<script src="{!! asset('public/admin_assets/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js')!!}"></script>
-<!-- iCheck -->
-<script src="{!! asset('public/admin_assets/vendors/iCheck/icheck.min.js')!!}"></script>
-
-                <!--<script src="public/admin_assets/vendors/jquery.hotkeys/jquery.hotkeys.js"></script>-->
+//});
+</script>
 <!-- jQuery Tags Input -->
-<script src="{!! asset('public/admin_assets/vendors/jquery.tagsinput/src/jquery.tagsinput.js')!!}"></script>
-<!-- Switchery -->
-<script src="{!! asset('public/admin_assets/vendors/switchery/dist/switchery.min.js')!!}"></script>
+<script src="{!! asset('public/admin/bower_components/jquery.tagsinput/src/jquery.tagsinput.js')!!}"></script>
+
 
 @endpush
 
