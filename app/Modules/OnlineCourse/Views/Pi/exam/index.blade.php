@@ -19,9 +19,9 @@
 
                     <a href="{{route('mdle_oc_pi_exam_app_phongthi')}}" class="btn btn-app"><i class="fa fa-check-square"></i> Phòng thi</a>
                     
-                    <a href="{{route('mdle_oc_pi_exam_dethithu')}}" class="btn btn-app"><i class="fa fa-check-square-o"></i> Đề thi thử</a>
+<!--                    <a href="{{route('mdle_oc_pi_exam_dethithu')}}" class="btn btn-app"><i class="fa fa-check-square-o"></i> Đề thi thử</a>
                     
-                    <a href="{{route('mdle_oc_pi_exam_app_tracnghiem')}}" class="btn btn-app"><i class="fa fa-check-square-o"></i> Trắc nghiệm</a>
+                    <a href="{{route('mdle_oc_pi_exam_app_tracnghiem')}}" class="btn btn-app"><i class="fa fa-check-square-o"></i> Trắc nghiệm</a>-->
 
                     <a href="{{route('mdle_oc_pi_exam_reject')}}" class="btn btn-app"><i class="fa fa-trash"></i> Bài thi bị hủy</a>
 

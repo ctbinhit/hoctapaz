@@ -170,7 +170,6 @@
 
 <script>
     $(document).ready(function () {
-
         var PEC = {
             route: {
                 pi_exam_ajax: $('#_mdle_oc_pi_exam_ajax').val()
@@ -200,7 +199,7 @@
                         dataType: 'json',
                         data: {
                             act: '779b01b6ac7f4d64459a3e1f52c0e90f',
-                            id: $(tr).id
+                            id: $(tr).data('id')
                         }, success: function (res) {
                             if(res.response_state){
                                 $(tr).slideUp();
@@ -290,7 +289,6 @@
                     buttons: {
                         button_remove: function ($element) {
                             $($element).on('click', function () {
-
                                 var tr______ = $(this).parents('tr');
                                 var this_btn = this;
                                 var app_id__ = $(tr______).data('name');

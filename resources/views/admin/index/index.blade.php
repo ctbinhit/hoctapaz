@@ -11,7 +11,7 @@
     <div class="col-md-12">
         <div class="x_panel">
             <div class="x_title">
-                <h2>Hệ thống
+                <h2><i class="fa fa-bar-chart-o"></i> Analytics
                     <small>Nếu bạn có thắc mắc trong quá trình sử dụng, xin vui lòng gởi mail phản hồi về địa chỉ <strong><a href="mailto:kythuat@toannang.com.vn">kythuat@toanang.com.vn</a></strong> </small>
                 </h2>
                 <div class="clearfix"></div>
@@ -24,15 +24,15 @@
                     <ul class="stats-overview">
                         <li>
                             <span class="name"> Tổng truy cập </span>
-                            <span class="value text-success"> 2300 </span>
+                            <span class="value text-success"> ... </span>
                         </li>
                         <li>
                             <span class="name"> Tổng đơn hàng </span>
-                            <span class="value text-success"> 2000 </span>
+                            <span class="value text-success"> ... </span>
                         </li>
                         <li class="hidden-phone">
                             <span class="name"> Thư liên hệ </span>
-                            <span class="value text-success"> 20 </span>
+                            <span class="value text-success"> ... </span>
                         </li>
                     </ul>
                     <br />
@@ -77,7 +77,6 @@
                 @endif
                 <!-- start project-detail sidebar -->
                 <div class="col-sm-3 mail_list_column">
-                    <button id="compose" class="btn btn-sm btn-success btn-block" type="button">Đề xuất</button>
 
                     <a href="{{route('admin_product_index',['sanpham'])}}" class="btn btn-app"><i class="fa fa-list"></i> Sản phẩm</a>
                     <a href="{{route('admin_article_index','tintuc')}}" class="btn btn-app"><i class="fa fa-book"></i> Tin tức</a>

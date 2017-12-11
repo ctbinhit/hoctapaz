@@ -19,6 +19,7 @@ use App\Modules\OnlineCourse\Components\ExamState;
 use Carbon\Carbon,
     Session,
     Illuminate\Support\Facades\Config;
+use App\Bcore\Services\StorageServiceV2;
 use App\Bcore\System\AjaxResponse;
 use App\Bcore\Services\NotificationService;
 use App\Bcore\Services\UserServiceV2;
@@ -63,7 +64,7 @@ class ExamController extends PackageServicePI {
     public function get_app_phongthi(Request $request) {
         $this->DVController = $this->registerDVC($this->ControllerName);
         $ExamModel = ExamModel::where([
-                    ['id_user',  UserServiceV2::current_userId(UserType::professor())],
+                    ['id_user', UserServiceV2::current_userId(UserType::professor())],
                     ['state', ExamState::de_thi()],
                     ['deleted_at', null]
                 ])->paginate(5);
@@ -77,7 +78,7 @@ class ExamController extends PackageServicePI {
     public function get_app_dethithu(Request $request) {
         $this->DVController = $this->registerDVC($this->ControllerName);
         $ExamModel = ExamModel::where([
-                    ['id_user',  UserServiceV2::current_userId(UserType::professor())],
+                    ['id_user', UserServiceV2::current_userId(UserType::professor())],
                     ['state', ExamState::thi_thu()],
                     ['deleted_at', null]
                 ])->paginate(5);
@@ -664,18 +665,42 @@ class ExamController extends PackageServicePI {
 
     private function remove_item($request) {
         $ExamModel = ExamModel::find($request->input('id'));
+
         if ($ExamModel == null) {
             $JsonResponse = AjaxResponse::dataNotFound();
             goto responseArea;
         }
+
+        // DELETE FILE - LOCALHOST
+
+//        $file = $this->load_fileByModel($ExamModel);
+//        if ($file != null) {
+//            if (Storage::disk('localhost')->exists($file->url)) {
+//                Storage::disk('localhost')->delete($file->url);
+//                $file = null;
+//            }
+//        }
+
         $ExamModel->deleted_at = Carbon::now();
-        if ($ExamModel->save()) {
-            $JsonResponse = AjaxResponse::success();
-        } else {
-            $JsonResponse = AjaxResponse::fail();
-        }
+
+        $JsonResponse = $ExamModel->save() ? AjaxResponse::success() : AjaxResponse::fail();
+
         responseArea:
         return response()->json($JsonResponse);
+    }
+
+    private function load_fileByModel($model) {
+        try {
+            return \App\Models\FileModel::
+                            where([
+                                ['id_user', UserServiceV2::current_userId(UserType::professor())],
+                                ['obj_id', $model->id],
+                                ['obj_table', $model->tbl]
+                            ])
+                            ->first();
+        } catch (\Exception $ex) {
+            return null;
+        }
     }
 
 }

@@ -10,9 +10,6 @@
         text-align: center;
     }
 </style>
-<!-- iCheck -->
-<!--<link href="{!!asset('public/admin_assets/plugins/jQuery.iCheck/skins/all.css')!!}" rel="stylesheet" />-->
-<link href="{!!asset('public/admin_assets/plugins/jQuery.iCheck/skins/square/blue.css')!!}" rel="stylesheet" />
 
 @endpush
 <table id="jquery-datatable-default" class="table table-hover table-effect">
@@ -21,11 +18,8 @@
             <td><input class="jquery-icheck-all" data-items="item-select" type="checkbox"></td>
             <th>{{__('label.trangthai')}}</th>
             <th>{{__('label.ten')}}</th>
-            <th>{{__('label.hinhanh')}}</th>
             <th>{{__('label.luotxem')}}</th>
             <th>{{__('label.ngaytao')}}</th>
-<!--            <th>{{__('label.noibat')}}</th>
-            <th>{{__('label.hienthi')}}</th>-->
             <th>{{__('label.thaotac')}}</th>
         </tr>
     </thead>
@@ -37,7 +31,7 @@
             <td style="text-align: center;">
                 <input class="jquery-icheck item-select" data-id="{{$v->id}}" type="checkbox">
             </td>
-            <td>
+            <td style="width: 10%;">
                 @if($v->approved_by>0)
                 {{__('label.daxacthuc')}}
                 @elseif($v->approved_by==null)
@@ -51,19 +45,9 @@
             <td style="width: 35%;">
                 {{$v->name}}
             </td>
-            <td>
-                <img src="{{$v->photo}}" />
-            </td>
             <td>{{$v->views}}</td>
             <td>{{ Carbon\Carbon::parse($v->created_at)->format('d-m-Y h:i:s') }}</td>
-<!--            <td><input type="checkbox" data-id="{{$v->id}}" data-field="highlight" data-tbl="{{$v->tbl}}" 
-                       data-action="ub" {{@$v->highlight==1?'checked=""':''}} class="js-switch" name="display" data-switchery="true" style="display: none;"></td>
-
-            <td><input type="checkbox" data-id="{{$v->id}}" data-field="display" data-tbl="{{$v->tbl}}" 
-                       data-action="ub" {!!@$v->display==1?'checked=""':''!!} class="js-switch" name="display" data-switchery="true" style="display: none;"></td>-->
             <td>
-             
-
                 @if(isset($template_recycle))
                 <a href="javascript:void(0)" data-id="{{$v->id}}" data-tbl="{{$v->tbl}}" data-action="reca" 
                    class="btn btn-primary jquery-button-recycle"><i class="fa fa-recycle"></i></a>
@@ -85,7 +69,7 @@
     <tfoot>
         <tr>
             <td colspan="2">
-             
+
             </td>
             <td style="text-align:center;" colspan="10"> {{$items->links()}}</td>
         </tr>

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\admin;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\AdminController;
-use ExamModel,
+use App\Modules\OnlineCourse\Models\ExamModel,
     PhotoModel;
 use ImageService;
 use Session;
@@ -34,10 +34,7 @@ class ExamManController extends AdminController {
         if (count($ExamModel) == 0) {
             goto renderViewArea;
         }
-        // Lấy tất cả hình ảnh theo từng bài viết & gán vào model
-        $ImageServie = new ImageService();
-        $items_ = $ImageServie->get_photoByModels((object) $LST_EXAM);
-        $items = $ImageServie->convertUrlImageFromModels('photo', $items_);
+
         renderViewArea:
         return view($this->_RV . 'exam/approver', [
             'items' => $LST_EXAM,
