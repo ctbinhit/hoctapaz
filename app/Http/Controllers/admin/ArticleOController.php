@@ -49,14 +49,6 @@ class ArticleOController extends AdminController {
     }
 
     public function get_index($pType, Request $request) {
-        // ================================== CHECK PERMISSION =========================================================
-        if (class_exists(\App\Modules\UserPermission\Services\UPService::class)) {
-            $CP = \App\Modules\UserPermission\Services\UPService::check_permission('per_view', __CLASS__, $request);
-            if (!$CP->status) {
-                return $CP->view;
-            }
-        }
-        // ================================== CHECK PERMISSION =========================================================
 
         $this->DVController = $this->registerDVC($this->ControllerName, $pType);
 
@@ -97,7 +89,7 @@ class ArticleOController extends AdminController {
             foreach ($LIST_LANGS as $k => $v) {
                 if (!isset($ArticleOModel[$v])) {
                     $ArticleOModel = new ArticleOModel();
-                    $ArticleOModel->id_user = session('user')['id'];
+                    $ArticleOModel->id_user = \App\Bcore\Services\UserServiceV2::current_userId(\App\Bcore\System\UserType::admin());
                     $ArticleOModel->id_lang = $v;
                     $ArticleOModel->type = $pType;
                     $ArticleOModel->title = 'Tiêu đề mẫu';
@@ -116,15 +108,6 @@ class ArticleOController extends AdminController {
     }
 
     public function post_index(Request $request) {
-        // ================================== CHECK PERMISSION =========================================================
-        if (class_exists(\App\Modules\UserPermission\Services\UPService::class)) {
-            $CP = \App\Modules\UserPermission\Services\UPService::check_permission('per_edit', __CLASS__, $request);
-            if (!$CP->status) {
-                return $CP->view;
-            }
-        }
-        // ================================== CHECK PERMISSION =========================================================
-
         $form_fields = $this->form_field_generator($request->all(), [], true);
         $r = false;
         foreach ($form_fields as $k => $v) {
@@ -146,73 +129,5 @@ class ArticleOController extends AdminController {
         return redirect()->route('admin_articleo_index', $request->input('type'));
     }
 
-    public static function register_strict() {
-        return (object) [
-                    'type' => [
-                        'gioi-thieu' => (object) [
-                            'name' => 'Giới thiệu',
-                            'default' => true,
-                        ],
-                        'lien-he' => (object) [
-                            'name' => 'Liên hệ',
-                            'default' => false,
-                        ],
-                        'dieu-khoan-chinh-sach' => (object) [
-                            'name' => 'Điều khoản & chính sách',
-                            'default' => false,
-                        ],
-                        'huong-dan-mua-hang' => (object) [
-                            'name' => 'Hướng dẫn mua hàng',
-                            'default' => false,
-                        ],
-                        'huong-dan-thanh-toan' => (object) [
-                            'name' => 'Hướng dẫn thanh toán',
-                            'default' => false,
-                        ],
-                        'dieu-khoan-dang-ky' => (object) [
-                            'name' => 'Điều khoản đăng ký',
-                            'default' => false,
-                        ],
-                        'dieu-khoan-doi-tac' => (object) [
-                            'name' => 'Điều khoản đối tác',
-                            'default' => false,
-                        ],
-                        'faq' => (object) [
-                            'name' => 'Câu hỏi thường gặp (FAQ)',
-                            'default' => false,
-                        ],
-                        'huong-dan-nap-tien' => (object) [
-                            'name' => 'Hướng dẫn nạp tiền',
-                            'default' => false,
-                        ],
-                    ]
-        ];
-    }
-
-    public static function register_permissions() {
-        return (object) [
-                    'admin' => (object) [
-                        'per_require' => (object) [
-                            'per_view' => (object) [
-                                'name' => 'Xem bài viết',
-                                'default' => true
-                            ],
-                            'per_edit' => (object) [
-                                'name' => 'Sửa bài viết',
-                                'default' => false
-                            ],
-                        ],
-                        'signin_require' => true,
-                        'classes_require' => (object) [
-                            'App\Bcore\StorageService',
-                            'App\Models\ArticleOModel',
-                            'Illuminate\Support\Facades\Lang'
-                        ]
-                    ],
-                    'client' => (object) [
-                        'signin_require' => false,
-                    ]
-        ];
-    }
 
 }

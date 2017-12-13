@@ -15,6 +15,10 @@ class UserVIPModel extends Model {
     private $_type = null;
     private $_orderBy = null;
 
+    // =================================================================================================================
+
+    
+
     private function set_defaultOptions() {
         if ($this->_select == null) {
             $this->_select = '*';

@@ -2,7 +2,7 @@
 <h2>Thông tin thanh toán</h2>
 
 <div>
-    <i class="fa fa-user"></i> {{UserService::fullname()}}
+    <i class="fa fa-user"></i> {{$user->fullname or 'Không xác định'}}
 </div>
 <div>
     Tài liệu: {{$file->name}}

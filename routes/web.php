@@ -60,7 +60,8 @@ Route::group(['middleware' => 'web'], function() {
 
     Route::get('/tro-thanh-doi-tac' . config('bcore.PageExtension'), ['uses' => 'client\IndexController@get_partner'])
             ->name('client_partner_index');
-
+    Route::post('/tro-thanh-doi-tac' . config('bcore.PageExtension'), ['uses' => 'client\IndexController@post_partner'])
+            ->name('_client_partner_index');
 
 
 
@@ -124,12 +125,20 @@ Route::group(['middleware' => 'web'], function() {
         Route::get('/lich-su-giao-dich' . config('bcore.PageExtension'), ['uses' => 'client\UserController@get_lsgd'])
                 ->name('client_user_lichsugiaodich')->middleware('ClientMiddleware');
 
+        Route::get('/nang-cap-vip' . config('bcore.PageExtension'), ['uses' => 'client\UserController@get_upgradeVIP'])
+                ->name('client_user_upgradevip')->middleware('ClientMiddleware');
+
+        Route::get('/donate' . config('bcore.PageExtension'), ['uses' => 'client\UserController@get_donate'])
+                ->name('client_user_donate')->middleware('ClientMiddleware');
+        Route::post('/donate' . config('bcore.PageExtension'), ['uses' => 'client\UserController@post_donate'])
+                ->name('_client_user_donate')->middleware('ClientMiddleware');
+
         Route::get('/cai-dat' . config('bcore.PageExtension'), ['uses' => 'client\UserController@get_caidat'])
                 ->name('client_user_caidat')->middleware('ClientMiddleware');
         Route::post('/cai-dat' . config('bcore.PageExtension'), ['uses' => 'client\UserController@post_caidat'])
                 ->name('_client_user_caidat')->middleware('ClientMiddleware');
 
-        Route::post('/ajax' . config('bcore.PageExtension'), ['uses' => 'client\UserController@_ajax'])
+        Route::post('/ajax' . config('bcore.PageExtension'), ['uses' => 'client\UserController@ajax'])
                 ->name('client_user_ajax')->middleware('ClientMiddleware');
     });
 
@@ -252,6 +261,14 @@ Route::group(['middleware' => 'web'], function() {
         Route::get('/login', ['uses' => 'admin\LoginController@index'])->name('admin_login_index');
         Route::get('/admin/login/fb/accountkit_callback', ['uses' => 'admin\LoginController@index'])->name('admin_login_fb_autokit_callback');
         Route::post('/login', ['uses' => 'admin\LoginController@signin'])->name('admin_login_signin');
+
+        // ===== NEWSLETTER ============================================================================================
+        Route::group(['prefix' => 'newsletter'], function() {
+
+            Route::get('/{type}' . config('bcore.PageExtension'), ['uses' => 'admin\NewsletterController@get_index'])
+                    ->name('admin_newsleeter_index');
+            
+        });
 
         // ===== SYSTEMS ===============================================================================================
 
@@ -565,10 +582,6 @@ Route::group(['middleware' => 'web'], function() {
 
         Route::get('logout', function() {
             App\Bcore\Services\UserServiceV2::drop_currentSession(\App\Bcore\System\UserType::professor());
-
-            dd(session()->all());
-
-            return;
             return redirect()->route('pi_index_index');
         })->name('pi_logout');
 
@@ -608,13 +621,6 @@ Route::group(['middleware' => 'web'], function() {
         Route::group(['prefix' => 'course'], function() {
             Route::get('/{type}', 'pi\CourseController@get_index')->name('pi_course_index')->middleware('UserMiddleware');
         });
-    });
-    //user
-    Route::get('/nap-tien.html', function() {
-        return view("client/naptien/index");
-    })->name('client_donate');
-    Route::get('/capnhat', function() {
-        return '?ang c?p nh?t';
     });
 
     Route::get('/thi-online.html', function() {

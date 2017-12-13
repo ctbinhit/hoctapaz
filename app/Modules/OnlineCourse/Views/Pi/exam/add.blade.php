@@ -66,15 +66,15 @@
                                 <div class="form-group">
                                     <label class="control-label col-md-2 col-sm-2 col-xs-12">{{__('schools.tgthi')}}</label>
                                     <div class="col-md-2 col-sm-10 col-xs-12">
-                                        <input type="number" id="JSExamController-input-timeh" name="time_h" class="form-control" value="{{isset($item->time_h)?$item->time_h:0}}" placeholder="{!! ucfirst(__('placeholder.nhap',['name'=> __('label.stt') ]))!!}">
+                                        <input type="number" id="JSExamController-input-timeh" name="time_h" class="form-control js-cedit" value="{{isset($item->time_h)?$item->time_h:0}}" placeholder="{!! ucfirst(__('placeholder.nhap',['name'=> __('label.stt') ]))!!}">
                                     </div>
                                     <label class="control-label col-md-1 col-sm-2 col-xs-12">{{__('schools.gio')}}</label>
                                     <div class="col-md-2 col-sm-10 col-xs-12">
-                                        <input type="number" id="JSExamController-input-timem" name="time_m" class="form-control" value="{{isset($item->time_m)?$item->time_m:45}}" placeholder="{!! ucfirst(__('placeholder.nhap',['name'=> __('label.stt') ]))!!}">
+                                        <input type="number" id="JSExamController-input-timem" name="time_m" class="form-control js-cedit" value="{{isset($item->time_m)?$item->time_m:45}}" placeholder="{!! ucfirst(__('placeholder.nhap',['name'=> __('label.stt') ]))!!}">
                                     </div>
                                     <label class="control-label col-md-1 col-sm-2 col-xs-12">{{__('schools.phut')}}</label>
                                     <div class="col-md-2 col-sm-10 col-xs-12">
-                                        <input type="number" id="JSExamController-input-times" name="time_s" class="form-control" value="{{isset($item->time_s)?$item->time_s:0}}" placeholder="{!! ucfirst(__('placeholder.nhap',['name'=> __('label.stt') ]))!!}">
+                                        <input type="number" id="JSExamController-input-times" name="time_s" class="form-control js-cedit" value="{{isset($item->time_s)?$item->time_s:0}}" placeholder="{!! ucfirst(__('placeholder.nhap',['name'=> __('label.stt') ]))!!}">
                                     </div>
                                     <label class="control-label col-md-1 col-sm-2 col-xs-12">{{__('schools.giay')}}</label>
 
@@ -83,7 +83,7 @@
                                 <div class="form-group">
                                     <label class="control-label col-md-2 col-sm-2 col-xs-12">{{__('label.danhmuc')}}</label>
                                     <div class="col-md-10 col-sm-10 col-xs-12">
-                                        <select class="form-control" name="id_category" id="id_category">
+                                        <select class="form-control js-cedit" name="id_category" id="id_category">
                                             @foreach($categories as $k=>$v)
                                             @if($v->can_select==0)
                                             <optgroup label="{!!$v->name!!}"></optgroup>
@@ -95,25 +95,31 @@
                                         </select>
                                     </div>
                                 </div>
-                                <!--                                <div class="form-group">
-                                                                    <label id="label_id_category_lv2" class="control-label col-md-2 col-sm-2 col-xs-12"></label>
-                                                                    <div class="col-md-10 col-sm-10 col-xs-12">
-                                                                        <select class="form-control" name="id_category2" id="id_category_lv2">
-                                                                            <option value="-1">- Môn học -</option>
-                                                                        </select>
-                                                                        <div id="suggestions-container" style="position: relative; float: left; width: 100%; margin: 10px;">
-                                                                            {!!$UI->field_note('ordinal_number',true)!!}</div>
-                                                                    </div>
-                                                                </div>-->
                                 @endif
                                 <div class="form-group">
                                     <label for="jquery-bootstrap-drp-exam-date-range" class="control-label col-lg-2 col-md-2 col-sm-3 col-xs-12">TG diễn ra:</label>
                                     <div class="col-lg-10 col-md-10 col-sm-9 col-xs-12 input-group">
-                                        <input type="text" name="tgdienra" id="jquery-bootstrap-drp-exam-date-range" class="form-control" placeholder="..." />
+                                        <input type="text" name="tgdienra" id="jquery-bootstrap-drp-exam-date-range" class="form-control js-cedit" placeholder="..." />
                                         <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
                                     </div>
                                     <div class="col-lg-10 col-md-10 col-sm-9 col-xs-12 col-md-offset-2">
                                         <p class="text-info"><i class="fa fa-info"></i> <span id="jquery-info-drp-exam-data-range">Sinh viên chỉ có thể làm bài thi trong thời gian này.</span></p>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="price" class="control-label col-lg-2 col-md-2 col-sm-3 col-xs-12">Phí thi trực tuyến:</label>
+                                    <div class="col-lg-10 col-md-10 col-sm-9 col-xs-12">
+                                        <input type="number" name="price" id="price" value="{{isset($item->price)?$item->price:old('price')}}"
+                                               class="form-control js-cedit" placeholder="Phí thi trực tuyến..." />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="price2" class="control-label col-lg-2 col-md-2 col-sm-3 col-xs-12">Phí thi lại:</label>
+                                    <div class="col-lg-10 col-md-10 col-sm-9 col-xs-12">
+                                        <input type="number" name="price2" id="price2" value="{{isset($item->price2)?$item->price2:old('price2')}}"
+                                               class="form-control js-cedit" placeholder="Phí thi lại (Luyện tập trắc nghiệm online)..." />
                                     </div>
                                 </div>
 
@@ -138,7 +144,7 @@
                         <div class="form-group">
                             <div class="col-md-12 col-sm-12 col-xs-12">
                                 <a href="{{route('mdle_oc_pi_exam_index')}}" class="btn btn-default">{{__('label.quaylai')}}</a> 
-                                <button type="submit" class="btn btn-success"><i class="fa fa-save"></i> {{__('label.gui')}}</button>
+                                <button type="submit" class="btn btn-success js-cedit"><i class="fa fa-save"></i> {{__('label.gui')}}</button>
                             </div>
                         </div>
                     </div>
@@ -156,13 +162,13 @@
                     <div class="form-group">
                         <label class="control-label col-md-2 col-sm-2 col-xs-12"> {{__('label.ten')}}</label>
                         <div class="col-md-10 col-sm-10 col-xs-12">
-                            <input type="text" name="name" class="form-control" value="{{isset($item->name)?$item->name:''}}" placeholder="Tên bài thi">
+                            <input type="text" name="name" class="form-control" value="{{isset($item->name)?$item->name:old('name')}}" placeholder="Tên bài thi">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="control-label col-md-2 col-sm-2 col-xs-12"> {{__('label.mota')}}</label>
                         <div class="col-md-10 col-sm-10 col-xs-12">
-                            <textarea name="description" class="form-control" placeholder="Mô tả bài thi">{{isset($item->description)?$item->description:''}}</textarea>
+                            <textarea name="description" class="form-control" placeholder="Mô tả bài thi">{{isset($item->description)?$item->description:old('description')}}</textarea>
                         </div>
                     </div>
                     <div class="form-group">
@@ -245,7 +251,7 @@
                     <div class="form-group">
                         <label class="control-label col-md-2 col-sm-2 col-xs-12">{{@$UI->field_name('seo_title')}}</label>
                         <div class="col-md-10 col-sm-10 col-xs-12">
-                            <input type="text" class="form-control" name="seo_title" id="seo_title" value="{{isset($item->seo_title)?$item->seo_title:''}}" placeholder="">
+                            <input type="text" class="form-control js-cedit" name="seo_title" id="seo_title" value="{{isset($item->seo_title)?$item->seo_title:old('seo_title')}}" placeholder="">
                             <div id="suggestions-container" style="position: relative; float: left; width: 100%; margin: 10px;">
                                 {{@$UI->field_note('seo_title',true)}}</div>
                         </div>
@@ -255,7 +261,7 @@
                     <div class="form-group">
                         <label class="control-label col-md-2 col-sm-2 col-xs-12">{{@$UI->field_name('seo_keywords')}}</label>
                         <div class="col-md-10 col-sm-10 col-xs-12">
-                            <input type="text" class="tags form-control jquery-input-tag" name="seo_keywords" value="{{isset($item->seo_keywords)?$item->seo_keywords:''}}" />
+                            <input type="text" class="tags form-control jquery-input-tag js-cedit" name="seo_keywords" value="{{isset($item->seo_keywords)?$item->seo_keywords:old('seo_keywords')}}" />
                             <div id="suggestions-container" style="position: relative; float: left; width: 100%; margin: 10px;">
                                 {{@$UI->field_note('seo_keywords',true)}}</div>
                         </div>
@@ -265,7 +271,7 @@
                     <div class="form-group">
                         <label class="control-label col-md-2 col-sm-2 col-xs-12">{{$UI->field_name('seo_description')}}</label>
                         <div class="col-md-10 col-sm-10 col-xs-12">
-                            <textarea class="form-control" name="seo_description" placeholder="">{{isset($item->seo_description)?$item->seo_description:''}}</textarea>
+                            <textarea class="form-control js-cedit" name="seo_description" placeholder="">{{isset($item->seo_description)?$item->seo_description:old('seo_description')}}</textarea>
                             <div id="suggestions-container" style="position: relative; float: left; width: 100%; margin: 10px;">
                                 {{@$UI->field_note('seo_description',true)}}</div>
                         </div>
@@ -314,6 +320,7 @@
         $('select').attr('disabled', '');
         $('input[type="radio"]').attr('disabled', '');
         $('input[type="checkbox"]').attr('disabled', '');
+        $('.js-cedit').removeAttr('disabled');
     });
 </script>
 @endisset

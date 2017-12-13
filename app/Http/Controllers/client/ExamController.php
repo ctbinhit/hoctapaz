@@ -17,6 +17,8 @@ use Session,
     View,
     Illuminate\Support\Facades\DB;
 use App\Bcore\Services\SeoService;
+use App\Bcore\Services\UserServiceV2;
+use App\Bcore\System\UserType;
 
 class ExamController extends ClientController {
 
@@ -417,10 +419,10 @@ class ExamController extends ClientController {
     public function post_exam_phongthi_redirect(Request $request) {
         // TOKEN
         $_TOKEN_DATE = Carbon::now();
-        $_TOKEN_1 = $_TOKEN_DATE->timestamp . str_random(30) . \App\Bcore\Services\UserService::id();
+        $_TOKEN_1 = $_TOKEN_DATE->timestamp . str_random(30) .UserServiceV2::current_userId(UserType::user());
         $_TOKEN_SESSION = md5($_TOKEN_1);
         session::flash('_TOKEN_EXAM', [
-            'id_user' => \App\Bcore\Services\UserService::id(),
+            'id_user' => UserServiceV2::current_userId(UserType::user()),
             'id_exam' => $request->input('id_exam'),
             'token' => $_TOKEN_SESSION
         ]);
@@ -430,12 +432,12 @@ class ExamController extends ClientController {
     public function get_exam_thionline_token() {
         session::keep('_TOKEN_EXAM');
         if (!session::has('_TOKEN_EXAM')) {
-            //return redirect()->route('client_exam_phongthi');
+            return redirect()->route('client_exam_phongthi');
         }
         $DATA_TOKEN = (object) session('_TOKEN_EXAM');
         $ExamModel = ExamModel::find($DATA_TOKEN->id_exam);
         //$ExamModel = ExamModel::find(36);
-        $UserModel = UserModel::find(session('user')['id']);
+        $UserModel = UserServiceV2::load_dbUserBySession($this->_USER);
         // $ExamModel = ExamModel::find(22);
         try {
             if ($ExamModel->seo_keywords != null) {
@@ -444,8 +446,6 @@ class ExamController extends ClientController {
         } catch (\Exception $ex) {
             
         }
-
-
 
         return view('client/thitracnghiem/tracnghiem_detail', [
             'item' => $ExamModel,
@@ -505,7 +505,7 @@ class ExamController extends ClientController {
             goto responseArea;
         }
 
-        $UserInfo = \App\Bcore\Services\UserService::db_info();
+        $UserInfo = UserServiceV2::load_dbUserBySession($this->_USER);
         if ($UserInfo == null) {
             $msg = 'Có lỗi xảy ra trong quá trình xác thực tài khoản!';
             goto responseArea;
@@ -581,11 +581,11 @@ class ExamController extends ClientController {
 
                     // ----- Đăng ký thông tin cho user ----------------------------------------------------------------
                     $ExamUserModel = \App\Modules\OnlineCourse\Models\ExamUserModel::where([
-                                ['id_user', \App\Bcore\Services\UserService::id()],
+                                ['id_user', UserServiceV2::current_userId(UserType::user())],
                                 ['id_exam', $Model->id]
                             ])->first();
-                    $ExamUserModel->code = md5(str_random(6) . $execute_time . session('user')['id']);
-                    $ExamUserModel->id_user = session('user')['id'];
+                    $ExamUserModel->code = md5(str_random(6) . $execute_time . UserServiceV2::current_userId(UserType::user()));
+                    $ExamUserModel->id_user = UserServiceV2::current_userId(UserType::user());
                     $ExamUserModel->id_exam = $request->input('id');
                     $ExamUserModel->time_in = $execute_time;
                     $r = $ExamUserModel->save();

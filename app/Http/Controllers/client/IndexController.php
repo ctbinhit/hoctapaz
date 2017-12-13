@@ -7,8 +7,10 @@ use Illuminate\Http\Request,
     ArticleOModel,
     ProductModel,
     PhotoModel;
+use App\Bcore\Services\CategoryService;
 use SeoService;
 use Cache;
+use Session;
 use DB;
 use App\Bcore\Services\PeopleService;
 
@@ -35,6 +37,7 @@ class IndexController extends ClientController {
         $QAModel = $QAModel->select([
             'qa.id', 'qa.title', 'qa.id_user', 'qa.created_at', 'qa.content', 'qa.tbl',
             'categories_lang.name as category_name', 'users.fullname as user_name',
+            'categories_lang.name_meta as cate_name_meta',
             'categories_lang.id_category',
             DB::raw('COUNT(tbl_qa_cmt.id) as answer_count')
         ]);
@@ -51,7 +54,7 @@ class IndexController extends ClientController {
     public function index() {
 
         $newest_qa = $this->load_qa();
-
+        $qa_categories = CategoryService::get_baseCategories('hoctap', 'exam');
 
         $SeoService = new SeoService();
         $SeoService->seo();
@@ -94,7 +97,8 @@ class IndexController extends ClientController {
             'sanphammoi' => $spm,
             'db_tintucmoinhat' => $tintucmoinhat,
             'slide_top' => $SliderModel,
-            'db_newest_qa' => $newest_qa
+            'db_newest_qa' => $newest_qa,
+            'db_qa_categories' => $qa_categories
         ]);
     }
 
@@ -102,6 +106,20 @@ class IndexController extends ClientController {
 
 
         return view('client/index/trothanhdoitac');
+    }
+
+    public function post_partner(Request $request) {
+        $NewsletterModel = (new \App\Models\NewsletterModel());
+        $NewsletterModel->type = 'tro-thanh-doi-tac';
+        $NewsletterModel->phone = $request->input('phone');
+        $NewsletterModel->email = $request->input('email');
+        $NewsletterModel->name = $request->input('fullname');
+        if ($NewsletterModel->save()) {
+            session::flash('state', true);
+        } else {
+            session::flash('state', false);
+        }
+        return redirect()->route('client_partner_index');
     }
 
     public function get_articleo($pType) {

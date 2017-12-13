@@ -29,12 +29,13 @@ class DocController extends PackageServiceAD {
 
     public function get_index($type) {
         $FileModel = FileModel::where([
-                    ['obj_type', $type],
+                    ['type', $type],
                     ['deleted_at', null],
                     ['state', DocumentState::pending()]
                 ])->orderBy('created_at', 'ASC')->paginate(5);
 
-
+        
+        
         return view('Document::Admin/Document/index', [
             'type' => $type,
             'items' => $FileModel

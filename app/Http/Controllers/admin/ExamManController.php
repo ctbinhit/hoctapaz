@@ -8,6 +8,7 @@ use App\Modules\OnlineCourse\Models\ExamModel,
     PhotoModel;
 use ImageService;
 use Session;
+use DB;
 
 class ExamManController extends AdminController {
 
@@ -21,23 +22,31 @@ class ExamManController extends AdminController {
     }
 
     public function get_approver() {
-        if (session::has("user.$this->ControllerName.m1_exam.display_count")) {
-            $PERPAGE = session::get("user.$this->ControllerName.m1_exam.display_count");
-        } else {
-            $PERPAGE = 5;
-        }
-        $ExamModel = new ExamModel();
-        $ExamModel->set_orderBy(['id', 'DESC']);
-        $ExamModel->set_deleted(1);
-        $ExamModel->set_perPage($PERPAGE);
-        $LST_EXAM = $ExamModel->db_get_items();
-        if (count($ExamModel) == 0) {
-            goto renderViewArea;
-        }
+
+        $ExamModels = DB::table('m1_exam')
+                ->join('categories', 'categories.id', '=', 'm1_exam.id_category')
+                ->join('categories_lang', 'categories_lang.id_category', '=', 'categories.id')
+                ->join('users', 'users.id', '=', 'm1_exam.id_user')
+                ->where([
+                    ['m1_exam.approved_by', '=', null],
+                    ['m1_exam.state', '=', 'de-thi'],
+                    ['categories_lang.id_lang', 1]
+                ])
+                ->select([
+                    'm1_exam.id', 'm1_exam.id_user', 'm1_exam.id_category', 'm1_exam.name', 'm1_exam.name_meta', 'm1_exam.time',
+                    'm1_exam.ordinal_number', 'm1_exam.views', 'm1_exam.highlight', 'm1_exam.price', 'm1_exam.display',
+                    'm1_exam.created_at',
+                    'categories_lang.name as category_name',
+                    'users.fullname as pi_name'
+                ])
+                ->orderBy('created_at', 'DESC')
+                ->paginate(5);
+       
+
 
         renderViewArea:
         return view($this->_RV . 'exam/approver', [
-            'items' => $LST_EXAM,
+            'items' => $ExamModels,
             // 'items_photo' => $items_photo,
             'tbl' => 'm1_exam'
         ]);
@@ -88,7 +97,7 @@ class ExamManController extends AdminController {
             goto redirectArea;
         }
 
-        $ExamModel->approved_by = session('user')['id'];
+        $ExamModel->approved_by = \App\Bcore\Services\UserServiceV2::current_userId(\App\Bcore\System\UserType::admin());
         $ExamModel->approved_date = \Carbon\Carbon::now();
         $r = $ExamModel->save();
         if ($r) {

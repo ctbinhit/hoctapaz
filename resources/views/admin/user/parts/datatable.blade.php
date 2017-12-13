@@ -8,7 +8,7 @@
     }
 </style>
 @endpush
-<table class="table table-hover table-effect">
+<table class="table table-bordered table-effect">
     <thead>
         <tr>
 <!--            <th>#</th>-->
@@ -34,7 +34,7 @@
             <td>{{$item->email}}</td>
             <td>{{$item->phone}}</td>
             <td><strong>{{number_format($item->coin,0)}}</strong> VNĐ</td>
-            <td>{{$item->data_vip->name}}</td>
+            <td><i class="label label-warning">{{$item->data_vip->name=='0'?'':$item->data_vip->name}}</i></td>
             <td>{{$item->created_at}}</td>
             </td>
             <td>

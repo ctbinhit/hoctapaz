@@ -180,6 +180,17 @@ class UserServiceV2 {
         Session::flush();
     }
 
+    public static function load_dbUserBySession($session_data) {
+        $sd = (object) $session_data;
+        $r = UserModel::select([
+                    'id', 'fullname', 'date_of_birth', 'email', 'coin', 'phone', 'phone_active', 'username', 'lang', 'address', 'gender',
+                    'id_card', 'id_city', 'id_district', 'status', 'id_vip', 'tbl', 'role', 'avatar', 'id_google', 'id_facebook',
+                    'google_avatar', 'facebook_avatar', 'type', 'lock_date', 'lock_by', 'lock_message', 'activated_at', 'created_at',
+                    'updated_at'
+                ])->find($sd->id);
+        return $r;
+    }
+
     public static function get_sesssionData($account_type) {
         $current_id_session = UserServiceV2::get_currentSession($account_type);
         return $current_id_session != null ? session($current_id_session) : null;

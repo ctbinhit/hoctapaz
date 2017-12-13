@@ -17,15 +17,10 @@
     <thead>
         <tr>
             <td><input class="jquery-icheck-all" data-items="item-select" type="checkbox"></td>
-            <th>{{__('label.stt')}}</th>
             <th>{{__('label.ten')}}</th>
-<!--            <th><i class="fa fa-picture-o"></i></th>-->
-            <th><i class="fa fa-eye"></i></th>
             <th><i class="fa fa-clock-o"></i></th>
             <th><i class="fa fa-users"></i></th>
             <th>Ngày bắt đầu</th>
-<!--            <th>{{__('label.noibat')}}</th>
-            <th>{{__('label.hienthi')}}</th>-->
             <th>{{__('label.trangthai')}}</th>
             <th>{{__('label.thaotac')}}</th>
         </tr>
@@ -37,16 +32,9 @@
             <td style="text-align: center;">
                 <input class="jquery-icheck item-select" data-id="{{$v->id}}" type="checkbox">
             </td>
-            <td style="width:2%">
-                <input style="width:100%" class="jquery-bcore-textbox" data-id="{{$v->id}}" data-field="ordinal_number" 
-                       data-tbl="{{$v->tbl}}" data-action="uf" type="number" value="{{$v->ordinal_number}}">
-            </td>
             <td style="width: 30%;">{{$v->name}}</td>
-<!--            <td>
-                <img src="" />
-            </td>-->
-            <td>{{$v->views}}</td>
-            <td>{{$v->time/60}} {{__('schools.phut')}}</td>
+           
+            <td><i class="label label-info">{{$v->time/60}} {{__('schools.phut')}}</div></td>
             <td>0</td>
             <td>{{diffInNow($v->approved_date)}} <br>{{ Carbon\Carbon::parse($v->approved_date)->format('d-m-Y h:i:s') }}</td>
             <td style="width: 10%;">

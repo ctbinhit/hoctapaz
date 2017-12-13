@@ -17,6 +17,8 @@ use App\Bcore\Services\NotificationService;
 use App\Bcore\System\AjaxResponse;
 use App\Bcore\System\DataType;
 use View;
+use App\Bcore\Services\UserServiceV2;
+use App\Bcore\System\UserType;
 
 class QAController extends PackageService {
 
@@ -155,7 +157,7 @@ class QAController extends PackageService {
         $QACommentModel = new QACommentModel();
         $QACommentModel->content = $request->input('content');
         $QACommentModel->id_qa = $id_qa;
-        $QACommentModel->id_user = UserService::id();
+        $QACommentModel->id_user = \App\Bcore\Services\UserServiceV2::current_userId(\App\Bcore\System\UserType::user());
         $QACommentModel->type = 'hoi-dap';
         if ($QACommentModel->save()) {
             NotificationService::alertRight('Bình luận của bạn đã được đăng lên hệ thống.', 'success');

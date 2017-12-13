@@ -187,9 +187,11 @@ class DocController extends PackageService {
             goto responseArea;
         }
 
-        $UserCoinOld = UserService::coin();
+        $UserCoinOld = \App\Bcore\Services\UserServiceV2::load_dbUserBySession($this->_USER);
 
-        if (!UserService::pay($FileModel->price)) {
+        $UserCoinOld->coin = $UserCoinOld->coin - $FileModel->price;
+
+        if (!$UserCoinOld->save()) {
             // Thanh toán không thành công.
             $JsonResponse = AjaxResponse::fail(['msg' => 'Có lỗi xảy ra, thanh toán thất bại!']);
             goto responseArea;
@@ -199,10 +201,12 @@ class DocController extends PackageService {
         if ($r) {
             $JsonResponse = AjaxResponse::success();
         } else {
+            $UM = \App\Bcore\Services\UserServiceV2::load_dbUserBySession($this->_USER);
             // Nếu có [Exception] => trả tiền lại cho KH
-            $UserCoin = UserService::coin();
+            $UserCoin = $UM->coin;
             if ($UserCoinOld < $UserCoin && $UserCoin - $UserCoinOld = $FileModel->price) {
-                UserService::returnMoneyBack($FileModel->price);
+                $UM->coin = $UM->coin + $FileModel->price;
+                $UM->save();
             }
             $JsonResponse = AjaxResponse::fail();
         }
@@ -218,14 +222,14 @@ class DocController extends PackageService {
             goto responseArea;
         }
 
-        if (UserService::isLoggedIn() != true) {
+        if (\App\Bcore\Services\UserServiceV2::isLoggedIn(\App\Bcore\System\UserType::user()) != true) {
             $JsonResponse = AjaxResponse::not_logged_in([
                         'msg' => 'Chưa đăng nhập, vui lòng đăng nhập trước khi thực hiện thao tác này.'
             ]);
             goto responseArea;
         }
 
-        $UserModel = UserService::db_info();
+        $UserModel = $this->get_currentDBUserData();
 
         if ($UserModel->coin - $FileModel->price < 0) {
             $JsonResponse = AjaxResponse::fail(['msg' => 'Số dư không đủ để thực hiện giao dịch, vui lòng nạp thêm']);

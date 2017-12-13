@@ -11,7 +11,7 @@ class ExamModel extends Model {
     protected $guarded = ['id', 'id_user', 'tbl', 'created_at'];
     // ===== OPTIONS ===================================================================================================
     private $_select = null;
-    private $_orderBy = ['created_at','DESC'];
+    private $_orderBy = ['created_at', 'DESC'];
     private $_keywords = null;
     private $_type = null;
     private $_lang = 1;
@@ -32,6 +32,7 @@ class ExamModel extends Model {
             return $this->_models->paginate($this->_perPage);
         }
     }
+    
 
     public function execute() {
         $RWEHRE = [];
@@ -119,6 +120,9 @@ class ExamModel extends Model {
             foreach ($this->_where as $k => $v) {
                 $r->where($v[0], $v[1], $v[2]);
             }
+        }
+        if ($this->_where != null) {
+            $r->where($this->_where);
         }
 
         // ----- SET SEARCH --------------------------------------------------------------------------------------------

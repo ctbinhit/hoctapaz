@@ -29,14 +29,7 @@ class UserController extends AdminController {
     }
 
     public function get_index($pType, Request $request) {
-        // ================================== CHECK PERMISSION =========================================================
-        if (class_exists(\App\Modules\UserPermission\Services\UPService::class)) {
-            $CP = \App\Modules\UserPermission\Services\UPService::check_permission('per_view', __CLASS__, $request);
-            if (!$CP->status) {
-                return $CP->view;
-            }
-        }
-        // ================================== CHECK PERMISSION =========================================================
+
 
         $this->DVController = $this->registerDVC($this->ControllerName);
 
@@ -54,25 +47,12 @@ class UserController extends AdminController {
     }
 
     public function get_add($pType, Request $request) {
-        // ================================== CHECK PERMISSION =========================================================
-        if (class_exists(\App\Modules\UserPermission\Services\UPService::class)) {
-            $CP = \App\Modules\UserPermission\Services\UPService::check_permission('per_add', __CLASS__, $request);
-            if (!$CP->status) {
-                return $CP->view;
-            }
-        }
-        // ================================== CHECK PERMISSION =========================================================
-// Đăng ký data view controller --------------------------------------------------------------------------------
+        // Đăng ký data view controller --------------------------------------------------------------------------------
         $this->DVController = $this->registerDVC($this->ControllerName);
         // -------------------------------------------------------------------------------------------------------------
-        if (\App\Bcore\PackageServiceAD::has_package(\App\Modules\UserPermission\Controllers\Admin\UserPermissionController::class)) {
-            $UserPerrmissionGroups = \App\Modules\UserPermission\Models\UserPermissionGroupsModel::
-                    get();
-        }
 
         return view($this->_RV . 'user/add', [
-            'type' => $pType,
-            'lst_per_groups' => @$UserPerrmissionGroups
+            'type' => $pType
         ]);
     }
 
@@ -131,14 +111,6 @@ class UserController extends AdminController {
     }
 
     public function get_lock($pType, $pId, Request $request) {
-        // ================================== CHECK PERMISSION =========================================================
-        if (class_exists(\App\Modules\UserPermission\Services\UPService::class)) {
-            $CP = \App\Modules\UserPermission\Services\UPService::check_permission('per_edit_status', __CLASS__, $request);
-            if (!$CP->status) {
-                return $CP->view;
-            }
-        }
-        // ================================== CHECK PERMISSION =========================================================
 
 
         $UserModel = UserModel::find($pId);
@@ -169,7 +141,7 @@ class UserController extends AdminController {
         }
         if ($UserModel->lock_by == null) {
             $UserModel->lock_date = Carbon::now();
-            $UserModel->lock_by = session('user')['id'];
+            $UserModel->lock_by = \App\Bcore\Services\UserServiceV2::current_userId(\App\Bcore\System\UserType::admin());
             $UserModel->lock_message = $request->input('message');
         } else {
             $UserModel->lock_date = null;
@@ -374,11 +346,11 @@ class UserController extends AdminController {
         $UserModel->id_vip = $ID_VIP;
         $saved = $UserModel->save();
         if ($saved) {
-             \App\Bcore\Services\NotificationService::
-                     alertRight("Cập nhật VIP cho $UserModel->fullname thành công!", 'success');
+            \App\Bcore\Services\NotificationService::
+            alertRight("Cập nhật VIP cho $UserModel->fullname thành công!", 'success');
         } else {
             \App\Bcore\Services\NotificationService::
-                    alertRight("Cập nhật VIP cho $UserModel->fullname thất bại, vui lòng thử lại sau!", 'warning');
+            alertRight("Cập nhật VIP cho $UserModel->fullname thất bại, vui lòng thử lại sau!", 'warning');
         }
         redirectArea:
         return redirect()->route('admin_user_index', $type);

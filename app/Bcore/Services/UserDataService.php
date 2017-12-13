@@ -11,6 +11,7 @@ use Config,
     View;
 use App\Bcore\System\StorageRole;
 use Illuminate\Support\Facades\Log;
+use App\Bcore\Services\UserServiceV2;
 
 class UserDataService extends Bcore {
 
@@ -56,13 +57,12 @@ class UserDataService extends Bcore {
         try {
             $UserDataModel = new UserDataModel();
             $UserDataModel->data_object = json_encode($Model);
-
             $UserDataModel->obj_table = $Model->tbl;
             $UserDataModel->obj_id = $Model->id;
             $UserDataModel->obj_type = $Model->obj_type;
             $UserDataModel->state = 1;
             $UserDataModel->role = StorageRole::private_();
-            $UserDataModel->id_user = UserService::id();
+            $UserDataModel->id_user = UserServiceV2::current_userId(\App\Bcore\System\UserType::user());
 
             $r = $UserDataModel->save();
             if ($r) {

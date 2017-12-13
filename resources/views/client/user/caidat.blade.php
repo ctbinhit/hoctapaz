@@ -8,7 +8,6 @@
             <div class="col-md-3">
                 @include('client.user.parts.nav_left')
             </div>
-
             <div class="col-md-9">
                 <div class="row">
                     <div class="col-md-12">
@@ -20,8 +19,18 @@
                     </div>
 
                     <div class="col-md-12">
+                        @if(Session::has('page-callback'))
+                        @php
+                        $bkr = Session::get('page-callback');
+                        @endphp
+                        <div class="alert alert-{{$bkr->type}}">
+                            <p><strong><i class="fa fa-info"></i> {{$bkr->title}}</strong> {{$bkr->message}}</p>
+                        </div>
+                        @endif
+
                         <form method="POST" action="" class="form form-horizontal">
                             {{ csrf_field() }}
+                            <input type="hidden" name="act" value="update_info" />
                             <div class="panel panel-default">
                                 <div class="panel-heading"><i class="fa fa-users"></i> Thông tin chung</div>
                                 <div class="panel-body text-center">
@@ -29,6 +38,32 @@
                                         <label class="control-label col-md-2">Tên hiển thị</label>
                                         <div class="col-md-10">
                                             <input type="text" class="form-control" name="fullname" value="{{$user->fullname}}" placeholder="Họ và tên"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="phone" class="control-label col-md-2">SĐT</label>
+                                        <div class="col-md-10">
+                                            <input type="text" class="form-control" name="phone" id="phone" value="{{$user->phone}}" placeholder="SĐT"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="id_city" class="control-label col-md-2">Tỉnh/Thành phố</label>
+                                        <div class="col-md-10">
+                                            <select class="form-control" name="id_city" id="id_city">
+                                                <optgroup label="Tỉnh/Thành phố"></optgroup>
+                                                @foreach($cities as $v)
+                                                <option value="{{$v->id}}">{{$v->name}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="address" class="control-label col-md-2">Địa chỉ:</label>
+                                        <div class="col-md-10">
+                                            <input type="text" class="form-control" name="address" id="address" value="{{$user->address}}" placeholder="Địa chỉ..."/>
                                         </div>
                                     </div>
                                 </div>

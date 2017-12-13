@@ -67,7 +67,9 @@ class ExamController extends PackageServicePI {
                     ['id_user', UserServiceV2::current_userId(UserType::professor())],
                     ['state', ExamState::de_thi()],
                     ['deleted_at', null]
-                ])->paginate(5);
+                ])
+                ->orderBy('approved_date', 'DESC')
+                ->paginate(5);
 
         return view('OnlineCourse::Pi/exam/app_phongthi', [
             'items' => $ExamModel,
@@ -148,10 +150,6 @@ class ExamController extends PackageServicePI {
             $request->session()->flash('message', __('message.dulieukhongcothuc'));
             return redirect()->route('pi_exam_index');
         }
-
-
-
-
         return view($this->_RV . 'exam/user');
     }
 
@@ -283,6 +281,11 @@ class ExamController extends PackageServicePI {
     }
 
     public function post_save(Request $request) {
+      
+        if (!$request->has('time_start') || !$request->has('time_end')) {
+            NotificationService::alertRight('Không tìm thấy thời gian bắt đầu & thời gian kết thúc, vui lòng kiểm tra lại dữ liệu.', 'danger');
+            goto resultArea;
+        }
 
         if (!$request->has('question_count')) {
             NotificationService::alertRight('Không tìm thấy danh sách câu trả lời, có lỗi xảy ra trong quá trình tạo bài thi.', 'danger');
@@ -383,6 +386,10 @@ class ExamController extends PackageServicePI {
             $ExamModel->name = $request->input('name');
             $ExamModel->time = (int) ($request->input('time_h') * 60 * 60) + (int) ($request->input('time_m') * 60) + (int) $request->input('time_s');
             $ExamModel->views = 0;
+            $ExamModel->price = $request->input('price');
+            $ExamModel->price2 = $request->input('price2');
+            $ExamModel->start_date = $request->input('time_start');
+            $ExamModel->expiry_date = $request->input('time_end');
             $ExamModel->name_meta = str_slug($request->input('name'), '-');
             $ExamModel->description = $request->input('description');
             $ExamModel->state = ExamState::free();
@@ -422,7 +429,7 @@ class ExamController extends PackageServicePI {
             if ($uploaded->file_uploaded() != null) {
 
 
-                if (true) {
+                if (false) {
                     goto uploadPDFToGoogleStorageArea;
                 } else {
                     goto skip_uploadPDFToGoogleStorageArea;
@@ -672,7 +679,6 @@ class ExamController extends PackageServicePI {
         }
 
         // DELETE FILE - LOCALHOST
-
 //        $file = $this->load_fileByModel($ExamModel);
 //        if ($file != null) {
 //            if (Storage::disk('localhost')->exists($file->url)) {

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Modules\UserVIP\Models\UserVIPModel;
 
 class UserModel extends Model {
 
@@ -11,6 +12,13 @@ class UserModel extends Model {
     public $select = null;
     private $_FIELDS = ['id', 'fullname', 'date_of_birth', 'email', 'phone', 'coin', 'username', 'lang', 'address',
         'id_card', 'id_city', 'id_district', 'status', 'id_vip', 'tbl', 'role', 'updated_at'];
+
+    public function load_vip() {
+        if ($this->id_vip == null) {
+            return null;
+        }
+        return UserVIPModel::find($this->id_vip);
+    }
 
     public function db_get_items($pKeyword = null, $pFilter = array(
         'orderBy' => ['id', 'desc']

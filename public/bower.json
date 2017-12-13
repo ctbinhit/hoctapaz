@@ -37,6 +37,7 @@
     "pjax": "jacobbennett/pjax#^1.0.2",
     "photobox": "^1.9.9",
     "paymentfont": "^1.2.5",
-    "wow": "wowjs#^1.1.2"
+    "wow": "wowjs#^1.1.2",
+    "semantic": "^2.2.13"
   }
 }

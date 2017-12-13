@@ -5,10 +5,21 @@
 <div class="">
     <div class="page-title">
         <div class="title_left">
-            <h3>Thông báo trang</h3>
+            <h3><i class="fa fa-info"></i> Thông báo trang</h3>
         </div>
     </div>
     <div class="clearfix"></div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="x_panel">
+                <div class="x_content">
+                    <a href="{{route('admin_index')}}" class="btn btn-app"><i class="fa fa-dashboard"></i> Dashboard</a>
+                    <a href="{{url()->full()}}" class="btn btn-app"><i class="fa fa-refresh"></i> Tải lại</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="x_panel">
         <div class="x_title">
@@ -19,23 +30,6 @@
             <form class="form-horizontal form-label-left" action="" method="POST" enctype="multipart/form-data">
                 {{csrf_field()}}
                 <input type="hidden" name="type" value="{{$type}}" />
-
-                <!--                <div class="form-group">
-                                    <label class="control-label col-md-2">Thời gian:</label>
-                                    <div class="col-md-10">
-                                        <div class="input-group date jquery-dtp-custom-time">
-                                            <input data-format="MM/dd/yyyy HH:mm:ss PP" type="text"></input>
-                                            <span class="add-on">
-                                                <i data-time-icon="icon-time" data-date-icon="icon-calendar">
-                                                </i>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>-->
-
-
-
-
 
                 <div class="form-group">
                     <label class="control-label col-md-2">Nội dung:</label>
@@ -83,8 +77,6 @@
             language: 'en',
             pick12HourFormat: true
         });
-
-
     });
 </script>
 @endpush

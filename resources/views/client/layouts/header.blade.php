@@ -53,17 +53,15 @@
                         </a>
                     </div>
                     <ul>
-                        <li>{{Session::get('user')['fullname']}} <i class="fa fa-angle-down"></i>
+                        <li style="width:30px;"><i class="fa fa-angle-down"></i>
                             <ul>
                                 <span class="dot_show_menu"></span>
                                 <li><a class="faa-parent animated-hover" title="Trang cá nhân" 
                                        href="{{route('client_user_info')}}"><i class="fa fa-info faa-horizontal"></i>   Trang cá nhân</a></li>
                                 <li><a class="faa-parent animated-hover" title="Tài khoản" 
                                        href="{{route('client_user_caidat')}}"><i class="fa fa-user faa-horizontal"></i>  Tài khoản</a></li>
-                                @if(Route::has('mdle_bkp_napthe'))
                                 <li><a class="faa-parent animated-hover" title="Tài khoản" 
-                                       href="{{route('mdle_bkp_napthe')}}"><i class="fa fa-money faa-horizontal"></i>  Nạp tiền</a></li>
-                                @endif
+                                       href="{{route('client_user_donate')}}"><i class="fa fa-money faa-horizontal"></i>  Nạp tiền</a></li>
                                 <li><a class="faa-parent animated-hover" title="Lịch sử" 
                                        href="{{route('client_user_lichsugiaodich')}}"><i class="fa fa-history faa-horizontal"></i>  Lịch sử</a></li>
                                 <li><a class="faa-parent animated-hover" title="Thoát" 

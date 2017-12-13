@@ -12,15 +12,18 @@
 </style>
 
 @endpush
-<table id="jquery-datatable-default" class="table table-hover table-effect">
+<table id="jquery-datatable-default" class="table table-bordered table-effect">
     <thead>
         <tr>
-            <td><input class="jquery-icheck-all" data-items="item-select" type="checkbox"></td>
+            <th width="30px"><input class="jquery-icheck-all" data-items="item-select" type="checkbox"></th>
+            <th><i class="fa fa-user"></i> Đối tác</th>
+            <th width="25%">Tên đề thi</th>
+            <th>Danh mục</th>
+            <th>Thời gian</th>
+            <th>Giá</th>
+            <th><i class="fa fa-clock-o"></i> {{__('label.ngaytao')}}</th>
             <th>{{__('label.trangthai')}}</th>
-            <th>{{__('label.ten')}}</th>
-            <th>{{__('label.luotxem')}}</th>
-            <th>{{__('label.ngaytao')}}</th>
-            <th>{{__('label.thaotac')}}</th>
+            <th width="200px">{{__('label.thaotac')}}</th>
         </tr>
     </thead>
     <tbody>
@@ -28,31 +31,31 @@
         @if(count($items)!=0)
         @foreach($items as $k=>$v)
         <tr id="jquery-icheck-{{$v->id}}">
-            <td style="text-align: center;">
-                <input class="jquery-icheck item-select" data-id="{{$v->id}}" type="checkbox">
-            </td>
-            <td style="width: 10%;">
-                @if($v->approved_by>0)
-                {{__('label.daxacthuc')}}
-                @elseif($v->approved_by==null)
-                {{__('label.dangcho')}}
-                @elseif($v->approved_by==-1)
-                {{__('label.datuchoi')}}
-                @else
-                Undefined
-                @endif
-            </td>
-            <td style="width: 35%;">
-                {{$v->name}}
-            </td>
-            <td>{{$v->views}}</td>
+            <td style="text-align: center;"><input class="jquery-icheck item-select" data-id="{{$v->id}}" type="checkbox"></td>
+            <td><a title="Click để xem thông tin của giáo viên này" href="#">{{@$v->pi_name}} <i class="fa fa-eye"></i></a></td>
+            <td><a title="{{$v->name}}" href="{{route('admin_examman_approver_detail',$v->id)}}">{{str_limit($v->name,30)}} <i class="fa fa-eye"></i></a></td>
+            <td><div class="label label-info">{{str_limit($v->category_name,30)}}</div></td>
+            <td><div class="label label-info">{{$v->time/60}} phút</div></td>
+            <td><div class="label label-info">{{number_format($v->price,0,'.',',')}} VNĐ</div></td>
             <td>{{ Carbon\Carbon::parse($v->created_at)->format('d-m-Y h:i:s') }}</td>
+            <td style="width: 10%;"><div class="label label-warning">{{__('label.dangcho')}}</div></td>
             <td>
                 @if(isset($template_recycle))
                 <a href="javascript:void(0)" data-id="{{$v->id}}" data-tbl="{{$v->tbl}}" data-action="reca" 
                    class="btn btn-primary jquery-button-recycle"><i class="fa fa-recycle"></i></a>
                 @else
-                <a href="{{route('admin_examman_approver_detail',$v->id)}}" class="btn btn-default"><i class="fa fa-eye"></i></a>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Thao tác <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a href="{{route('admin_examman_approver_detail',$v->id)}}" class=""><i class="fa fa-eye"></i> Xem chi tiết</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="javascript:;" class="jquery-btn-removeExam"><i class="fa fa-trash"></i> Xóa</a></li>
+                    </ul>
+                </div>
+
                 @endif
             </td>
         </tr>

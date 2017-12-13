@@ -11,6 +11,7 @@ use Session;
 use UserModel,
     MailService;
 use \App\Bcore\Services\UserService;
+use App\Bcore\Services\UserServiceV2;
 use App\Bcore\System\UserType;
 use App\Bcore\Services\SeoService;
 use App\Bcore\Services\NotificationService;
@@ -43,7 +44,9 @@ class LoginController extends ClientController {
             return redirect()->back();
         }
 
-        $SigninResponse = UserService::signinWithForm($request->input('username'), $request->input('password'), UserType::user());
+        //$SigninResponse = UserService::signinWithForm($request->input('username'), $request->input('password'), UserType::user());
+        $SigninResponse = UserServiceV2::signinWithForm($request->input('username'), $request->input('password'), UserType::user());
+
         $response_code = $SigninResponse['code'];
         if ($response_code == 404) {
             session::flash('html_callback', (object) [
@@ -178,7 +181,7 @@ class LoginController extends ClientController {
     public function access_authenticate_callback($driver) {
         $AuthCallback = $this->_AuthService->auth_callback($driver);
         // Lỗi xảy ra trong quá trình xác thực tài khoản
-        
+
         if (!is_object($AuthCallback)) {
             session::flash('html_callback', (object) ['message_type' => 'warning',
                         'message' => "Không thể xác thực $driver vào lúc này"]);

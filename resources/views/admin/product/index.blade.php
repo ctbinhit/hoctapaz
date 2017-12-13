@@ -18,9 +18,7 @@
                 <div class="x_content">
                     <a href="{{route('admin_product_add',$type)}}" class="btn btn-app"><i class="fa fa-plus"></i> {{__('label.them')}}</a>
                     <a href="{{route('admin_product_index',$type)}}" class="btn btn-app"><i class="fa fa-refresh"></i> {{__('label.tailai')}}</a>
-                    <a href="#" class="btn btn-app"><i class="fa fa-remove"></i> {{__('label.xoacache')}}</a>
                     <a href="javascript:void(0)" onclick="PNotify.removeAll();" class="btn btn-app"><i class="fa fa-bell"></i> {{__('label.xoathongbao')}}</a>
-                    <a href="javascript:void(0)" class="btn btn-app"><i class="fa fa-cloud-upload"></i> {{__('label.dongbo')}}</a>
                     <a href="{{route('admin_category_index',['products',$type])}}" class="btn btn-app"><i class="fa fa-list"></i> {{__('label.quanlydanhmuc')}}</a>
                 </div>
             </div>
@@ -71,16 +69,16 @@
                                         <option>-- Danh mục cấp 1 --</option>
                                     </select>
                                 </div>
-<!--                                <div class="col-md-4">
-                                    <select class="form-control">
-                                        <option>-- Danh mục cấp 2 --</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-4">
-                                    <select class="form-control">
-                                        <option>-- Danh mục cấp 3 --</option>
-                                    </select>
-                                </div>-->
+                                <!--                                <div class="col-md-4">
+                                                                    <select class="form-control">
+                                                                        <option>-- Danh mục cấp 2 --</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-md-4">
+                                                                    <select class="form-control">
+                                                                        <option>-- Danh mục cấp 3 --</option>
+                                                                    </select>
+                                                                </div>-->
                             </div>
                         </div>
                     </div>

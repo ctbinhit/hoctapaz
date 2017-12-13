@@ -120,16 +120,18 @@
 <input type="hidden" id="_mdle_client_qa_ajax" value="{{route('_mdle_client_qa_ajax')}}" />
 <input type="hidden" id="this_route" value="{{route('mdle_client_qa_detail',$item->id)}}" />
 <input type="hidden" id="this_url" value="{{url()->full()}}" />
-<script src="{{asset('public/client/plugins/ckeditors/math/ckeditor.js')}}"></script>
+
+
+<!-- CKEditor -->
+<script src="{{asset('public/bower_components/ckeditor/ckeditor.js')}}"></script>
+<!--<script src="{{asset('public/plugins/ckeditor/plugins/ckeditor_wiris/integration/WIRISplugins.js')}}"></script><script>CKEDITOR.dtd.$removeEmpty['span'] = false;</script>-->
 <script>
-    $(document).ready(function () {
-        setTimeout(function () {
-            CKEDITOR.editorConfig = function (config) {
-                config.height = '500px';
-            };
-            CKEDITOR.replace('noidungbinhluan');
-        }, 2000);
-    });</script>
+    CKEDITOR.editorConfig = function (config) {
+        config.height = '500px';
+    };
+    CKEDITOR.replace('noidungbinhluan');
+</script>
+<!-- /Ckeditor -->
 <script>
     $(document).ready(function () {
         $('#js-q-cmt').on('focus', function () {

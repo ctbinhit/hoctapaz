@@ -13,11 +13,10 @@ namespace App\Bcore;
 
 use UserModel;
 use Socialite;
-
 use Session;
 
 class AuthService extends Bcore {
-    
+
     private $_RESULT = [
         'state' => null,
         'driver_data' => null,
@@ -32,10 +31,6 @@ class AuthService extends Bcore {
     function __construct($pDirver = null) {
         parent::__construct();
         $this->_driver = $pDirver;
-        
-        
-        
-        
     }
 
     public function set_typeRequire($pType) {
@@ -136,7 +131,7 @@ class AuthService extends Bcore {
 
     public function user_info() {
         if ($this->is_user()) {
-            $USER_ID = session('user')['id'];
+            $USER_ID = Services\UserServiceV2::current_userId(System\UserType::user());
             $UserModel = UserModel::find($USER_ID);
             if ($UserModel == null) {
                 return false;
@@ -149,13 +144,13 @@ class AuthService extends Bcore {
     }
 
     public function is_user() {
-        if (session::has('user')) {
-            if (isset(session('user')['id'])) {
+        if (Services\UserServiceV2::isLoggedIn(System\UserType::user())) {
+            if (Services\UserServiceV2::isUser()) {
                 return true;
             } else {
                 return -1;
             }
-        } else {
+        }else{
             return false;
         }
     }

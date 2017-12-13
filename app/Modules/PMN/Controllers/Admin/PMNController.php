@@ -14,17 +14,6 @@ class PMNController extends PackageServiceAD {
 
     public function get_index($pType, Request $request) {
 
-        // ================================== CHECK PERMISSION =========================================================
-        if (class_exists(\App\Modules\UserPermission\Services\UPService::class)) {
-            $CP = \App\Modules\UserPermission\Services\UPService::check_permission('per_edit', __CLASS__, $request);
-      
-            
-            if (!$CP->status) {
-                return $CP->view;
-            }
-        }
-        // ================================== CHECK PERMISSION =========================================================
-
         if (!Schema::hasTable('m_pmn')) {
             $this->get_init($pType);
         }
@@ -90,39 +79,6 @@ class PMNController extends PackageServiceAD {
             $table->timestamps();
         });
         return redirect()->route('mdle_pmn_index', $pType);
-    }
-
-    public static function register_strict() {
-        return (object) [
-                    'type' => [
-                        'header' => (object) [
-                            'name' => 'Thông báo top',
-                            'default' => true,
-                        ],
-                    ]
-        ];
-    }
-
-    public static function register_permissions() {
-        return (object) [
-                    'admin' => (object) [
-                        'per_require' => (object) [
-                            'per_edit' => (object) [
-                                'name' => 'Cập nhật nội dung thông báo',
-                                'default' => false
-                            ],
-                        ],
-                        'signin_require' => true,
-                        'classes_require' => (object) [
-                            'App\Bcore\StorageService',
-                            'App\Models\ArticleOModel',
-                            'Illuminate\Support\Facades\Lang'
-                        ]
-                    ],
-                    'client' => (object) [
-                        'signin_require' => false,
-                    ]
-        ];
     }
 
 }
