@@ -39,13 +39,12 @@
             <div class="panel-heading">Thông tin cá nhân</div>
             <!-- List group -->
             <ul class="list-group">
-                <li class="list-group-item list-group-item-warning">Số dư: {{number_format($userdata->coin,0)}} VNĐ</li>
-                <li class="list-group-item">VIP: {{$userdata->id_vip == null ? 'Không có':''}}</li>
-                <li class="list-group-item">SĐT: {{$userdata->phone}}</li>
-                <li class="list-group-item">Email: <i class="label label-info">{{$userdata->email}}</i></li>
-                <li class="list-group-item">Địa chỉ: {{$userdata->address}}</li>  
-                <li class="list-group-item">Sống tại: {{$userdata->address}}</li>
-
+                <li class="list-group-item list-group-item-warning">Số dư: {{number_format(($userdata->coin or 0),0)}} VNĐ</li>
+                <li class="list-group-item">VIP: {{($userdata->id_vip or null) == null ? 'Không có':''}}</li>
+                <li class="list-group-item">SĐT: {{$userdata->phone or ''}}</li>
+                <li class="list-group-item">Email: <i class="label label-info">{{$userdata->email or ''}}</i></li>
+                <li class="list-group-item">Địa chỉ: {{$userdata->address or ''}}</li>  
+                <li class="list-group-item">Sống tại: {{$userdata->address or ''}}</li>
             </ul>
         </div>
     </div>

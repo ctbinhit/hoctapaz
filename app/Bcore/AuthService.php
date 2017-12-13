@@ -150,7 +150,7 @@ class AuthService extends Bcore {
             } else {
                 return -1;
             }
-        }else{
+        } else {
             return false;
         }
     }
@@ -158,7 +158,7 @@ class AuthService extends Bcore {
     public function auth_redirect($pDriver = null) {
         if ($pDriver == null) {
             if ($this->_driver == null) {
-// Log
+                // Log
                 return -1;
             } else {
                 $pDriver = $this->_driver;
@@ -366,45 +366,45 @@ class AuthService extends Bcore {
 
     public function checkSocial($pDriver, $pData) {
         $this->_SOCIALDATA = $pData;
-// TK MXH Có email => Check email
+        // TK MXH Có email => Check email
         if ($pData->email != null) {
             $UserEmailModel = $this->get_userModelByEmail($pData->email);
-// Không có email tồn tại trên local
+            // Không có email tồn tại trên local
             if ($UserEmailModel == null) {
-// Không có email -> check id driver
+                // Không có email -> check id driver
                 $TMP = $this->get_userModelByIdDriver($pDriver, $pData->id);
                 if ($TMP == null) {
-// TK chưa có đăng ký trên hệ thống => tạo mới
+                    // TK chưa có đăng ký trên hệ thống => tạo mới
                     return 199;
                 } else {
-// 200 OK => id driver có trên hệ thống => xác thực thành công
+                    // 200 OK => id driver có trên hệ thống => xác thực thành công
                     $this->_USERDATA = $TMP;
                     return 200;
                 }
             } else {
                 if ($UserEmailModel->{"id_$pDriver"} == null) {
-// Email tồn tại trên local, Id không tồn tại => đồng bộ tk
+                    // Email tồn tại trên local, Id không tồn tại => đồng bộ tk
                     return 188;
                 } elseif ($UserEmailModel->{"id_$pDriver"} == $pData->id) {
-// 2 ID giống nhau => xác thực thành công
+                    // 2 ID giống nhau => xác thực thành công
                     $this->_USERDATA = $UserEmailModel;
                     return 200;
                 } elseif ($UserEmailModel->{"id_$pDriver"} != $pData->id) {
-// Email trùng với tk trên local nhưng id driver không trùng => đã bị xác thực bởi tk driver khác
+                    // Email trùng với tk trên local nhưng id driver không trùng => đã bị xác thực bởi tk driver khác
                     return 189;
                 } else {
                     return 201;
-// Lỗi không xác định
+                    // Lỗi không xác định
                 }
             }
         } else {
-// Email MXH = null => check ID
+            // Email MXH = null => check ID
             $TMP = $this->get_userModelByIdDriver($pDriver, $pData->id);
             if ($TMP == null) {
-// Email social = null , ID DRIVER chưa tồn tại trên local => thêm mới
+                // Email social = null , ID DRIVER chưa tồn tại trên local => thêm mới
                 return 199;
             } else {
-// ID driver tồn tại trên hệ thống => xác thực thành công
+                // ID driver tồn tại trên hệ thống => xác thực thành công
                 $this->_USERDATA = $TMP;
                 return 200;
             }

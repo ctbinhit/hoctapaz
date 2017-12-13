@@ -30,11 +30,12 @@ class UserController extends ClientController {
     public function __construct() {
         parent::__construct();
         view::share('client_exam_ajax', route('client_user_ajax'));
-
+        
         $this->middleware(function($request, $next) {
             $ud = $this->get_currentDBUserData(UserType::user());
             view::share('userdata', $ud);
             $this->userdata = $ud;
+           
             return $next($request);
         });
     }

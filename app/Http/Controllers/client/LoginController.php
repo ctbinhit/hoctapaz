@@ -12,9 +12,11 @@ use UserModel,
     MailService;
 use \App\Bcore\Services\UserService;
 use App\Bcore\Services\UserServiceV2;
+use App\Bcore\Services\UserServiceV3;
 use App\Bcore\System\UserType;
 use App\Bcore\Services\SeoService;
 use App\Bcore\Services\NotificationService;
+use App\Bcore\Services\AuthServiceV2;
 
 class LoginController extends ClientController {
 
@@ -46,6 +48,9 @@ class LoginController extends ClientController {
 
         //$SigninResponse = UserService::signinWithForm($request->input('username'), $request->input('password'), UserType::user());
         $SigninResponse = UserServiceV2::signinWithForm($request->input('username'), $request->input('password'), UserType::user());
+
+        $UserServiceV3 = (new UserServiceV3);
+        $SigninWithForm = $UserServiceV3->signinWithForm($request->input('username'), $request->input('password'));
 
         $response_code = $SigninResponse['code'];
         if ($response_code == 404) {
@@ -179,21 +184,28 @@ class LoginController extends ClientController {
      */
 
     public function access_authenticate_callback($driver) {
-        $AuthCallback = $this->_AuthService->auth_callback($driver);
-        // Lỗi xảy ra trong quá trình xác thực tài khoản
 
-        if (!is_object($AuthCallback)) {
+        $AuthService = (new AuthServiceV2($driver))
+                ->set_userType([UserType::user()])
+                ->get_authCallback();
+        if ($AuthService == null) {
+            session::flash('html_callback', (object) ['message_type' => 'warning',
+                        'message' => "Hết phiên đăng nhập, vui lòng thử lại."]);
+            return redirect()->route('client_login_index');
+        }
+        if (!$AuthService->is_social()) {
             session::flash('html_callback', (object) ['message_type' => 'warning',
                         'message' => "Không thể xác thực $driver vào lúc này"]);
             return redirect()->route('client_login_index');
         }
-        $TMP = $this->_AuthService->signin_with_driver($driver, $AuthCallback);
-        if ($TMP) {
-            return redirect()->route('client_login_index');
+
+        if ($AuthService->signinWithDriver()) {
+            session::flash('html_callback', (object) ['message_type' => 'success',
+                        'message' => "Không thể xác thực $driver vào lúc này"]);
         } else {
+            $log = $AuthService->get_log();
             session::flash('html_callback', (object) ['message_type' => 'warning',
-                        'message' => $this->_AuthService->log()->msg]);
-            return redirect()->route('client_login_index');
+                        'message' => $log['message']]);
         }
         return redirect()->route('client_login_index');
     }

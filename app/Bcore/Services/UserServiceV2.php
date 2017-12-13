@@ -4,7 +4,7 @@ namespace App\Bcore\Services;
 
 use Session;
 use Storage;
-use App\Bcore\System\UserType;
+use App\Bcore\SystemComponents\User\UserType;
 use App\Models\UserModel;
 use Illuminate\Support\Facades\DB;
 use App\Bcore\Type\SocialType;
@@ -106,6 +106,28 @@ class UserServiceV2 {
         }
     }
 
+    public static function is_socialExist($social) {
+        try {
+            if ($social == null) {
+                return false;
+            }
+            $s_id = $social->id;
+            $s_email = $social->email;
+            $db = DB::table('users')
+                    ->where('email', $s_email)
+                    ->orWhere('id_google', $s_id)
+                    ->orWhere('id_facebook', $s_id)
+                    ->first();
+            return $db == null ? false : true;
+        } catch (\Exception $ex) {
+            return null;
+        }
+    }
+
+    public static function siginWithDriver($data) {
+        
+    }
+
     public static function signinWithForm($username, $password, $account_type) {
         $UserModel = DB::table('users')
                         ->where([
@@ -120,7 +142,7 @@ class UserServiceV2 {
     }
 
     public static function signinWithModel($model) {
-        return UserServiceV2::setSession($model);
+        return UserServiceV2::setSession($model->type, $model);
     }
 
     public static function get_currentSession($account_type = 'user') {
@@ -223,6 +245,10 @@ class UserServiceV2 {
         } catch (\Exception $ex) {
             return false;
         }
+    }
+
+    public static function generate_key() {
+        return str_random(4) . time();
     }
 
 }

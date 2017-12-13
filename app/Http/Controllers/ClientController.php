@@ -21,7 +21,7 @@ class ClientController extends ControllerService {
 
     public function __construct() {
         parent::__construct();
-
+        
         $this->middleware(function($request, $next) {
             $this->_USER = UserServiceV2::get_currentSessionData(UserType::user());
             return $next($request);
