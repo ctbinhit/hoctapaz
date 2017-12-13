@@ -5,7 +5,7 @@
     "license": "MIT",
     "type": "project",
     "require": {
-        //"php": ">=5.6.4",
+        
         "barryvdh/laravel-debugbar": "^2.4",
         "geoip/geoip": "~1.14",
         "geoip2/geoip2": "~2.0",
