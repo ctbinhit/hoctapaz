@@ -6,6 +6,7 @@
 /public/admin/bower_components
 /public/admin/node_modules
 /public/storage
+/nbproject
 /storage/*.key
 /storage/framework
 /vendor
