@@ -483,6 +483,7 @@ Route::group(['middleware' => 'web'], function() {
                     ->name('admin_article_save_post');
 
             Route::post('ajax_', ['uses' => 'admin\ArticleController@ajax_'])->name('admin_article_ajax');
+            Route::post('ajax', ['uses' => 'admin\ArticleController@ajax'])->name('_admin_article_ajax');
         });
 
         // ===== Article 1 Page ========================================================================================

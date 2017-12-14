@@ -35,7 +35,7 @@
     <tbody>
         @if(count($items)!=0)
         @foreach($items as $k=>$v)
-        <tr id="jquery-icheck-{{$v->id}}">
+        <tr id="jquery-icheck-{{$v->id}}" data-id="{{$v->id}}" data-name="{{$v->name}}">
             <td style="text-align: center;"><input class="jquery-icheck item-select" data-id="{{$v->id}}" type="checkbox"></td>
             @if(!isset($template_recycle))
             <td style="width:2%">
@@ -121,31 +121,27 @@
 </tbody> 
 
 </table>
-
+<input type="hidden" id="_admin_article_ajax" value="{{route('_admin_article_ajax')}}" />
 @push('scripts')
 <!-- iCheck -->
 <script src="{!!asset('public/admin_assets/plugins/jQuery.iCheck/icheck.min.js')!!}"></script>
 <script>
-    $(document).ready(function () {
-        $('.jquery-icheck-all').iCheck({
-            checkboxClass: 'icheckbox_square-blue',
-            radioClass: 'iradio_square-blue',
-            increaseArea: '20%' // optional
-        });
-
-        $('.jquery-icheck-all').on('ifChecked', function (event) {
-            var items = $('.' + $(this).data('items'));
-            $(items).iCheck('check');
-        }).on('ifUnchecked', function (event) {
-            var items = $('.' + $(this).data('items'));
-            $(items).iCheck('uncheck');
-        });
-
-        $('.jquery-icheck').iCheck({
-            checkboxClass: 'icheckbox_square-blue',
-            radioClass: 'iradio_square-blue',
-            increaseArea: '20%' // optional
-        });
+    $('.jquery-icheck-all').iCheck({
+        checkboxClass: 'icheckbox_square-blue',
+        radioClass: 'iradio_square-blue',
+        increaseArea: '20%' // optional
+    });
+    $('.jquery-icheck-all').on('ifChecked', function (event) {
+        var items = $('.' + $(this).data('items'));
+        $(items).iCheck('check');
+    }).on('ifUnchecked', function (event) {
+        var items = $('.' + $(this).data('items'));
+        $(items).iCheck('uncheck');
+    });
+    $('.jquery-icheck').iCheck({
+        checkboxClass: 'icheckbox_square-blue',
+        radioClass: 'iradio_square-blue',
+        increaseArea: '20%' // optional
     });
 </script>
 
@@ -452,63 +448,48 @@
         });
 
         $('.jquery-button-remove').on('click', function () {
-            var this_ = this;
-            var noti = new PNotify({
-                title: 'Bạn có muốn xóa?',
-                text: 'Dữ liệu này sẽ được chuyển vào thùng rác.',
-                icon: 'glyphicon glyphicon-question-sign',
-                hide: false,
-                styling: 'bootstrap3',
-                addclass: 'stack-modal',
-                confirm: {
-                    confirm: true,
-                    buttons: [{
-                            text: 'Xóa',
-                            addClass: 'btn-danger',
-                            click: function (notice) {
-                                var data = {
-                                    id: $(this_).data('id'),
-                                    tbl: $(this_).data('tbl'),
-                                    action: $(this_).data('action')
-                                };
-                                $.ajax({
-                                    url: '{{route("ajax_bcore_action")}}',
-                                    beforeSend: function () {
-                                        $(this_).css('background', '#CFF');
-                                    },
-                                    headers: {
-                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                    },
-                                    type: 'POST',
-                                    dataType: 'json',
-                                    data: data,
-                                    success: function (data) {
-                                        if (data.result == 1) {
-                                            $(this_).parents('tr').slideUp();
-                                            notice.remove();
-                                        } else {
-                                            $(this_).css('background', '#F00');
-                                        }
-                                    }, error: function (data) {
-                                        console.log(data.responseText);
-                                    }
-                                });
-                            }
-                        }, {
-                            text: 'Cancel',
-                            click: function (notice) {
-                                notice.remove();
-                            }
-                        }]
-                },
+            var this_btn = this;
+            var tr = $(this).parents('tr');
+
+            $.confirm(jquery_confirm_options({
+                text: 'Thông báo', type: 'blue',
+                content: 'Bạn có muốn xóa bài viết này? <br> (<b>' + $(tr).data('name') + '</b>)',
                 buttons: {
-                    closer: false,
-                    sticker: false
-                },
-                history: {
-                    history: false
+                    confirm: {
+                        text: '<i class="fa fa-trash"></i> Xóa ngay', btnClass: 'btn btn-danger',
+                        action: function () {
+                            $.ajax({
+                                url: $('#_admin_article_ajax').val(),
+                                beforeSend: function () {
+                                    $(this_btn).css('background', '#CFF');
+                                },
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                },
+                                type: 'POST',
+                                dataType: 'json',
+                                data: {
+                                    act: 'rm',
+                                    id: $(tr).data('id')
+                                },
+                                success: function (data) {
+                                    if (data.state) {
+                                        $(this_btn).parents('tr').slideUp();
+                                        notice.remove();
+                                    } else {
+                                        $(this_btn).css('background', '#F00');
+                                    }
+                                }, error: function (data) {
+                                    console.log(data);
+                                }
+                            });
+                        }
+                    },
+                    cancel: {
+                        text: 'Thôi', btnClass: 'btn btn-default'
+                    }
                 }
-            });
+            }));
         });
     });
 </script>

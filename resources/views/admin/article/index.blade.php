@@ -13,12 +13,10 @@
             <div class="x_panel">
                 <div class="x_content">
                     <a href="{{route('admin_article_add',$type)}}" class="btn btn-app"><i class="fa fa-plus"></i> {{__('label.them')}}</a>
-
                     <a href="{{url()->full()}}" class="btn btn-app"><i class="fa fa-refresh"></i> {{__('label.tailai')}}</a>
-                    <a href="{{route('admin_article_recycle',[$type])}}" class="btn btn-app"><i class="fa fa-recycle"></i> {{__('label.khoiphuc')}}</a>
+<!--                    <a href="{{route('admin_article_recycle',[$type])}}" class="btn btn-app"><i class="fa fa-recycle"></i> {{__('label.khoiphuc')}}</a>-->
                     <a href="{{route('admin_cache_clear',['article','admin_article_index'])}}?type={{$type}}" class="btn btn-app"><i class="fa fa-remove"></i> {{__('label.xoacache')}}</a>
                     <a href="javascript:void(0)" onclick="PNotify.removeAll();" class="btn btn-app"><i class="fa fa-bell"></i> {{__('label.xoathongbao')}}</a>
-
                     <a href="{{route('admin_category_index',['bai-viet',$type])}}" class="btn btn-app"><i class="fa fa-list"></i> {{__('label.quanlydanhmuc')}}</a>
                 </div>
             </div>

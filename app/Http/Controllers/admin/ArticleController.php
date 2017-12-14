@@ -122,7 +122,7 @@ class ArticleController extends AdminController {
             $request->session()->flash('message', Lang::get('message.dulieukhongcothuc'));
             return redirect()->route('admin_article_index', [$pType]);
         }
-        $ArticleModel = PhotoModel::findByModel(['photo'], $ArticleModel);
+        $ArticleModel = PhotoModel::findByModel(['photo', 'photo_seo'], $ArticleModel);
 
         $ArticleLangModel = ArticleLangModel::where([
                     'id_article' => $ArticleModel->id
@@ -171,7 +171,7 @@ class ArticleController extends AdminController {
     }
 
     public function post_save(Request $request) {
-        dd(123);
+
         $r_action = '';
 
         if ($request->input('type') == null)
@@ -203,40 +203,15 @@ class ArticleController extends AdminController {
             $request->session()->flash('message', "$r_action không thành công");
         }
 
-        // [3] Lấy id của article vừa save (* Bước quan trọng)
-        $IdModel = $ArticleModel->id;
-        $PathLocal = null;
+        // PHOTO SEO ---------------------------------------------------------------------------------------------------
+
+        if ($request->hasFile('photo_seo')) {
+            $this->upload_image($ArticleModel->id, 'photo_seo', $request->file('photo_seo'));
+        }
+
         // PHOTO -------------------------------------------------------------------------------------------------------
         if ($request->hasFile('photo')) {
-
-            $photo = $request->file('photo');
-            $PARENT_FOLDER = $this->info()->storage_path . '/' . $request->input('type') . '/photo';
-            $PathLocal = Storage::disk('localhost')->putFile($PARENT_FOLDER, $photo, 'public');
-            // ----- Database ------------------------------------------------------------------------------------------
-            $PhotoModel = new PhotoModel();
-            $PhotoModel->obj_id = $IdModel;
-            $PhotoModel->obj_table = 'articles';
-            $PhotoModel->obj_type = 'photo';
-            $PhotoModel->dir_name = $this->storage_folder;
-            $PhotoModel->mimetype = $request->file('photo')->getMimetype();
-            $PhotoModel->size = $request->file('photo')->getSize();
-            $PhotoModel->url = $PathLocal;
-            $PhotoModel->url_encode = md5($PathLocal);
-            $PhotoModel->name = $photo->getClientOriginalName();
-            $PhotoModel->id_user = \App\Bcore\Services\UserServiceV2::current_userId(\App\Bcore\System\UserType::admin());
-
-            // Nếu tồn tại $GOOGLE_JSON 
-            $PhotoModel->sync_google = null;
-
-            $PhotoUploaded = $PhotoModel->save();
-            if ($PhotoUploaded) {
-                // ----- Xóa hình cũ -----------------------------------------------------------------------------------
-            } else {
-                // Không thể lưu vào database
-                // Write log, xóa hình đã up...
-                if ($PathLocal != null)
-                    Storage::disk('localhost')->delete($PathLocal);
-            }
+            $this->upload_image($ArticleModel->id, 'photo', $request->file('photo'));
         }
 
         $datalang = $request->input('data_lang');
@@ -245,7 +220,7 @@ class ArticleController extends AdminController {
                 $tmp = [
                     'name' => @$model['name'],
                     'name_meta' => $model['name_meta'],
-                    'id_article' => $IdModel,
+                    'id_article' => $ArticleModel->id,
                     'id_lang' => $lang_id,
                     'description' => @$model['description'],
                     'description2' => @$model['description2'],
@@ -275,6 +250,59 @@ class ArticleController extends AdminController {
     }
 
     // ===== PRIVATE FUNCTION ==========================================================================================
+
+    private function upload_image($id_model, $type, $photo) {
+        $PARENT_FOLDER = $this->info()->storage_path . '/' . $type . '/' . $type;
+        $PathLocal = Storage::disk('localhost')->putFile($PARENT_FOLDER, $photo, 'public');
+        // ----- Database ----------------------------------------------------------------------------------------------
+        $PhotoModel = new PhotoModel();
+        $PhotoModel->obj_id = $id_model;
+        $PhotoModel->obj_table = 'articles';
+        $PhotoModel->obj_type = $type;
+        $PhotoModel->dir_name = $this->storage_folder;
+        $PhotoModel->mimetype = $photo->getMimetype();
+        $PhotoModel->size = $photo->getSize();
+        $PhotoModel->url = $PathLocal;
+        $PhotoModel->url_encode = md5($PathLocal);
+        $PhotoModel->name = $photo->getClientOriginalName();
+        $PhotoModel->id_user = \App\Bcore\Services\UserServiceV2::current_userId(\App\Bcore\System\UserType::admin());
+        // Nếu tồn tại $GOOGLE_JSON 
+        $PhotoModel->sync_google = null;
+        if ($PhotoModel->save()) {
+            // ----- Xóa hình cũ ---------------------------------------------------------------------------------------
+        } else {
+            // Không thể lưu vào database
+            // Write log, xóa hình đã up...
+            if ($PathLocal != null)
+                Storage::disk('localhost')->delete($PathLocal);
+        }
+    }
+
+    // ===== AJAX REQUEST ==============================================================================================
+
+    public function ajax_(Request $request) {
+        $requestAction = $request->input('act');
+        switch ($requestAction) {
+            case 'cnm':
+                return $this->check_namemeta($request);
+            case 'update_checkbox':
+                return $this->update_boolean($request);
+            case 'delete': // Xóa vào bộ nhớ tạm
+                return $this->delete();
+            case 'remove': // Xóa vĩnh viễn
+                return $this->remove($request);
+            default:
+                return response()->json(['state' => false, 'message' => 'Act undefined!']);
+        }
+    }
+
+    public function ajax(Request $request) {
+        $act = $request->input('act');
+        switch ($act) {
+            case 'rm':
+                return $this->delete($request);
+        }
+    }
 
     private function check_namemeta($request) {
         $type = 'warning';
@@ -308,29 +336,25 @@ class ArticleController extends AdminController {
     }
 
     private function delete($request) {
-        
+        $AR = (new \App\Bcore\SystemComponents\AjaxResponse());
+        $id_article = $request->input('id');
+        $ArticleModel = ArticleModel::find($id_article);
+        if ($ArticleModel == null) {
+            $AR->cb_dataNotFound();
+            goto responseArea;
+        }
+        $ArticleModel->deleted_at = Carbon::now();
+        if ($ArticleModel->save()) {
+            $AR->cb_success();
+        } else {
+            $AR->cb_error();
+        }
+        responseArea:
+        return response()->json($AR->render());
     }
 
     private function remove($request) {
         
-    }
-
-    // ===== AJAX REQUEST ==============================================================================================
-
-    public function ajax_(Request $request) {
-        $requestAction = $request->input('act');
-        switch ($requestAction) {
-            case 'cnm':
-                return $this->check_namemeta($request);
-            case 'update_checkbox':
-                return $this->update_boolean($request);
-            case 'delete': // Xóa vào bộ nhớ tạm
-                return $this->delete();
-            case 'remove': // Xóa vĩnh viễn
-                return $this->remove($request);
-            default:
-                return response()->json(['state' => false, 'message' => 'Act undefined!']);
-        }
     }
 
     public static function register_package() {
