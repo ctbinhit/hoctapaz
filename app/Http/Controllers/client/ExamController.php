@@ -450,8 +450,27 @@ class ExamController extends ClientController {
 
         return view('client/thitracnghiem/tracnghiem_detail', [
             'item' => $ExamModel,
-            'user_data' => $UserModel
+            'user_data' => $UserModel,
+            'chart_top_score' => $this->get_top_score($ExamModel->id)
         ]);
+    }
+
+    private function get_top_score($id_exam, $exam_type = 'de-thi') {
+        $ExamModel = DB::table('m1_exam_user')
+                ->join('users', 'users.id', '=', 'm1_exam_user.id_user')
+                ->join('m1_exam', 'm1_exam.id', '=', 'm1_exam_user.id_exam')
+                ->where([
+                    ['m1_exam_user.score','>=',5],
+                    ['m1_exam_user.id_exam', $id_exam],
+                    ['m1_exam_user.type', '=', trim($exam_type)]
+                ])
+                ->select([
+            'm1_exam_user.score', 'm1_exam_user.time_end',
+            'users.fullname',
+            'm1_exam.time'
+        ]);
+        $ExamModel->orderBy('m1_exam_user.score', 'DESC');
+        return $ExamModel->take(5)->get();
     }
 
     // THI TRẮC NGHIỆM
@@ -611,15 +630,15 @@ class ExamController extends ClientController {
                     $response->error_message = "Phát hiện nghi vấn hack.";
                     goto responseArea;
                 }
-                if (!$request->has('data')) {
-                    $response->error_message = "Dữ liệu gửi lên thất bại.";
-                    goto responseArea;
-                }
+//                if (!$request->has('data')) {
+//                    $response->error_message = "Dữ liệu gửi lên thất bại.";
+//                    goto responseArea;
+//                }
                 // ----- Gán dữ liệu
 
                 $INPUT_ExamCode = $request->input('exam_code');
                 $INPUT_Time = $request->input('time');
-                $INPUT_Data = $request->input('data');
+                $INPUT_Data = $request->has('data') ? $request->input('data') : [];
 
                 // ----- Kiểm tra time_out -----------------------------------------------------------------------------
                 $ExamUserModel = ExamUserModel::where('code', '=', $INPUT_ExamCode)->first();
