@@ -18,8 +18,9 @@
         <tr>
             <td><input class="jquery-icheck-all" data-items="item-select" type="checkbox"></td>
             <th>{{__('label.ten')}}</th>
+            <th><i class="fa fa-list"></i></th>
             <th><i class="fa fa-clock-o"></i></th>
-            <th><i class="fa fa-users"></i></th>
+            <th><i class="fa fa-users" title="Lượt thi"></i></th>
             <th>Ngày bắt đầu</th>
             <th>{{__('label.trangthai')}}</th>
             <th>{{__('label.thaotac')}}</th>
@@ -33,9 +34,9 @@
                 <input class="jquery-icheck item-select" data-id="{{$v->id}}" type="checkbox">
             </td>
             <td style="width: 30%;">{{$v->name}}</td>
-           
+            <td><i class="label label-info">{{$v->cate_name}}</i></td>
             <td><i class="label label-info">{{$v->time/60}} {{__('schools.phut')}}</div></td>
-            <td>0</td>
+            <td><i class="label label-info">{{$v->sum_exam_user}}</i></td>
             <td>{{diffInNow($v->approved_date)}} <br>{{ Carbon\Carbon::parse($v->approved_date)->format('d-m-Y h:i:s') }}</td>
             <td style="width: 10%;">
                 @if($v->approved_by>0)
@@ -53,6 +54,7 @@
                     @if($v->approved_by>0)
                     <ul class="dropdown-menu">
                         <li><a href="javascript:;" class="jquery-btn-viewExamDetail"><i class="fa fa-eye"></i> Xem chi tiết</a></li>
+                        <li><a href="{{route('mdle_oc_pi_exam_score',$v->id)}}" class=""><i class="fa fa-bar-chart-o"></i> Kết quả thi</a></li>
                         <li><a href="javascript:;" class=""><i class="fa fa-clock-o"></i> Gia hạn</a></li>
                         <li><a href="javascript:;" class="jquery-btn-cancel"><i class="fa fa-remove"></i> Hủy phòng thi</a></li>
                     </ul>
@@ -64,8 +66,6 @@
                     </ul>
                     @endif
                 </div>
-
-
             </td>
         </tr>
         @endforeach

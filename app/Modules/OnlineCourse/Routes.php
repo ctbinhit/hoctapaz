@@ -14,23 +14,34 @@ Route::group(['module' => $module_name, 'middleware' => 'web', 'namespace' => $n
      * =================================================================================================================
      */
 
-    Route::group(['prefix' => 'professor'], function() use ($module_prefix, $post, $cn) {
+    Route::group(['prefix' => 'admin', 'middleware' => 'AdminMiddleware'], function() use ($module_prefix, $post, $cn) {
+
+        Route::group(['prefix' => 'exam-chart'], function() use ($module_prefix, $post, $cn) {
+            Route::get('/ket-qua-thi/{type}', ['uses' => 'Admin\ExamChartController@get_index'])
+                    ->name($module_prefix . 'oc_pi_exam_chart_index');
+        });
+    });
+
+    Route::group(['prefix' => 'giao-vien'], function() use ($module_prefix, $post, $cn) {
 
         // ===== EXAM AREA =============================================================================================
 
         Route::group(['prefix' => 'exam'], function() use ($module_prefix, $post, $cn) {
+            Route::get('/ket-qua-thi/{id_exam}', ['uses' => 'Pi\ExamController@get_exam_score'])
+                    ->name($module_prefix . 'oc_pi_exam_score');
+            
             // Danh sách app đang trong trạng thái free
             Route::get('/', ['uses' => 'Pi\ExamController@get_index'])
                     ->name($module_prefix . 'oc_pi_exam_index');
 
             Route::get('/phong-thi', ['uses' => 'Pi\ExamController@get_app_phongthi'])
                     ->name($module_prefix . 'oc_pi_exam_app_phongthi');
-            
+
             Route::get('/trac-nghiem-online', ['uses' => 'Pi\ExamController@get_app_tracnghiem'])
                     ->name($module_prefix . 'oc_pi_exam_app_tracnghiem');
             Route::get('/de-thi-thu', ['uses' => 'Pi\ExamController@get_app_dethithu'])
                     ->name($module_prefix . 'oc_pi_exam_dethithu');
-            
+
 
             Route::get('/reject', ['uses' => 'Pi\ExamController@get_reject'])
                     ->name($module_prefix . 'oc_pi_exam_reject');

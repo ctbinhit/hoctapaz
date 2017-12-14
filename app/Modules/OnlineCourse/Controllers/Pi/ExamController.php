@@ -24,6 +24,7 @@ use App\Bcore\System\AjaxResponse;
 use App\Bcore\Services\NotificationService;
 use App\Bcore\Services\UserServiceV2;
 use App\Bcore\System\UserType;
+use App\Bcore\Services\SearchService;
 
 class ExamController extends PackageServicePI {
 
@@ -61,14 +62,96 @@ class ExamController extends PackageServicePI {
         ]);
     }
 
+    public function get_exam_score($id_exam, Request $request) {
+        $SearchService = (new SearchService(['keyword', 'seb', 'orn', 'orv'], $request));
+        $searchEngine = [
+            'sortBy' => [['fullname', 'Họ và tên'], ['email', 'Email']],
+            'orderBy' => [
+                'name' => [['created_at', 'Ngày thi'], ['score', 'Điểm số'], ['time_end', 'Thời gian']],
+                'value' => [['asc', 'Tăng dần | Cữ nhất'], ['DESC', 'Giảm dần | Mới nhất']]
+            ]
+        ];
+
+        $ExamDetail = ExamModel::find($id_exam);
+        if ($ExamDetail == null) {
+            return 'Dữ liệu không có thực.';
+        }
+        $ExamUserModel = DB::table('m1_exam_user')
+                ->join('users', 'users.id', '=', 'm1_exam_user.id_user')
+                ->join('m1_exam', 'm1_exam.id', '=', 'm1_exam_user.id_exam')
+                ->where([
+                    ['m1_exam_user.type', 'de-thi'],
+                    ['m1_exam_user.id_exam', $id_exam]
+                ])
+                ->select([
+            'm1_exam_user.id', 'm1_exam_user.code', 'm1_exam_user.score', 'm1_exam_user.time_in', 'm1_exam_user.time_end',
+            'm1_exam_user.time_out', 'm1_exam_user.type', 'm1_exam_user.created_at',
+            'm1_exam.name', 'm1_exam.name_meta', 'm1_exam_user.id_user', 'm1_exam.id as id_exam', 'm1_exam.time as exam_time',
+            'users.fullname', 'users.id as id_user', 'users.email'
+        ]);
+
+        if ($request->has('keyword')) {
+            $keyword = $request->input('keyword');
+            $search_by = $request->has('seb') ? $request->input('seb') : '';
+            switch ($search_by) {
+                case 'email':
+                    $ExamUserModel->where('users.email', 'LIKE', "%$keyword%");
+                    break;
+                default:
+                    $ExamUserModel->where('users.fullname', 'LIKE', "%$keyword%");
+            }
+        }
+
+        if ($request->has('orn')) {
+            $OrderByName = $request->input('orn');
+            $OrderByValue = $request->has('orv') ? ($request->input('orv') == 'asc' ? 'asc' : 'desc') : 'desc';
+            switch ($OrderByName) {
+                case 'fullname':
+                    $ExamUserModel->orderBy('users.fullname', $OrderByValue);
+                    break;
+                case 'score':
+                    $ExamUserModel->orderBy('m1_exam_user.score', $OrderByValue);
+                    break;
+                case 'time':
+                    $ExamUserModel->orderBy('m1_exam_user.time_end', $OrderByValue);
+                    break;
+                default:
+                    goto defaultOrderBy;
+            }
+        } else {
+            defaultOrderBy:
+            $ExamUserModel->orderBy('m1_exam_user.created_at', 'DESC');
+        }
+
+        $items = $ExamUserModel->paginate(5);
+
+        return view('OnlineCourse::Pi/exam/score/index', [
+            'exam' => $ExamDetail,
+            'items' => $items,
+            'se' => $searchEngine,
+            'search_append' => $SearchService->generate()
+        ]);
+    }
+
     public function get_app_phongthi(Request $request) {
         $this->DVController = $this->registerDVC($this->ControllerName);
-        $ExamModel = ExamModel::where([
-                    ['id_user', UserServiceV2::current_userId(UserType::professor())],
-                    ['state', ExamState::de_thi()],
-                    ['deleted_at', null]
+        $ExamModel = DB::table('m1_exam')
+                ->join('users', 'users.id', '=', 'm1_exam.id_user')
+                ->leftJoin('m1_exam_user', 'm1_exam_user.id_exam', '=', 'm1_exam.id')
+                ->leftJoin('categories_lang', 'categories_lang.id', '=', 'm1_exam.id_category')
+                ->where([
+                    ['m1_exam.id_user', UserServiceV2::current_userId(UserType::professor())],
+                    ['m1_exam.state', ExamState::de_thi()],
+                    ['m1_exam.deleted_at', null],
                 ])
-                ->orderBy('approved_date', 'DESC')
+                ->select([
+                    'm1_exam.id', 'm1_exam.name', 'm1_exam.created_at', 'm1_exam.start_date', 'm1_exam.expiry_date',
+                    'm1_exam.state', 'm1_exam.price', 'm1_exam.time', 'm1_exam.approved_date', 'm1_exam.approved_by', 'm1_exam.tbl',
+                    'categories_lang.name as cate_name', DB::raw('COUNT(tbl_m1_exam_user.id_exam) as sum_exam_user')
+                ])
+                ->orderBy('m1_exam.approved_date', 'DESC')
+                ->orderBy('categories_lang.id', 'ASC')
+                ->groupBy('m1_exam.id')
                 ->paginate(5);
 
         return view('OnlineCourse::Pi/exam/app_phongthi', [
@@ -281,7 +364,7 @@ class ExamController extends PackageServicePI {
     }
 
     public function post_save(Request $request) {
-      
+
         if (!$request->has('time_start') || !$request->has('time_end')) {
             NotificationService::alertRight('Không tìm thấy thời gian bắt đầu & thời gian kết thúc, vui lòng kiểm tra lại dữ liệu.', 'danger');
             goto resultArea;

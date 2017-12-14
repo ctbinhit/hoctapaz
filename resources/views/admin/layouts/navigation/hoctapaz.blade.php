@@ -4,7 +4,7 @@
         <li><a href="{{route('admin_examman_approver')}}">Kiểm duyệt khóa học & bài thi</a></li>
         <li><a href="{{route('mdle_admin_doc_index','tai-lieu-hoc')}}">Tài liệu học chờ duyệt</a></li>
         <li><a href="{{route('mdle_admin_doc_index','de-thi-thu')}}">Đề thi thử chờ duyệt</a></li>
-
+        <li><a href="{{route('mdle_oc_pi_exam_chart_index','de-thi')}}">Kết quả thi</a></li>
         <li><a href="{{route('admin_user_index','professor')}}">Danh sách đối tác</a></li>
         <li><a href="{{route('admin_newsleeter_index','tro-thanh-doi-tac')}}">Danh sách đối tác đăng ký</a></li>
     </ul>
