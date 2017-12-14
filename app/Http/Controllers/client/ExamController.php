@@ -131,7 +131,7 @@ class ExamController extends ClientController {
         ]);
     }
 
-    public function get_exam_phongthi_danhmuc($name_meta,Request $request) {
+    public function get_exam_phongthi_danhmuc($name_meta, Request $request) {
         $ArrayId = [];
         $this_cate = \App\Bcore\Services\CategoryService::find_byNameMeta($name_meta);
         $sub_cate_ = \App\Bcore\Services\CategoryService::get_childCateByIdParent($this_cate->id);
@@ -419,7 +419,7 @@ class ExamController extends ClientController {
     public function post_exam_phongthi_redirect(Request $request) {
         // TOKEN
         $_TOKEN_DATE = Carbon::now();
-        $_TOKEN_1 = $_TOKEN_DATE->timestamp . str_random(30) .UserServiceV2::current_userId(UserType::user());
+        $_TOKEN_1 = $_TOKEN_DATE->timestamp . str_random(30) . UserServiceV2::current_userId(UserType::user());
         $_TOKEN_SESSION = md5($_TOKEN_1);
         session::flash('_TOKEN_EXAM', [
             'id_user' => UserServiceV2::current_userId(UserType::user()),
@@ -431,6 +431,7 @@ class ExamController extends ClientController {
 
     public function get_exam_thionline_token() {
         session::keep('_TOKEN_EXAM');
+        session('_TOKEN_EXAM', session::get('_TOKEN_EXAM'));
         if (!session::has('_TOKEN_EXAM')) {
             return redirect()->route('client_exam_phongthi');
         }

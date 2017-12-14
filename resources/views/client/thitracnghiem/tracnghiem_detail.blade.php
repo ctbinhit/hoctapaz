@@ -110,15 +110,21 @@
                 </div>-->
     </div>
     <div class="detail-right">
-        <h3>Bảng trắc nghiệm</h3>
+        <h4 style="margin-top: 0px;text-align: center;" class=""><i class="fa fa-check-square-o"></i> Bảng trắc nghiệm</h4>
         <div class="jquery-cec-panCheck" id="jquery-cec-panCheck">
-            Bảng trắc nghiệm sẽ được hiển thị tại đây.
+            <p class="alert alert-info"><i class="fa fa-check-square"></i> Bảng trắc nghiệm câu hỏi sẽ được hiển thị tại đây sau khi bạn nhấn nút <b>bắt đầu thi</b>.</p>
+            <p class="alert alert-warning"><i class="fa fa-warning"></i> Vui lòng kiểm tra kết nối mạng ổn định trước khi làm bài để tránh những trường hợp đáng tiếc xảy ra.</p>
+            <p class="alert alert-success"><i class="fa fa-check"></i> Chúc bạn làm bài tốt.</p>
  <!--           <div class="jquery-cec-question"><span>Câu 1:</span>
                 <button class="jquery-cec-radio" data-id="1" type="button" disabled="">A</button>
                 <button class="jquery-cec-radio jquery-cec-radio-checked" data-id="1" type="button">B</button>
                 <button class="jquery-cec-radio" data-id="1" type="button">C</button>
                 <button class="jquery-cec-radio" data-id="1" type="button">D</button>
             </div>-->
+        </div>
+        
+        <div class="exam-top-charts">
+            <h4 class="text-center text-success"><i class="fa fa-line-chart"></i> Bảng xếp hạng</h4>
         </div>
     </div>
 </div>
