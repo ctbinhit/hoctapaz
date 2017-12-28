@@ -2,23 +2,22 @@
 
 namespace App\Http\Controllers\client;
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\ClientController;
-use App\Bcore\Services\UserService;
-use App\Bcore\Services\UserDataService;
-use App\Bcore\Services\SeoService;
-use Carbon\Carbon;
+use Session,
+    View,
+    Storage;
 use UserModel,
     ExamUserModel,
     ExamModel;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 use App\Models\UserDataModel;
-use App\Models\FileModel;
-use Session,
-    View;
-use App\Modules\UserVIP\Models\UserVIPModel;
-use Storage;
+use App\Bcore\Services\SeoService;
 use App\Bcore\System\AjaxResponse;
-use App\Bcore\System\UserType;
+use App\Bcore\Services\UserService;
+use App\Bcore\Services\UserServiceV3;
+use App\Http\Controllers\ClientController;
+use App\Modules\UserVIP\Models\UserVIPModel;
+use App\Bcore\SystemComponents\User\UserType;
 
 class UserController extends ClientController {
 
@@ -30,27 +29,19 @@ class UserController extends ClientController {
     public function __construct() {
         parent::__construct();
         view::share('client_exam_ajax', route('client_user_ajax'));
-        
+
         $this->middleware(function($request, $next) {
-            $ud = $this->get_currentDBUserData(UserType::user());
-            view::share('userdata', $ud);
-            $this->userdata = $ud;
-           
+            $this->userData = (new UserServiceV3())->user()->current()->loadFromDatabase()->get_userModel();
+            view::share('userData', $this->userData);
             return $next($request);
         });
     }
 
     public function get_info() {
-
-
-
-
         if (UserService::isProfessor()) {
             return redirect()->route('pi_me_info');
         }
-
         return view('client/user/info', [
-            'user' => (object) $this->get_user()
         ]);
     }
 
@@ -75,7 +66,6 @@ class UserController extends ClientController {
             $UserModel_ = UserModel::whereIn('id', $LST_ID)->get();
             $UserModel__ = $this->groupModelsById($UserModel_);
         }
-
         if (count($ExamUserModel) != 0) {
             foreach ($ExamUserModel as $v) {
                 if (isset($ExamModel[$v->id_exam])) {
@@ -87,9 +77,6 @@ class UserController extends ClientController {
                 }
             }
         }
-
-
-
         return view('client/user/ketquahoctap', [
             'user' => (object) $UserModel,
             'exams_user' => $ExamUserModel,
@@ -120,6 +107,7 @@ class UserController extends ClientController {
     }
 
     public function get_tldm_download($id) {
+
         $UserDataModel = UserDataModel::find($id);
 
 
@@ -146,7 +134,7 @@ class UserController extends ClientController {
 
     public function get_upgradeVIP() {
         SeoService::seo_title('AZ - Nâng cấp VIP');
-        $UserModel = $this->get_currentDBUserData(\App\Bcore\System\UserType::user());
+        $UserModel = $this->get_currentDBUserData(UserType::user());
         $UserVIPModel = $UserModel->load_vip();
 
         $UserVIPModels = UserVIPModel::where('type', 'user')
@@ -205,13 +193,23 @@ class UserController extends ClientController {
         return back()->withInput();
     }
 
+    public function get_update_profilepicture() {
+        SeoService::seo_title('Cập nhật ảnh đại diện | Thông tin cá nhân | AZ');
+        $USV3 = (new UserServiceV3());
+        $UserModel = $USV3->user()->current()->loadFromDatabase()->withPhotoUrl();
+
+        return view('client/user/profile/picture', [
+            'item' => $UserModel->get_userModel()
+        ]);
+    }
+
     public function get_caidat() {
         $Cities = \App\Models\CityModel::all();
 
         $Districts = \App\Models\DistrictModel::all();
 
         return view('client/user/caidat', [
-            'user' => (object) $this->userdata,
+            'user' => $this->current_user,
             'cities' => $Cities
         ]);
     }
@@ -225,10 +223,48 @@ class UserController extends ClientController {
             case 'update_account':
                 $this->update_account($request);
                 break;
+            case 'update_profilePicture':
+                $this->update_profilePicture($request);
+                break;
             default:
                 $this->set_response('Thao tác không xác định!', 'warning');
         }
+        if ($request->has('cwu')) {
+            return redirect($request->input('cwu'));
+        }
         return redirect()->route('client_user_caidat');
+    }
+
+    private function update_profilePicture($request) {
+        $UserModel = (new UserServiceV3())->user()->current()->loadFromDatabase()->get_userModel();
+        $FileUpload = $request->hasFile('profile_picture') ? $request->file('profile_picture') : null;
+        if ($FileUpload == null) {
+            $this->set_response('Cập nhật thất bại, File không hợp lệ!', 'warning');
+            goto EndFunction;
+        }
+        $LocalPath = Storage::disk('localhost')->put('users/profile_picture', $FileUpload, 'public');
+        if ($LocalPath == null) {
+            $this->set_response('Cập nhật thất bại, File không hợp lệ!', 'warning');
+            goto EndFunction;
+        }
+
+        $PhotoModel = (new \App\Models\PhotoModel());
+        $PhotoModel->set_file($FileUpload);
+        $PhotoModel->url = $LocalPath;
+        $PhotoModel->url_encode = md5($LocalPath);
+        $PhotoModel->id_user = $UserModel->id;
+        $PhotoModel->obj_type = 'photo';
+        $PhotoModel->obj_table = 'users';
+        $PhotoModel->obj_id = $UserModel->id;
+        if ($PhotoModel->save()) {
+            $UserModel->avatar = $PhotoModel->id;
+            $UserModel->save();
+            $this->set_response('Cập nhật ảnh đại diện thành công!', 'success');
+        } else {
+            $this->set_response('Cập nhật ảnh đại diện không thành công!', 'warning');
+        }
+
+        EndFunction:
     }
 
     private function update_account($request) {
@@ -250,7 +286,7 @@ class UserController extends ClientController {
     }
 
     private function update_info($request) {
-        $UserModel = $this->get_currentDBUserData(\App\Bcore\System\UserType::user());
+        $UserModel = (new UserServiceV3())->user()->current()->loadFromDatabase()->get_userModel();
         if ($UserModel == null) {
             $this->set_response('Dữ liệu người dùng không tồn tại, vui lòng thử lại sau.');
         }
@@ -350,7 +386,7 @@ class UserController extends ClientController {
 
     private function load_nextVIP() {
         try {
-            $UserModel = $this->get_currentDBUserData(\App\Bcore\System\UserType::user());
+            $UserModel = $this->get_currentDBUserData(UserType::user());
             $UserVIP = UserVIPModel::orderBy('level', 'ASC');
             if ($UserModel->id_vip != null) {
                 $tmp_uvm = UserVIPModel::find($UserModel->id_vip);
@@ -362,28 +398,6 @@ class UserController extends ClientController {
         } catch (\Exception $ex) {
             return null;
         }
-    }
-
-    private function get_user() {
-
-        $UserModel = UserModel::find(-1);
-        if ($UserModel == null) {
-            
-        } else {
-            $UserModel = $this->get_avatar($UserModel);
-        }
-        return $UserModel;
-    }
-
-    private function get_avatar($Model) {
-        if ($Model->facebook_avatar != null) {
-            $Model->avatar = $Model->facebook_avatar;
-        } elseif ($Model->google_avatar != null) {
-            $Model->avatar = $Model->google_avatar;
-        } else {
-            $Model->avatar = null;
-        }
-        return $Model;
     }
 
     private function set_response($message, $type = 'info', $title = 'Thông báo') {

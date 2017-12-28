@@ -7,7 +7,7 @@
         <!-- menu profile quick info -->
         <div class="profile clearfix">
             <div class="profile_pic">
-                <img src="{{ UserServiceV2::get_current_avatar(@$current_admin) }}" alt="..." class="img-circle profile_img">
+<!--                <img src="" alt="..." class="img-circle profile_img">-->
             </div>
             <div class="profile_info">
                 <h2>{{ __('default.chao')}} <b>{{ @$current_admin->fullname }}</b></h2>
@@ -25,6 +25,15 @@
 
                     @include('admin.layouts.navigation.hoctapaz')
 
+
+                </ul>
+            </div>
+
+            <div class="menu_section">
+                <h3>AZ Modules</h3>
+                <ul class="nav side-menu">
+                    <li><a href="{{route('mdle_admin_collaborator_exchange_index')}}"><i class="fa fa-exchange"></i> Yêu cầu nạp/rút</a></li>
+                    <li><a href="{{route('admin_user_index','professor')}}"><i class="fa fa-users"></i> Danh sách đối tác</a></li>
                     @include('admin.layouts.navigation.mail')
                 </ul>
             </div>
@@ -41,6 +50,8 @@
                 </ul>
             </div>
             @endif
+
+
 
             @include('admin.layouts.navigation.product')
 

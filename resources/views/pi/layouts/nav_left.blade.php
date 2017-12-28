@@ -16,7 +16,7 @@
         <!-- menu profile quick info -->
         <div class="profile clearfix">
             <div class="profile_pic">
-                <img src="{{ UserServiceV2::get_current_avatar(@$user_info) }}" alt="..." class="img-circle profile_img">
+<!--                <img src="" alt="..." class="img-circle profile_img">-->
             </div>
             <div class="profile_info">
                 <span>{{ __('default.chao')}}, </span>
@@ -32,6 +32,7 @@
                 <h3>Quản trị</h3>
                 <ul class="nav side-menu">
                     <li><a href="{{ route('pi_index_index')}}"><i class="fa fa-dashboard"></i> Dashboard</a></li>
+                    <li><a href="{{route('mdle_pi_collaborator_exchange_index')}}"><i class="fa fa-money"></i> Nạp & Rút</a></li>
                     @if(Route::has('mdle_oc_pi_exam_index'))
                     <li><a><i class="fa fa-check-square-o"></i> Trắc nghiệm (Beta)<span class="fa fa-chevron-down"></span></a>
                         <ul class="nav child_menu">
@@ -39,7 +40,7 @@
                         </ul>
                     </li>
                     @endif
-                    <li><a><i class="fa fa-book"></i> {{__('schools.khoahoc')}} (Beta)<span class="fa fa-chevron-down"></span></a>
+                    <li class="hidden"><a><i class="fa fa-book"></i> {{__('schools.khoahoc')}} (Beta)<span class="fa fa-chevron-down"></span></a>
                         <ul class="nav child_menu">
                             <li><a href="{{route('mdle_oc_index')}}">{{__('schools.quanlykhoahoc')}}</a></li>
                         </ul>

@@ -92,7 +92,7 @@ class ArticleController extends AdminController {
         $ArticleModels = new ArticleModel();
         $Models = $ArticleModels
                 ->set_type($pType)
-                ->set_lang(\App\Bcore\Services\UserServiceV2::get_currentLangId(\App\Bcore\System\UserType::admin()))
+                ->set_lang(\App\Bcore\Services\UserServiceV2::get_currentLangId(\App\Bcore\SystemComponents\User\UserType::admin()))
                 ->set_orderBy(['articles.ordinal_number', 'ASC'])
                 ->set_deleted(1)
                 ->set_keyword($request->input('keyword'))

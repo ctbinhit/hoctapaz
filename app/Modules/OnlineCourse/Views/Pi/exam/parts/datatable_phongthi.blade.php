@@ -13,16 +13,17 @@
 @endpush
 
 @if(isset($items))
-<table id="jquery-datatable-default" class="table table-hover table-effect">
+<table id="jquery-datatable-default" class="table table-bordered table-effect">
     <thead>
         <tr>
             <td><input class="jquery-icheck-all" data-items="item-select" type="checkbox"></td>
-            <th>{{__('label.ten')}}</th>
-            <th><i class="fa fa-list"></i></th>
-            <th><i class="fa fa-clock-o"></i></th>
-            <th><i class="fa fa-users" title="Lượt thi"></i></th>
-            <th>Ngày bắt đầu</th>
-            <th>{{__('label.trangthai')}}</th>
+            <th data-toggle="tooltip" data-placement="top" title="Tên hiển thị">{{__('label.ten')}}</th>
+            <th data-toggle="tooltip" data-placement="top" title="Danh mục"><i class="fa fa-list"></i></th>
+            <th data-toggle="tooltip" data-placement="top" title="Thời gian thi"><i class="fa fa-clock-o"></i></th>
+            <th data-toggle="tooltip" data-placement="top" title="Lượt thi"><i class="fa fa-users"></i></th>
+            <th data-toggle="tooltip" data-placement="top" title="Ngày bắt đầu"><i class="fa fa-calendar"></i> Ngày đăng ký</th>
+            <th data-toggle="tooltip" data-placement="top" title="Ngày hết hạn"><i class="fa fa-calendar"></i> Ngày hết hạn</th>
+            <th data-toggle="tooltip" data-placement="top" title="Trạng thái"><i class="fa fa-check-circle-o"></i></th>
             <th>{{__('label.thaotac')}}</th>
         </tr>
     </thead>
@@ -36,13 +37,16 @@
             <td style="width: 30%;">{{$v->name}}</td>
             <td><i class="label label-info">{{$v->cate_name}}</i></td>
             <td><i class="label label-info">{{$v->time/60}} {{__('schools.phut')}}</div></td>
-            <td><i class="label label-info">{{$v->sum_exam_user}}</i></td>
-            <td>{{diffInNow($v->approved_date)}} <br>{{ Carbon\Carbon::parse($v->approved_date)->format('d-m-Y h:i:s') }}</td>
+            <td><i class="label label-info">{{$v->total_users or 0}}</i></td>
+            <td>{{diffInNow($v->created_at)}} <br>{{ Carbon\Carbon::parse($v->created_at)->format('d-m-Y h:i:s') }}</td>
+            <td>{{diffInNow($v->expiry_date)}} <br>{{ Carbon\Carbon::parse($v->expiry_date)->format('d-m-Y h:i:s') }}</td>
             <td style="width: 10%;">
-                @if($v->approved_by>0)
-                <p class="label label-success">Đang diễn ra</p>
-                @else
-                <p class="label label-primary">Đang chờ duyệt</p>
+                @if($v->state==1)
+                <p class="label label-success" data-toggle="tooltip" data-placement="top" title="Đã duyệt"><i class="fa fa-check-square"></i></p>
+                @elseif($v->state==0)
+                <p class="label label-primary" data-toggle="tooltip" data-placement="top" title="Đang chờ duyệt"><i class="fa fa-spinner faa-spin animated"></i></p>
+                @elseif($v->state==-1)
+                <p class="label label-danger" data-toggle="tooltip" data-placement="top" title="Đã bị từ chối"><i class="fa fa-remove"></i></p>
                 @endif
             </td>
             <td style="width: 20%;">
@@ -51,18 +55,22 @@
                     <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Hành động <span class="caret"></span>
                     </button>
-                    @if($v->approved_by>0)
+                    @if($v->state==1)
                     <ul class="dropdown-menu">
                         <li><a href="javascript:;" class="jquery-btn-viewExamDetail"><i class="fa fa-eye"></i> Xem chi tiết</a></li>
                         <li><a href="{{route('mdle_oc_pi_exam_score',$v->id)}}" class=""><i class="fa fa-bar-chart-o"></i> Kết quả thi</a></li>
                         <li><a href="javascript:;" class=""><i class="fa fa-clock-o"></i> Gia hạn</a></li>
                         <li><a href="javascript:;" class="jquery-btn-cancel"><i class="fa fa-remove"></i> Hủy phòng thi</a></li>
                     </ul>
-                    @else
+                    @elseif($v->state==0)
                     <ul class="dropdown-menu">
                         <li><a href="javascript:;" class="jquery-btn-viewExamDetail"><i class="fa fa-eye"></i> Xem chi tiết</a></li>
                         <li><a href="javascript:;" class=""><i class="fa fa-clock-o"></i> Gia hạn</a></li>
                         <li><a href="javascript:;" class="jquery-btn-cancel"><i class="fa fa-remove"></i> Hủy yêu cầu</a></li>
+                    </ul>
+                    @elseif($v->state==-1)
+                    <ul class="dropdown-menu">
+                        <li><a href="javascript:;" class="jquery-btn-cancel"><i class="fa fa-eye"></i> Ẩn</a></li>
                     </ul>
                     @endif
                 </div>
@@ -80,41 +88,11 @@
     <tfoot>
         <tr>
             <td colspan="99">
-                <!-- Số lượng hiển thị -->
-                @if($UI->check_displayCount())
-                <div class="col-md-3"> 
-                    <form action="" method="POST" name="frm_changeDisplayCount" class="form form-horizontal">
-                        {{ csrf_field() }}
-                        <input type="hidden" value="{{$tbl}}" name="tbl"/>
-
-                        <div class="form-group">
-                            <label class="col-md-4 col-sm-4 col-xs-12 control-label">{{__('label.hienthi')}}:</label>
-                            <div class="col-md-8 col-sm-8 col-xs-12">
-                                <select class="form-control jquery-display-count" name="display_count" disabled="">
-                                    {!! $UI->load_displayCount($_ControllerName,$tbl)!!}
-                                </select>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="col-md-3">
-                    @if(isset($template_recycle))
-                    <button type="button" data-tbl="{{$items[0]->tbl}}" data-action="recs" 
-                            class="btn btn-primary jquery-bcore-btn" data-items="item-select">
-                        <i class="fa fa-recycle"></i> {{__('label.phuchoi')}}
-                    </button>
-                    @else
-                    <!--                    <button type="button" data-tbl="{{$items[0]->tbl}}" data-action="rs" 
-                                                class="btn btn-default jquery-bcore-btn" data-items="item-select">
-                                            <i class="fa fa-trash"></i> {{__('label.xoadachon')}}
-                                        </button>-->
-                    @endif
-                </div>
-                <div class="col-md-3">
+                <div class="col-md-12">
                     {{$items->links()}}
                 </div>
             </td>
-            @endif
+
         </tr>
     </tfoot>
     @endif

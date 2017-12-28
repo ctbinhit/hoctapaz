@@ -13,10 +13,10 @@ Route::group(['module' => $module_name, 'middleware' => 'web', 'namespace' => $n
         Route::get('/cart', ['uses' => 'Admin\\' . $module_name . 'Controller@get_index'])
                 ->name($module_prefix . 'admin_cart_index');
 
-        Route::get('/cart/{id}', ['uses' => 'Admin\\' . $module_name . 'Controller@get_cart_detail'])
+        Route::get('/cart/view/{id}', ['uses' => 'Admin\\' . $module_name . 'Controller@get_cart_detail'])
                 ->name($module_prefix . 'admin_cart_detail');
 
-        Route::post('/cart/{id}', ['uses' => 'Admin\\' . $module_name . 'Controller@post_cart_detail_cart_save'])
+        Route::post('/cart/view/{id}', ['uses' => 'Admin\\' . $module_name . 'Controller@post_cart_detail_cart_save'])
                 ->name($post . $module_prefix . 'admin_cart_detail_cart_saved');
 
         Route::post('/cart/ajax', ['uses' => 'Admin\\' . $module_name . 'Controller@ajax'])

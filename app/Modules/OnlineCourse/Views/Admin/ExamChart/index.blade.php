@@ -16,7 +16,7 @@
 <div class="">
     <div class="page-title">
         <div class="title_left">
-            <h3><i class="fa fa-image"></i> Slide</h3>
+            <h3><i class="fa fa-edit"></i> Kết quả thi</h3>
         </div>
     </div>
     <div class="clearfix"></div>

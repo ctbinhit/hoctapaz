@@ -22,7 +22,7 @@ Route::group(['module' => $module_name, 'middleware' => 'web', 'namespace' => $n
         });
     });
 
-    Route::group(['prefix' => 'giao-vien'], function() use ($module_prefix, $post, $cn) {
+    Route::group(['prefix' => App\Bcore\System\RouteArea::collaborator() , 'middleware' => 'PiMiddleware'], function() use ($module_prefix, $post, $cn) {
 
         // ===== EXAM AREA =============================================================================================
 
@@ -31,6 +31,9 @@ Route::group(['module' => $module_name, 'middleware' => 'web', 'namespace' => $n
                     ->name($module_prefix . 'oc_pi_exam_score');
             
             // Danh sách app đang trong trạng thái free
+            Route::get('/test', ['uses' => 'Pi\ExamController@get_test'])
+                    ->name($module_prefix . 'oc_pi_exam_test');
+            
             Route::get('/', ['uses' => 'Pi\ExamController@get_index'])
                     ->name($module_prefix . 'oc_pi_exam_index');
 

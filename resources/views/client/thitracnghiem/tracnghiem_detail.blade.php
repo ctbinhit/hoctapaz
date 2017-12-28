@@ -2,21 +2,20 @@
 @extends('client.layouts.master')
 @include('client.thitracnghiem.jsc.JSExamController')
 @section('content')
-
-
-
+<input type="hidden" id="erm_id" name="erm_id" value="{{$item->id}}" />
+<input type="hidden" id="client_exam_ajaxV2" name="client_exam_ajaxV2" value="{{route('client_exam_ajaxV2')}}" />
 <div class="examonline">
     <div class="sup-nav">
-        <a href="index.php"><i class="fa fa-home" aria-hidden="true"></i> Trang chủ</a> <i class="fa fa-angle-double-right"></i>
-        <a href="thi-trac-nghiem.html">Thi online</a> <i class="fa fa-angle-double-right"></i>
-        <a href="">{{$item->name}}</a>
+        <a href="{{route('client_index')}}"><i class="fa fa-home" aria-hidden="true"></i> Trang chủ</a> <i class="fa fa-angle-double-right"></i>
+        <a href="javascript:;">Phòng thi</a> <i class="fa fa-angle-double-right"></i>
+        <a href="javascript:;">{{$item->name}}</a>
     </div>
     <div class="detail-left">
         <div class="content-top">
             <h2>Thi trắc nghiệm trực tuyến {{$item->name}}</h2>
             <p><span>Ngay đăng:</span>{{$item->created_at}}</p>
             <p><span>Thời gian thi:</span>{{number_format($item->time/60,1)}} phút</p>
-            <p><span>Số câu:</span>50 câu</p>
+            <p><span>Số câu:</span>{{count($app_data->data)}} câu</p>
             <div class="clear"></div>
 
             <div id="jquery-app-exam">
@@ -57,13 +56,13 @@
                             <span class="jquery-cec-socaudung"><i class="fa fa-spinner faa-spin animated"></i></span>/<span class="jquery-cec-tongsocau"><i class="fa fa-spinner faa-spin animated"></i></span> câu</h3>
 
                         <hr>
-                        <p>Họ và tên: <span>{{$user_data->fullname}}</span></p> <br>
+                        <p>Họ và tên: <span>{{$item->user_fullname}}</span></p> <br>
 
                         <p>Số điểm: <span class="jquery-cec-score"><i class="fa fa-spinner faa-spin animated"></i></span></p> <br>
 
                         <p>Thời gian thi: <span class="jquery-cec-time"><i class="fa fa-spinner faa-spin animated"></i></span>s</p> <br>
 
-                        @if($user_data->address!=null)
+                        @if(@$item->address!=null)
                         <p>Địa chỉ: <span>{{$user_data->address}}</span></p> <br>
                         @endif
 
@@ -80,9 +79,6 @@
             </div>
 
 
-            <hr>
-            <button type="button" class="btn btn-primary btn-xs">Toán</button>
-            <button type="button" class="btn btn-primary btn-xs">Lớp 10</button>
 
 
         </div>
@@ -90,11 +86,7 @@
         <br>
         <div class="tag">
             <span>Từ khóa:</span>
-            @if(count($item->seo_keywords)!=0)
-            @foreach($item->seo_keywords as $k => $v)
-            <a class="btn btn-default btn-xs" href="javascript:void(0)" role="button">{{$v}}</a>
-            @endforeach
-            @endif
+            <i class="label label-info">{{$item->seo_keywords}}</i>
         </div>
         <br>
         <!--        <div class="other">
@@ -145,6 +137,15 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    $(window).bind('beforeunload', function () {
+        alert(123);
+        return 'Đảm bảo mọi thứ đã được lưu trước khi rời khỏi trang này!';
+    });
+</script>
+@endpush
 
 @push('stylesheet')
 <link rel="stylesheet" href="{{asset('public/client/css/app.phongthi.css')}}"/>

@@ -3,14 +3,14 @@
 <div class="">
     <div class="page-title">
         <div class="title_left">
-            <h3>{{__('label.caidat') }}</h3>
+            <h3><i class="fa fa-file"></i> FILE & GIỚI HẠN</h3>
         </div>
-
     </div>
     <div class="clearfix"></div>
     <div class="col-md-12 col-sm-12 col-xs-12">
         <div class="x_panel">
             <div class="x_content">
+                <a href="{{url()->previous()}}" class="btn btn-app"><i class="fa fa-arrow-left"></i> Quay lại</a>
                 <a href="{{route('admin_setting_index')}}" class="btn btn-app"><i class="fa fa-gear"></i> {{ __('label.caidatchung')}}</a>
                 <a href="{{route('admin_setting_ff')}}" class="btn btn-app"><i class="fa fa-refresh"></i> {{ __('label.tailai')}}</a>
             </div>
@@ -19,7 +19,7 @@
     <div class="col-md-6 col-xs-12">
         <div class="x_panel">
             <div class="x_title">
-                <h2>{{ __('label.dinhdang')}} <small> Các định dạng cho phép</small></h2>
+                <h2><i class="fa fa-file-o"></i> {{ __('label.dinhdang')}} <small> Các định dạng cho phép</small></h2>
                 <div class="clearfix"></div>
             </div>
             <div class="x_content">
@@ -52,7 +52,7 @@
                     <div class="ln_solid"></div>
                     <div class="form-group">
                         <div class="col-md-9 col-sm-9 col-xs-12 col-md-offset-3">
-                            <button type="submit" class="btn btn-success">{{__('label.capnhat')}}</button>
+                            <button type="submit" class="btn btn-success"><i class="fa fa-save"></i> {{__('label.capnhat')}}</button>
                         </div>
                     </div>
 
@@ -63,7 +63,7 @@
     <div class="col-md-6 col-xs-12">
         <div class="x_panel">
             <div class="x_title">
-                <h2>{{ __('label.gioihan')}} <small> {{ __('label.gioihandungluong')}}</small></h2>
+                <h2><i class="fa fa-hdd-o"></i> {{ __('label.gioihan')}} <small> {{ __('label.gioihandungluong')}}</small></h2>
                 <div class="clearfix"></div>
             </div>
             <div class="x_content">
@@ -96,7 +96,7 @@
                     <div class="ln_solid"></div>
                     <div class="form-group">
                         <div class="col-md-9 col-sm-9 col-xs-12 col-md-offset-3">
-                            <button type="submit" class="btn btn-success">{{__('label.capnhat')}}</button>
+                            <button type="submit" class="btn btn-success"><i class="fa fa-save"></i> {{__('label.capnhat')}}</button>
                         </div>
                     </div>
                 </form>
@@ -113,16 +113,10 @@
 
 
 @section('header_css')
-<!-- Select2 -->
-<link href="{!! asset('public/admin_assets/vendors/select2/dist/css/select2.min.css ')!!}" rel="stylesheet">
 @endsection
 
 @section('footer_js')
-<!-- bootstrap-progressbar -->
-<script src="{!! asset('public/admin_assets/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js')!!}"></script>
 
 <!-- jQuery Tags Input -->
-<script src="{!! asset('public/admin_assets/vendors/jquery.tagsinput/src/jquery.tagsinput.js')!!}"></script>
-<!-- Select2 -->
-<script src="{!! asset('public/admin_assets/vendors/select2/dist/js/select2.full.min.js')!!}"></script>
+<script src="{!! asset('public/admin/bower_components/jquery.tagsinput/src/jquery.tagsinput.js')!!}"></script>
 @endsection

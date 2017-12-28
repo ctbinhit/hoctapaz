@@ -14,6 +14,7 @@ use SettingModel,
 use Cache;
 use Illuminate\Support\Facades\Config;
 use App\Bcore\Services\NotificationService;
+use App\Bcore\Services\StorageServiceV2;
 
 class SettingController extends AdminController {
 
@@ -312,11 +313,11 @@ class SettingController extends AdminController {
             if ($this->_SETTING->mode_fastboot) {
                 goto SaveArea;
             }
+            //dd($StorageServide->getDiskUssage('google'));
             $ParentFolderInfo = $StorageServide->checkConnectionRoot($Model->storage_parent);
             if ($ParentFolderInfo['code'] == -1) {
                 $Model->status = __($ParentFolderInfo['message']);
             } else {
-
                 // Kết nối thành công --------------------------------------------------------------------------------------
                 $Model->status = __(@$ParentFolderInfo['message']);
                 $ParentFolderSize = $StorageServide->getDiskUssage();
@@ -331,12 +332,13 @@ class SettingController extends AdminController {
         }
         SaveArea:
         return view($this->_RV . 'setting/account/google_drive', [
-            'item' => $Model
+            'item' => $Model,
+            'item_cache' => (new StorageServiceV2())->google_config()
         ]);
     }
 
     public function get_account_googledrive_path() {
-        $list_storage = ['exam_documents', 'file_doc'];
+        $list_storage = ['dethi', 'dethithu', 'tailieuhoc'];
         $GSM = \App\Models\GoogleStorageModel::whereIn('id', $list_storage)->get();
         return view($this->_RV . 'setting/account/google/storage_path', [
             'gg_paths' => $GSM
@@ -383,6 +385,12 @@ class SettingController extends AdminController {
         }
         redirectArea:
         return redirect()->route('admin_setting_account_googledrive');
+    }
+
+    public function get_account_googledrive_clearcache() {
+        (new StorageServiceV2())->google_config(true);
+        NotificationService::alertRight('Cache google drive đã được cập nhật.', 'success', 'CACHE');
+        return redirect(\App\Bcore\System\Redirect::url('admin_setting_account_googledrive'));
     }
 
     // ===== TIMEZONE SETTING ==========================================================================================

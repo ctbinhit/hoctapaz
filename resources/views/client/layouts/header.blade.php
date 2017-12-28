@@ -37,7 +37,7 @@
                 </p>
                 <!--Tài khoản-->
                 <div class="accout pull-right">
-                    @if(UserService::isLoggedIn())
+                    @if($current_user!=null)
                     <div class="shop">
                         <a href="#"><i class="thumbnail fa fa-bell"></i>
                             <span style="position:relative;left:-8px;top:-15px;" 
@@ -49,7 +49,7 @@
                     </div>
                     <div class="img_logo">  <a href="{{route('client_user_info')}}">
                             <img style="width:32px;height:32px;border-radius:50%;" 
-                                 src="{{UserService::photo_thumbnail()}}" />
+                                 src="{{@$current_user->avatar}}" />
                         </a>
                     </div>
                     <ul>
@@ -100,3 +100,5 @@
 
     </div>
 </div>
+
+

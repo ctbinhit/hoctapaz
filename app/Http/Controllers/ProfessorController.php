@@ -10,7 +10,8 @@ use View,
     Config;
 use Illuminate\Support\Facades\Cache;
 use App\Bcore\Services\UserServiceV2;
-use App\Bcore\System\UserType;
+use App\Bcore\Services\UserServiceV3;
+use App\Bcore\SystemComponents\User\UserType;
 
 class ProfessorController extends ControllerService {
 
@@ -44,13 +45,20 @@ class ProfessorController extends ControllerService {
             View::share('navbar', $navbar);
             $this->_NAVBAR = $navbar;
 
-            $user_info = UserServiceV2::get_currentSessionData(UserType::professor());
-            $this->current_user = $user_info;
-            View::share('current_user', (object) $user_info);
-            View::share('user_info', (object) $user_info);
-
+//            $user_info = UserServiceV2::get_currentSessionData(UserType::professor());
+//            $this->current_user = $user_info;
+//            View::share('current_user', (object) $user_info);
+//            View::share('user_info', (object) $user_info);
+            $this->load_userSession();
             return $next($request);
         });
+    }
+
+    public function load_userSession() {
+        $this->current_user = (object) json_decode(json_encode((new UserServiceV3)->professor()->load_session()->get_session()));
+        View::share('current_user', (object) $this->current_user);
+        View::share('user_info', (object) $this->current_user);
+        return $this->current_user;
     }
 
     // ===== registerDVC (Register data view controller) ===============================================================

@@ -2,24 +2,20 @@
 
 namespace App\Modules\Document\Controllers\Client;
 
-use App\Bcore\PackageService;
-use Illuminate\Http\Request;
-use App\Bcore\Services\NotificationService;
-use App\Events\AfterSendRequestFileDoc;
-use App\Models\FileModel;
-use App\Bcore\System\AjaxResponse;
+use View;
 use Carbon\Carbon;
-use App\Bcore\Services\UserDataService;
-use App\Models\UserDataModel;
+use App\Models\FileModel;
+use Illuminate\Http\Request;
+use App\Bcore\PackageService;
 use App\Bcore\Services\SeoService;
-use App\Bcore\Services\UserService;
-use App\Modules\Document\Components\DocumentState;
-use Illuminate\Support\Facades\Log;
-use App\Bcore\Services\LogService;
-use View,
-    DB;
+use Illuminate\Support\Facades\DB;
+use App\Bcore\System\AjaxResponse;
 use Illuminate\Support\Facades\Route;
+use App\Bcore\Services\UserServiceV3;
 use App\Bcore\Services\CategoryService;
+use App\Bcore\Services\UserDataService;
+use App\Bcore\SystemComponents\User\UserType;
+use App\Modules\Document\Components\DocumentState;
 
 class DocController extends PackageService {
 
@@ -38,64 +34,6 @@ class DocController extends PackageService {
         View::share('current_route', $this->current_route);
     }
 
-    private function file_filter($FileModels, $mime_type) {
-        switch ($mime_type) {
-            case null:
-                SeoService::seo_title('Tài liệu online | PDF | WORD');
-                break;
-            case 'pdf':
-                SeoService::seo_title('Tài liệu PDF');
-                $FileModels->where([
-                    ['mimetype', 'application/pdf'],
-                    ['price', 0]
-                ]);
-                break;
-            case 'word':
-                SeoService::seo_title('Tài liệu WORD');
-                $FileModels->where([
-                    ['mimetype', 'application/word'],
-                    ['price', 0]
-                ]);
-                break;
-            case 'pdf-tinh-phi':
-                SeoService::seo_title('Tài liệu PDF tính phí');
-                $FileModels->where([
-                    ['mimetype', 'application/pdf'],
-                    ['price', '<>', 0]
-                ]);
-                break;
-            case 'word-tinh-phi':
-                SeoService::seo_title('Tài liệu WORD tính phí');
-                $FileModels->where([
-                    ['mimetype', 'application/word'],
-                    ['price', '<>', 0]
-                ]);
-                break;
-        }
-        return $FileModels;
-    }
-
-    private function file_orderBy($FileModels) {
-        return $FileModels->orderBy('approved_date', 'DESC');
-    }
-
-    private function load_fileByType($type) {
-        $FileModels = DB::table('files')
-                        ->join('users', 'users.id', '=', 'files.id_user')
-                        ->leftJoin('categories_lang', 'categories_lang.id_category', '=', 'files.id_category')
-                        ->where([
-                            ['files.obj_type', $type],
-                            ['state', DocumentState::approve()],
-                            ['files.display', true],
-                            ['files.deleted_at', null],
-                            ['categories_lang.id_lang', 1]
-                        ])->select([
-            'files.*', 'users.fullname',
-            'categories_lang.name as name_category'
-        ]);
-        return $FileModels;
-    }
-
     private function load_baseCategory() {
         return \App\Bcore\Services\CategoryService::get_baseCategories('hoctap', 'exam');
     }
@@ -103,35 +41,34 @@ class DocController extends PackageService {
     public function get_index($type = null, $mime_type = null, Request $request) {
         View::share('type', $type);
         View::share('mime_type', $mime_type);
-
-
+        SeoService::seo_title('Tài liệu WORD tính phí');
         $doc_type = $request->doc_type;
-
         $DataUser = UserDataService::get_arrayIdData('files', $doc_type);
 
-        $FileModel = $this->load_fileByType($type);
-        $FileModel = $this->file_orderBy($FileModel);
-        $FileModel = $this->file_filter($FileModel, $mime_type);
-
+        $FileModels = (new \App\Bcore\Services\FileServiceV3())
+                ->set_where('files.type', $type)
+                ->set_where('files.state', DocumentState::approve())
+                ->set_where('files.display', true)
+                ->set_where('files.deleted_at', null)
+                ->set_where('files.obj_type', 'base')
+                ->set_orderBy('approved_date', 'DESC')
+                ->set_pagination(5);
+        $this->filter_mimeTypeByModels($FileModels, $mime_type);
+        
         if ($request->has('keywords')) {
-            $FileModel->where('files.name', 'LIKE', '%' . $request->input('keywords') . '%');
+            $FileModels->search($request->input('keywords'));
         }
-
-        $FileModel = $FileModel->paginate(8);
 
         $Categories = $this->load_baseCategory();
+        $Models = $FileModels->get_models();
 
-        if ($request->ajax()) {
-            if ($request->input('type') == 'ajax_view') {
-                return response()->json(view('client/tailieuhoc/parts/items', array('items' => $FileModel))->render());
-            }
-            goto responseArea;
-        }
+        $Models = \App\Bcore\Services\FileServiceV3::findFileByModels($Models);
+     
 
         responseArea:
         return view('client/tailieuhoc/index', [
             'doc_type' => $doc_type,
-            'items' => $FileModel,
+            'items' => $Models,
             'categories_hoctap' => $Categories
         ]);
     }
@@ -173,8 +110,25 @@ class DocController extends PackageService {
                 return $this->check_payment($request);
             case 'f83c2a85d972a89238f31296c63f0dbc': // Thanh toán
                 return $this->payment($request);
+            case 'view_demo':
+                return $this->get_linkDemo($request);
             default:
                 return response()->json(AjaxResponse::actionUndefined());
+        }
+    }
+
+    private function get_linkDemo($request) {
+        $ID_PDF = $request->input('id');
+        $ParentFile = FileModel::find($ID_PDF);
+        if ($ParentFile == null) {
+            return null;
+        }
+        $FileDemo = FileModel::where([['obj_type', $ParentFile->type], ['obj_table', $ParentFile->tbl], ['obj_id', $ParentFile->id]])
+                        ->orderBy('id', 'DESC')->first();
+        if ($FileDemo != null) {
+            return null;
+        } else {
+            return $FileDemo->url;
         }
     }
 
@@ -187,7 +141,7 @@ class DocController extends PackageService {
             goto responseArea;
         }
 
-        $UserCoinOld = \App\Bcore\Services\UserServiceV2::load_dbUserBySession($this->_USER);
+        $UserCoinOld = \App\Models\UserModel::find($this->current_user->id);
 
         $UserCoinOld->coin = $UserCoinOld->coin - $FileModel->price;
 
@@ -201,7 +155,7 @@ class DocController extends PackageService {
         if ($r) {
             $JsonResponse = AjaxResponse::success();
         } else {
-            $UM = \App\Bcore\Services\UserServiceV2::load_dbUserBySession($this->_USER);
+            $UM = \App\Models\UserModel::find($this->current_user->id);
             // Nếu có [Exception] => trả tiền lại cho KH
             $UserCoin = $UM->coin;
             if ($UserCoinOld < $UserCoin && $UserCoin - $UserCoinOld = $FileModel->price) {
@@ -221,15 +175,13 @@ class DocController extends PackageService {
             $JsonResponse = AjaxResponse::dataNotFound();
             goto responseArea;
         }
-
-        if (\App\Bcore\Services\UserServiceV2::isLoggedIn(\App\Bcore\System\UserType::user()) != true) {
+        if (\App\Bcore\Services\UserServiceV2::isLoggedIn(UserType::user()) != true) {
             $JsonResponse = AjaxResponse::not_logged_in([
                         'msg' => 'Chưa đăng nhập, vui lòng đăng nhập trước khi thực hiện thao tác này.'
             ]);
             goto responseArea;
         }
-
-        $UserModel = $this->get_currentDBUserData();
+        $UserModel = (new UserServiceV3())->user()->current()->loadFromDatabase()->get_userModel();
 
         if ($UserModel->coin - $FileModel->price < 0) {
             $JsonResponse = AjaxResponse::fail(['msg' => 'Số dư không đủ để thực hiện giao dịch, vui lòng nạp thêm']);
@@ -240,11 +192,57 @@ class DocController extends PackageService {
             'file' => $FileModel,
             'user' => $UserModel,
                 ])->render();
-
         $JsonResponse = AjaxResponse::success(['view' => $view, 'file_id' => $File_ID]);
-
         responseArea:
         return response()->json($JsonResponse);
+    }
+
+    private function load_fileByType($type) {
+
+
+        $FileModels = DB::table('files')
+                        ->join('users', 'users.id', '=', 'files.id_user')
+                        ->leftJoin('categories_lang', 'categories_lang.id_category', '=', 'files.id_category')
+                        ->where([
+                            ['files.obj_type', $type],
+                            ['state', DocumentState::approve()],
+                            ['files.display', true],
+                            ['files.deleted_at', null],
+                            ['categories_lang.id_lang', 1]
+                        ])->select([
+            'files.*', 'users.fullname',
+            'categories_lang.name as name_category'
+        ]);
+        return $FileModels;
+    }
+
+    private function filter_mimeTypeByModels($FileModels, $mime_type) {
+
+        switch ($mime_type) {
+            case null:
+                SeoService::seo_title('Tài liệu online | PDF | WORD');
+                break;
+            case 'pdf':
+                SeoService::seo_title('Tài liệu PDF');
+                $FileModels->set_where('mimetype', 'application/pdf');
+                $FileModels->set_where('price', 0);
+                break;
+            case 'word':
+                SeoService::seo_title('Tài liệu WORD');
+                $FileModels->set_where('mimetype', 'application/word');
+                $FileModels->set_where('price', 0);
+                break;
+            case 'pdf-tinh-phi':
+                SeoService::seo_title('Tài liệu PDF tính phí');
+                $FileModels->set_where('mimetype', 'application/pdf');
+                $FileModels->set_where('price', 0, '<>');
+                break;
+            case 'word-tinh-phi':
+                SeoService::seo_title('Tài liệu WORD tính phí');
+                $FileModels->set_where('mimetype', 'application/word');
+                $FileModels->set_where('price', 0, '<>');
+                break;
+        }
     }
 
 }

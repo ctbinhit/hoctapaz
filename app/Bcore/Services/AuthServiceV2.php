@@ -15,6 +15,9 @@ use App\Bcore\SystemComponents\User\UserType;
 class AuthServiceV2 {
 
     private $_driver = null;
+    private $_options = [
+        'userType' => null
+    ];
     private $_userData = null;
     private $_allowUserType = [];
     private $_logs = [];

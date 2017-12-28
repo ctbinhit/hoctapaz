@@ -8,6 +8,7 @@ CKEDITOR.editorConfig = function( config ) {
 	// For complete reference see:
 	// http://docs.ckeditor.com/#!/api/CKEDITOR.config
 
+	config.extraPlugins += (config.extraPlugins.length == 0 ? '' : ',') + 'pastefromword,clipboard';
 	config.extraPlugins += (config.extraPlugins.length == 0 ? '' : ',') + 'codeTag';
 
 	config.extraPlugins += (config.extraPlugins.length == 0 ? '' : ',') + 'chart';
@@ -26,7 +27,14 @@ CKEDITOR.editorConfig = function( config ) {
     config.extraPlugins += (config.extraPlugins.length == 0 ? '' : ',') + 'widget,lineutils,fontawesome';
     config.contentsCss 	= window.location.origin + '/public/bower_components/font-awesome/css/font-awesome.min.css';
 
-    config.allowedContent = true;
+        //config.pasteFromWordRemoveFontStyles = false;
+	//config.pasteFromWordRemoveStyles = false;
+        config.forcePasteAsPlainText = false;
+        config.pasteFromWordRemoveFontStyles = false;
+        config.pasteFromWordRemoveStyles = false;
+        config.allowedContent = true;
+        config.extraAllowedContent = 'p(mso*,Normal)';
+        config.pasteFilter = null;
 
 	// The toolbar groups arrangement, optimized for two toolbar rows.
 	config.toolbarGroups = [

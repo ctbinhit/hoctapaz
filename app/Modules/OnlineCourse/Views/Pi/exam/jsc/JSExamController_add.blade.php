@@ -68,11 +68,12 @@
                     $(JSExamController.elements.button.qc_add).attr('disabled', '');
                     var ul = '<ul class="JSExamController-question-ul">';
                     for (i = 1; i <= $QCV; i++) {
-                        var li = "<li class='JSExamController-question-li'>Câu " + i + ": ";
-                        li += '<div> A <input type="radio" class="qc_radio" name="question' + i + '" value="1" checked/></div>';
-                        li += '<div> B <input type="radio" class="qc_radio" name="question' + i + '" value="2" /></div>';
-                        li += '<div> C <input type="radio" class="qc_radio" name="question' + i + '" value="3" /></div>';
-                        li += '<div> D <input type="radio" class="qc_radio" name="question' + i + '" value="4" /></div>';
+                        var li = "<li class='JSExamController-question-li'>";
+                        li += '<div>Câu ' + i + '</div>';
+                        li += '<div> A <input type="radio" class="qc_radio" name="questions[' + i + ']" value="1" checked/></div>';
+                        li += '<div> B <input type="radio" class="qc_radio" name="questions[' + i + ']" value="2" /></div>';
+                        li += '<div> C <input type="radio" class="qc_radio" name="questions[' + i + ']" value="3" /></div>';
+                        li += '<div> D <input type="radio" class="qc_radio" name="questions[' + i + ']" value="4" /></div>';
                         li += '</li>';
                         ul += li;
                     }
@@ -174,8 +175,6 @@
                     }
                 });
             }
-
-
         };
         JSExamController.init('#frm_exam_add');
     });

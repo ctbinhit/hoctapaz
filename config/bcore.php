@@ -2,7 +2,7 @@
 
 // ========== TOAN NANG Co., Ltd =======================================================================================
 // Hotline: 0964 247 742 (Bình Cao)
-// Email: info.toannang@gmail.com | binhcao.toannang@gmail.com | phamtam.toannang@gmail.com
+// Email: info.toannang@gmail.com | binhcao.toannang@gmail.com
 // 2th Floor, SBI Town ,Quang Trung Software City , Tan Chanh Hiep Ward ,District 12, Ho Chi Minh City.                
 // =====================================================================================================================
 
@@ -11,6 +11,14 @@ return [
     'DefaultLanguage' => 'VN',
     'Debug' => true,
     'PageExtension' => '.html',
+    'Route' => [
+        'Admin' => 'administrator',
+        'Collaborator' => 'doi-tac',
+        'Client' => ''
+    ],
+    'Module' => [
+        'prefix' => 'mdle_'
+    ],
     // ----- Sync ------------------------------------------------------------------------------------------------------
     'Sync' => [
         'Google' => [
@@ -33,9 +41,6 @@ return [
             'jpg|png|jpeg|gif|swf|JPG|PNG|JPEG|GIF' => 10000,
             'mp3,mp4,3gp,avi' => 50000
         ]
-    ],
-    'Image' => [
-        [300, 200]
     ],
     // -----------------------------------------------------------------------------------------------------------------
     'ClientSecret' => [

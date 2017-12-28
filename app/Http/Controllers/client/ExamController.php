@@ -2,23 +2,24 @@
 
 namespace App\Http\Controllers\client;
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\ClientController;
-use App\Modules\OnlineCourse\Models\ExamModel,
+use Session;
+use View;
+use Illuminate\Http\Request,
     PhotoModel,
     UserModel,
-    FileModel,
-    App\Modules\OnlineCourse\Models\ExamUserModel;
-use ImageService,
-    AuthService,
-    FileService;
+    FileModel;
 use Carbon\Carbon;
-use Session,
-    View,
-    Illuminate\Support\Facades\DB;
+use App\Bcore\FileService;
 use App\Bcore\Services\SeoService;
+use Illuminate\Support\Facades\DB;
 use App\Bcore\Services\UserServiceV2;
-use App\Bcore\System\UserType;
+use App\Bcore\Services\UserServiceV3;
+use App\Http\Controllers\ClientController;
+use App\Modules\OnlineCourse\App\ExamHelper;
+use App\Bcore\SystemComponents\User\UserType;
+use App\Modules\OnlineCourse\Models\ExamModel;
+use App\Modules\OnlineCourse\Models\ExamUserModel;
+use App\Modules\OnlineCourse\Models\ExamRegisteredModel;
 
 class ExamController extends ClientController {
 
@@ -68,65 +69,19 @@ class ExamController extends ClientController {
         $Categories = \App\Bcore\Services\CategoryService::get_baseCategories('hoctap', 'exam');
         SeoService::seo_title('Phòng thi online');
 
-        $ExamModel = DB::table('m1_exam')
-                ->join('users', 'users.id', '=', 'm1_exam.id_user')
-                ->where([
-                    ['users.type', 'professor'],
-                    //['m1_exam.id_user','<>', \App\Bcore\Services\UserService::id()],
-                    ['m1_exam.deleted', null],
-                    ['m1_exam.approved_by', '>', 0],
-                    ['m1_exam.state', \App\Modules\OnlineCourse\Components\ExamState::de_thi()]
-                ])
-                ->select([
-                    'users.google_avatar', 'users.facebook_avatar',
-                    'users.fullname', 'm1_exam.name', 'm1_exam.name_meta', 'm1_exam.id_category', 'm1_exam.description',
-                    'm1_exam.time', 'm1_exam.price', 'm1_exam.seo_description', 'm1_exam.created_at'
-                ])
-                ->orderBy('m1_exam.id', 'DESC');
+        $ExamHelper = (new \App\Modules\OnlineCourse\App\ExamHelper())
+                ->load_models()
+                ->set_request($request)
+                ->filter(['keywords', 'username'])
+                ->set_where('m1_exam_registered.state', 1)
+                ->set_options([
+            'paginate' => 5
+        ]);
 
-        if ($request->has('keywords')) {
-            if ($request->has('filterBy')) {
-                switch ($request->input('filterBy')) {
-                    case 'keywords':
-                        goto defaultFilterArea;
-                        break;
-                    case 'username':
-                        $ExamModel->where('users.fullname', 'LIKE', '%' . $request->input('keywords') . '%');
-                        break;
-                    default:
-                        goto defaultFilterArea;
-                }
-            } else {
-                defaultFilterArea:
-                $ExamModel->where('m1_exam.seo_keywords', 'LIKE', '%' . $request->input('keywords') . '%');
-            }
-        }
-
-
-        $ExamModel = $ExamModel->paginate(10);
-        foreach ($ExamModel as $k => $v) {
-
-            $v->avatar = $v->google_avatar != null ? $v->google_avatar : $v->facebook_avatar;
-
-            $tmp = new Carbon($v->created_at);
-            $v->created_at = $tmp->format('d/m/Y');
-        }
-
-        // Chữa cháy
-        $UserModel = UserModel::where([
-                    ['type', '=', 'professor'],
-                    ['role', '>', 0]
-                ])->get();
-
-        $ListNameProfessor = $this->groupModelsById($UserModel);
-
-        foreach ($Categories as $k => $v) {
-            
-        }
+        //dd($ExamHelper->load_models());
 
         return view('client/phongthi/index', [
-            'items' => $ExamModel,
-            'professor' => $ListNameProfessor,
+            'items' => $ExamHelper->get_models(),
             'categories_hoctap' => $Categories
         ]);
     }
@@ -316,6 +271,7 @@ class ExamController extends ClientController {
 
     // Kiểm tra điều kiện nếu thỏa redirect trang thi
     public function get_exam_phongthi_redirect($pExamMeta, Request $request) {
+
         $RESULT = (object) [
                     'state' => false,
                     'status' => false,
@@ -326,104 +282,97 @@ class ExamController extends ClientController {
                     'user_data' => null,
                     'exam_data' => null
         ];
-        // Thông tin user
-        $AuthService = new AuthService();
-        $UserModel = $AuthService->user_info();
-        if (!$UserModel) {
+
+        if ($this->current_user == null) {
             $RESULT->error_type = 'chuadangnhap';
             $RESULT->message = "Vui lòng đăng nhập trước khi thực hiện thao tác";
+            return redirect()->route('client_login_index', [
+                        'cwr' => url()->full()
+            ]);
+        }
+
+        $UserModel = (new UserServiceV3)->user()->current()->loadFromDatabase()->get_userModel();
+
+        if ($UserModel == null) {
+            $RESULT->message = "User không tồn tại!";
             goto resultArea;
         }
-        // Thông tin bài thi
-        $ExamModel = ExamModel::where([['name_meta', '=', $pExamMeta]])->get();
 
-        // ===== KIỂM TRA BÀI VIẾT =====================================================================================
-        if (count($ExamModel) == 0) {
+        // ----- Thông tin bài thi -------------------------------------------------------------------------------------
+        $ERM = (new ExamHelper())
+                ->load_modelByMetaName($pExamMeta)
+                ->get_model();
+
+        if ($ERM == null) {
             $RESULT->message = "Bài thi không tồn tại, vui lòng kiểm tra lại hoặc liên hệ quản trị để biết thêm thông tin!";
             goto resultArea;
-        } else if (count($ExamModel) > 1) {
-            $RESULT->message = "Có lỗi xảy ra trong quá trình thao tác, vui lòng liên hệ quản trị để được hỗ trợ!";
-            goto resultArea;
-        } else if (count($ExamModel) == 1) {
-            $ExamModel = $ExamModel[0];
-            // Bài viết tồn tại => next step
-        } else {
-            $RESULT->message = "Lỗi không xác định!";
-            goto resultArea;
         }
 
-        // ===== KIỂM TRA XÁC THỰC BÀI THI =============================================================================
-        if ($ExamModel->approved_by == null) {
+        if ($ERM->state == 0) {
             $RESULT->message = "Bài thi chưa được xác thực, vui lòng quay lại sau";
             goto resultArea;
-        } else if ($ExamModel->approved_by == -1) {
-            $RESULT->message = "Bài thi này đã bị tạm khóa, vui lòng liên hệ quản trị để được hỗ trợ.";
+        }
+        if ($ERM->state == 2) {
+            $RESULT->message = "Bài thi đang bị tạm khóa, vui lòng quay lại sau";
             goto resultArea;
-        } else if ($ExamModel->approved_by > 0) {
-            // Bài viết đã được xác thực => next step
         }
 
-        // ===== KIỂM TRA COIN USER ====================================================================================
-        if ($UserModel->coin < $ExamModel->price) {
+        $ERM_CHECK = ExamUserModel::where([
+                    ['id_user', $UserModel->id], ['erm_id', $ERM->id], ['id_exam', $ERM->id_exam]
+                ])->first();
+
+        if ($ERM_CHECK != null) {
+            if ($ERM_CHECK->time_in != null && $ERM_CHECK->time_out != null) {
+                $RESULT->state = false;
+                $RESULT->message = "Bạn đã tham gia bài thi này, không thể tham gia nữa!";
+                goto resultArea;
+            }
+            if ($ERM_CHECK->time_in == null && $ERM_CHECK->time_out != null) {
+                $RESULT->state = false;
+                $RESULT->message = "Bạn đã bỏ lỡ trong quá trình làm bài thi, vui lòng liên hệ giáo viên để được thi lại.";
+                goto resultArea;
+            }
+            $RESULT->state = true;
+            $RESULT->paid = true;
+        }
+
+        if ($UserModel->coin < $ERM->price) {
             $RESULT->error_type = 'naptien';
-            $RESULT->message = "Số tiền trong tài khoản còn " . $UserModel->coin . ", số tiền cần thanh toán là " . $ExamModel->price . " Vui lòng nạp thêm tiền để thực hiện thao tác này.";
+            $RESULT->message = "Số tiền trong tài khoản còn " . $UserModel->coin . ", số tiền cần thanh toán là "
+                    . $ERM->price . " Vui lòng nạp thêm tiền để thực hiện thao tác này.";
             goto resultArea;
         } else {
             $RESULT->state = true;
             $RESULT->error_type = 'success';
             $RESULT->message = "Đang khởi tạo bài thi...";
             $RESULT->user_data = $UserModel;
-            $RESULT->exam_data = $ExamModel;
+            $RESULT->exam_data = $ERM;
         }
-
-        $a = \App\Modules\OnlineCourse\Models\ExamUserModel::where([
-                    ['id_user', $UserModel->id],
-                    ['id_exam', $ExamModel->id]
-                ])->first();
-        if ($a != null) {
-
-//            if ($a->time_in != null && $a->time_out != null) {
-//                $RESULT->state = false;
-//                $RESULT->message = "Bạn đã tham gia bài thi này, không thể tham gia nữa!";
-//                goto resultArea;
-//            }
-
-            if ($a->time_in == null && $a->time_out != null) {
-                $RESULT->state = false;
-                $RESULT->message = "Bạn đã bỏ lỡ trong quá trình làm bài thi, vui lòng liên hệ giáo viên để được thi lại.";
-                goto resultArea;
-            }
-
-            $RESULT->state = true;
-            $RESULT->paid = true;
-        }
-
-        // TOKEN
+        // GENERATE TOKEN
         $_TOKEN_DATE = Carbon::now();
         $_TOKEN_1 = $_TOKEN_DATE->timestamp . str_random(30) . $UserModel->id;
         $_TOKEN_SESSION = md5($_TOKEN_1);
         session::flash('_TOKEN_EXAM', [
             'id_user' => $UserModel->id,
-            'id_exam' => $ExamModel->id,
+            'id_erm' => $ERM->id,
             'token' => $_TOKEN_SESSION
         ]);
 
         resultArea:
         return view('client/phongthi/redirect', [
             'redirect' => @$RESULT,
-            'id_exam' => @$ExamModel->id,
-            'exam' => @$ExamModel
+            'erm' => $ERM
         ]);
     }
 
     public function post_exam_phongthi_redirect(Request $request) {
         // TOKEN
         $_TOKEN_DATE = Carbon::now();
-        $_TOKEN_1 = $_TOKEN_DATE->timestamp . str_random(30) . UserServiceV2::current_userId(UserType::user());
+        $_TOKEN_1 = $_TOKEN_DATE->timestamp . str_random(30) . $this->current_user->id;
         $_TOKEN_SESSION = md5($_TOKEN_1);
         session::flash('_TOKEN_EXAM', [
-            'id_user' => UserServiceV2::current_userId(UserType::user()),
-            'id_exam' => $request->input('id_exam'),
+            'id_user' => $this->current_user->id,
+            'id_erm' => $request->input('erm_id'),
             'token' => $_TOKEN_SESSION
         ]);
         return redirect()->route('client_exam_thionline_');
@@ -436,41 +385,30 @@ class ExamController extends ClientController {
             return redirect()->route('client_exam_phongthi');
         }
         $DATA_TOKEN = (object) session('_TOKEN_EXAM');
-        $ExamModel = ExamModel::find($DATA_TOKEN->id_exam);
-        //$ExamModel = ExamModel::find(36);
-        $UserModel = UserServiceV2::load_dbUserBySession($this->_USER);
-        // $ExamModel = ExamModel::find(22);
-        try {
-            if ($ExamModel->seo_keywords != null) {
-                $ExamModel->seo_keywords = explode(',', $ExamModel->seo_keywords);
-            }
-        } catch (\Exception $ex) {
-            
-        }
+        $ERM = (new ExamHelper())
+                        ->append_options('select', 'm1_exam_registered.app_data')->load_ermById($DATA_TOKEN->id_erm)->get_model();
+        $ERM_DATA = (object) json_decode($ERM->app_data);
+
+//        $ExamModel = DB::table('m1_exam')
+//                ->join('m1_exam_detail', 'm1_exam_detail.id_exam', '=', 'm1_exam.id')
+//                ->where([
+//                    ['m1_exam.id', $DATA_TOKEN->id_erm]
+//                ])
+//                ->select([
+//                    'm1_exam.id', 'm1_exam.name', 'm1_exam.name_meta', 'm1_exam.description', 'm1_exam.time',
+//                    'm1_exam.seo_keywords', 'm1_exam.seo_title', 'm1_exam.seo_description', 'm1_exam.created_at',
+//                    DB::raw('COUNT(tbl_m1_exam_detail.id) as eqc')
+//                ])
+//                ->groupBy('m1_exam.id')
+//                ->first();
+        //$ExamModel = ExamModel::find($DATA_TOKEN->id_exam);
+
 
         return view('client/thitracnghiem/tracnghiem_detail', [
-            'item' => $ExamModel,
-            'user_data' => $UserModel,
-            'chart_top_score' => $this->get_top_score($ExamModel->id)
+            'item' => $ERM,
+            'app_data' => $ERM_DATA,
+            'chart_top_score' => @$this->get_top_score($ERM->id)
         ]);
-    }
-
-    private function get_top_score($id_exam, $exam_type = 'de-thi') {
-        $ExamModel = DB::table('m1_exam_user')
-                ->join('users', 'users.id', '=', 'm1_exam_user.id_user')
-                ->join('m1_exam', 'm1_exam.id', '=', 'm1_exam_user.id_exam')
-                ->where([
-                    ['m1_exam_user.score','>=',5],
-                    ['m1_exam_user.id_exam', $id_exam],
-                    ['m1_exam_user.type', '=', trim($exam_type)]
-                ])
-                ->select([
-            'm1_exam_user.score', 'm1_exam_user.time_end',
-            'users.fullname',
-            'm1_exam.time'
-        ]);
-        $ExamModel->orderBy('m1_exam_user.score', 'DESC');
-        return $ExamModel->take(5)->get();
     }
 
     // THI TRẮC NGHIỆM
@@ -512,55 +450,190 @@ class ExamController extends ClientController {
         switch ($act) {
             case 'paying':
                 return $this->paying($request);
+            case 'es': // ERM -> START
+                return $this->erm_start($request);
+            case 'ee':
+                return $this->erm_end($request);
         }
     }
 
     private function paying($request) {
-        $ExamId = $request->input('id_exam');
-        $ExamModel = ExamModel::find($ExamId);
+        $ERM_ID = $request->input('id_exam');
+        $ERM = ExamRegisteredModel::find($ERM_ID);
         $state = false;
 
-        if ($ExamModel == null) {
+        if ($ERM == null) {
             $msg = 'Dữ liệu không có thực!';
             goto responseArea;
         }
 
-        $UserInfo = UserServiceV2::load_dbUserBySession($this->_USER);
+        $UserInfo = (new UserServiceV3())->user()->current()->loadFromDatabase()->get_userModel();
+
         if ($UserInfo == null) {
             $msg = 'Có lỗi xảy ra trong quá trình xác thực tài khoản!';
             goto responseArea;
         }
 
-        if ($UserInfo->coin < $ExamModel->price) {
+        if ($UserInfo->coin < $ERM->price) {
             $msg = 'Tài khoản không đủ để thực hiện thanh toán, vui lòng nạp thêm!';
             goto responseArea;
         }
 
         $a = \App\Modules\OnlineCourse\Models\ExamUserModel::where([
                     ['id_user', $UserInfo->id],
-                    ['id_exam', $ExamId]
+                    ['id_exam', $ERM_ID]
                 ])->first();
         if ($a != null) {
             $msg = 'Tài khoản đã đăng ký và đã thanh toán, không thể thanh toán lần 2!';
             goto responseArea;
         }
 
-        $UserInfo->coin -= $ExamModel->price;
+        $UserInfo->coin -= $ERM->price;
         $r = $UserInfo->save();
 
         if ($r) {
-            \App\Modules\OnlineCourse\Models\ExamUserModel::registerUser($UserInfo->id, $ExamId);
+            $ExamHelper = (new ExamHelper())->load_ermById($ERM_ID)->register_appData($UserInfo, $ERM);
             $state = true;
             $msg = 'Thanh toán thành công!';
         } else {
             $msg = 'Có lỗi xảy ra trong quá trình thanh toán, vui lòng thử lại sau!';
         }
-
-
         responseArea:
         return response()->json([
                     'state' => @$state,
                     'message' => @$msg
+        ]);
+    }
+
+    private function erm_start($request) {
+        session::keep('_TOKEN_EXAM');
+        $execute_time = Carbon::now();
+        $execute_time_tmp = $execute_time;
+        $UserModel = (new UserServiceV3)->user()->current()->loadFromDatabase()->get_userModel();
+        if ($UserModel == null) {
+            
+        }
+
+
+        $input_erm_id = $request->input('id');
+        $ERM = (new ExamHelper())->append_options('select', 'm1_exam_registered.app_data')->load_ermById($input_erm_id)->append_fileUrl()->get_model();
+        $ERM_APP_DATA = (object) json_decode($ERM->app_data);
+        if ($ERM == null) {
+            
+        }
+
+        $EUM = ExamUserModel::where([
+                    ['id_user', $UserModel->id], ['id_exam', $ERM->id_exam], ['erm_id', $ERM->id]
+                ])->first();
+
+        if ($EUM == null) {
+            
+        }
+        $EUM->time_in = $execute_time;
+        return response()->json([
+                    'state' => $EUM->save(),
+                    'app_data' => $ERM_APP_DATA->data,
+                    'eum_code' => $EUM->code,
+                    'erm' => $ERM
+        ]);
+    }
+
+    private function erm_end($request) {
+        session::keep('_TOKEN_EXAM');
+        $execute_time = Carbon::now();
+        $execute_time_tmp = $execute_time;
+        $input_eum_code = $request->input('eum_code');
+        $input_time = $request->input('time');
+        $input_data = $request->has('data') ? $request->input('data') : [];
+        $EUM = ExamUserModel::where('code', '=', $input_eum_code)->first();
+        if ($EUM == null) {
+            
+        }
+        $ERM = (new ExamHelper())->append_options('select', 'm1_exam_registered.app_data')->load_ermById($EUM->erm_id)->get_model();
+
+
+        //$ERM = ExamRegisteredModel::find($EUM->erm_id);
+        $TimeIn = new Carbon($EUM->time_in);
+        $TimeIn->addSecond($ERM->time);
+        $TimeDiff = $execute_time->diffInSeconds($TimeIn);
+        if ($TimeDiff < 0) {
+            // Lỗi ngày giờ hệ thống
+        }
+        if ($input_time == 0) {
+            checkTimeDiff:
+            // Kiểm tra độ trễ của user, nếu time_in & time_out cách nhau hơn 10s => HACK hoặc máy lag
+            // Cấp TOKEN Thi lại & không hoàn tiền
+            if ($TimeDiff > 10) {
+                if (session::has('_TOKEN_EXAM')) {
+                    session::keep('_TOKEN_EXAM');
+                } else {
+                   
+                }
+                goto responseArea;
+            }
+        } else {
+            // User nộp bài sớm hơn dự định
+            $execute_time->addSecond((int) $input_time);
+            $TimeDiff = $execute_time->diffInSeconds($TimeIn);
+            goto checkTimeDiff;
+        }
+
+        // ----- Lưu phiếu trắc nghiệm của user ------------------------------------------------------------------------
+        // Nếu phiếu trả lời == 0 cho ngay 0 điểm khỏi suy nghĩ :))
+        if (count($input_data) == 0) {
+            $EUM->score = 0;
+        }
+
+        $user_result = [];
+        foreach ($input_data as $v) {
+            $user_result[$v[0]] = $v[1];
+        }
+        $EUM->data = json_encode($user_result);
+
+        // ----- Chấm thi ----------------------------------------------------------------------------------------------
+        $ERM_DATA = (object) json_decode($ERM->app_data);
+        $ERM_QUESTIONS = $ERM_DATA->data;
+        $QC = count($ERM_QUESTIONS);
+        $PERC = 10 / $QC;
+        $USER_SOCRE = 0;
+        $_PASSS = 0;
+        foreach ($ERM_QUESTIONS as $k => $v) {
+            if (isset($user_result[$k + 1])) {
+                if ((int) trim($v->answer) == (int) trim($user_result[$k + 1])) {
+                    $USER_SOCRE += $PERC;
+                    $_PASSS ++;
+                }
+            }
+        }
+        $RESULT_PAN = (object) [
+                    'socaudung' => $_PASSS,
+                    'socausai' => $QC - $_PASSS,
+                    'tongsocau' => $QC,
+                    'score' => $USER_SOCRE,
+                    'tongthoigianlambai' => $ERM->time - $input_time,
+                    'urlketqua' => route('client_exam_ketquathi', $EUM->code)
+        ];
+        $EUM->score = $USER_SOCRE;
+        $EUM->time_end = $input_time;
+        $EUM->time_out = $execute_time_tmp;
+        $EUM->type = $ERM->app_type;
+        $r = $EUM->save();
+        if ($r) {
+           
+        } else {
+            if (session::has('_TOKEN_EXAM')) {
+                session::keep('_TOKEN_EXAM');
+            } else {
+                
+            }
+            goto responseArea;
+           
+        }
+        responseArea:
+        return response()->json([
+                    'state' => isset($r) ? $r : false,
+                    'data' => @$RESULT_PAN,
+                    'erm_code' => $input_eum_code,
         ]);
     }
 
@@ -762,6 +835,25 @@ class ExamController extends ClientController {
         }
         responseArea:
         return response()->json($response);
+    }
+
+    // PRIVATE FUNCTIONS
+    private function get_top_score($id_exam, $exam_type = 'de-thi') {
+        $ExamModel = DB::table('m1_exam_user')
+                ->join('users', 'users.id', '=', 'm1_exam_user.id_user')
+                ->join('m1_exam', 'm1_exam.id', '=', 'm1_exam_user.id_exam')
+                ->where([
+                    ['m1_exam_user.score', '>=', 5],
+                    ['m1_exam_user.id_exam', $id_exam],
+                    ['m1_exam_user.type', '=', trim($exam_type)]
+                ])
+                ->select([
+            'm1_exam_user.score', 'm1_exam_user.time_end',
+            'users.fullname',
+            'm1_exam.time'
+        ]);
+        $ExamModel->orderBy('m1_exam_user.score', 'DESC');
+        return $ExamModel->take(5)->get();
     }
 
 }

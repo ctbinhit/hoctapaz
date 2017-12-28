@@ -1,5 +1,4 @@
-<?php
-
+<?php // 
 namespace App\Http\Controllers\pi;
 
 use Illuminate\Http\Request;
@@ -16,8 +15,9 @@ use StorageService,
 use Carbon\Carbon,
     Session,
     Illuminate\Support\Facades\Config;
+use App\Bcore\SystemComponents\User\UserType;
 
-class ExamController extends ProfessorController {
+class ExamController1 extends ProfessorController {
 
     public $storage_folder = 'exam';
     public $ControllerName = 'Exam';

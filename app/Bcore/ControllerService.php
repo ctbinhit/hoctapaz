@@ -15,6 +15,9 @@ use Config,
     Cache,
     View;
 use Jenssegers\Agent\Agent;
+use App\Bcore\Services\StorageServiceV2;
+use App\Bcore\SystemComponents\Accounts\StorageDisk;
+use App\Bcore\System\System;
 
 class ControllerService extends BaseController {
 
@@ -24,6 +27,7 @@ class ControllerService extends BaseController {
     public $_SETTING_ACCOUNT;
     public $_STORAGE_GOOGLE;
     public $_Agent = null;
+    public $_SYSTEM = null;
 
     use AuthorizesRequests,
         DispatchesJobs,
@@ -31,57 +35,18 @@ class ControllerService extends BaseController {
     use Traits\SettingSupporter;
 
     function __construct() {
-       
-        $this->_Agent = new Agent();
+        $this->_SYSTEM = (new System())->set_googleDrive((new StorageServiceV2())->set_timeCache(3600)->google_config())
+                ->build();
+        $this->buildConfig();
+    }
 
-        // -------------------------------------------------------------------------------------------------------------
-        $Model = Cache::remember('SETTING_SYNC_GOOGLEDRIVE', 3600, function() {
-                    return SettingAccountModel::find('google-drive');
-                });
-        // -------------------------------------------------------------------------------------------------------------
-
-        if ($Model->client_id == null || $Model->app_key == null || $Model->token == null || $Model->storage_parent == null
-        ) {
-            Cache::forget('SETTING_SYNC_GOOGLEDRIVE');
-            $Model->active = 0;
-            $Model->save();
-        }
-
-        if ($Model != null) {
-            config(['bcore.Sync.Google.Active' => $Model->active]);
-            config(['bcore.Sync.Google.AutoSync' => $Model->auto_sync]);
-            $this->_STORAGE_GOOGLE['state'] = $Model->active;
-            if ($Model->active) {
-//                $this->_STORAGE_GOOGLE['GOOGLE_DRIVE_CLIENT_ID'] = $Model->client_id;
-//                $this->_STORAGE_GOOGLE['GOOGLE_DRIVE_CLIENT_SECRET'] = $Model->app_key;
-//                $this->_STORAGE_GOOGLE['GOOGLE_DRIVE_REFRESH_TOKEN'] = $Model->token;
-//                $this->_STORAGE_GOOGLE['GOOGLE_DRIVE_FOLDER_ID'] = $Model->storage_parent;
-                config(['Bcore.storage_service.google_drive.GOOGLE_DRIVE_CLIENT_ID' => $Model->client_id]);
-                config(['Bcore.storage_service.google_drive.GOOGLE_DRIVE_CLIENT_SECRET' => $Model->app_key]);
-                config(['Bcore.storage_service.google_drive.GOOGLE_DRIVE_REFRESH_TOKEN' => $Model->token]);
-                config(['Bcore.storage_service.google_drive.GOOGLE_DRIVE_FOLDER_ID' => $Model->storage_parent]);
-                // SUB PARENT ID
-                // ----- ARTICLE ---------------------------------------------------------------------------------------
-                config(['Bcore.storage_service.google_drive.GOOGLE_DRIVE_FOLDER_ARTICLE' => $Model->storage_article]);
-                $this->_STORAGE_GOOGLE['GOOGLE_DRIVE_FOLDER_ARTICLE'] = $Model->client_id;
-                // ----- PRODUCT ---------------------------------------------------------------------------------------
-                config(['Bcore.storage_service.google_drive.GOOGLE_DRIVE_FOLDER_PRODUCT' => $Model->storage_article]);
-                // ----- CATEGORY --------------------------------------------------------------------------------------
-                config(['Bcore.storage_service.google_drive.GOOGLE_DRIVE_FOLDER_CATEGORY' => $Model->storage_article]);
-                // ----- GOOGLE_DRIVE_FOLDER_EXAM ----------------------------------------------------------------------
-                config(['Bcore.storage_service.google_drive.GOOGLE_DRIVE_FOLDER_EXAM' => $Model->storage_exam]);
-
-                $this->_STORAGE_GOOGLE['GOOGLE_DRIVE_FOLDER_DOC'] = '1ZqfSCqm_c1P65l3ZXT62IThUa3i4LCAN';
-            } else {
-                
-            }
-        }
-
-        // LOAD SESSION
+    private function buildConfig() {
+        // ----- SETTING -----------------------------------------------------------------------------------------------
         $this->_SETTING = $this->get_setting();
-        $this->_SETTING_LANGS = $this->get_settingLangs();
-        
-        
+        $this->_SETTING_LANG = $this->get_settingLangs();
+        $this->_SETTING_LANGS = $this->_SYSTEM->_configLang;
+        // ----- AGENT -------------------------------------------------------------------------------------------------
+        $this->_Agent = new Agent();
     }
 
     public function view($pView, $data = []) {
@@ -117,19 +82,19 @@ class ControllerService extends BaseController {
         Cache::forget('CACHE_SETTING_ACCOUNT');
     }
 
-    private function array_convertSettingAccoutn($pArray) {
-        if ($pArray == null) {
-            return null;
-        }
-        if (count($pArray) <= 0) {
-            return null;
-        }
-        $r = [];
-        foreach ($pArray as $k => $v) {
-            $r[$v->id] = $v;
-        }
-        return $r;
-    }
+//    private function array_convertSettingAccoutn($pArray) {
+//        if ($pArray == null) {
+//            return null;
+//        }
+//        if (count($pArray) <= 0) {
+//            return null;
+//        }
+//        $r = [];
+//        foreach ($pArray as $k => $v) {
+//            $r[$v->id] = $v;
+//        }
+//        return $r;
+//    }
 
     // SUPPORT METHOD
 

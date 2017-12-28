@@ -110,4 +110,18 @@ class UserModel extends Model {
         return $models;
     }
 
+    public static function info_fields() {
+        return ['users.id', 'users.fullname', 'users.gender', 'users.id_card',
+            'users.phone', 'users.email', 'users.role', 'users.type', 'users.created_at'];
+    }
+
+    public static function data_fields() {
+        return ['users.id', 'users.fullname', 'users.gender', 'users.id_card',
+            'users.phone', 'users.email', 'users.role', 'users.type', 'users.created_at'];
+    }
+
+    public static function full_fields() {
+        return ['*'];
+    }
+
 }

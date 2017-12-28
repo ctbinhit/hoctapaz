@@ -2,37 +2,28 @@
 
 namespace App\Http\Controllers\client;
 
-use App\Http\Controllers\ClientController;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Socialite;
-use AuthService;
 use Session;
-use UserModel,
-    MailService;
-use \App\Bcore\Services\UserService;
-use App\Bcore\Services\UserServiceV2;
-use App\Bcore\Services\UserServiceV3;
-use App\Bcore\System\UserType;
+use UserModel;
+use Illuminate\Http\Request;
 use App\Bcore\Services\SeoService;
-use App\Bcore\Services\NotificationService;
-use App\Bcore\Services\AuthServiceV2;
+use App\Http\Controllers\ClientController;
+use App\Bcore\Services\UserServiceV3;
+use App\Bcore\SystemComponents\User\UserType;
+use App\Bcore\Services\AuthServiceV3;
 
 class LoginController extends ClientController {
 
-    private $_AuthService = null;
     // Mail service
     private $_MS;
 
     function __construct() {
         parent::__construct();
-        $this->_AuthService = new AuthService();
     }
 
     public function get_index(Request $request) {
         SeoService::seo_title('Học tập AZ | Đăng nhập');
         SeoService::seo_description('Đăng nhập Học Tập AZ để so tài kiến thức với bạn bè nào.');
-        if (session::has('user')) {
+        if ($this->current_user != null) {
             return redirect()->route('client_index');
         }
         return view($this->RV . 'login/index');
@@ -45,42 +36,16 @@ class LoginController extends ClientController {
                         'message' => 'Vui lòng nhập tài khoản & mật khẩu!']);
             return redirect()->back();
         }
+        $UserServiceV3 = (new UserServiceV3())->user();
+        $BOOL_LOGGEDIN = $UserServiceV3->signinWithForm($request->input('username'), $request->input('password'));
 
-        //$SigninResponse = UserService::signinWithForm($request->input('username'), $request->input('password'), UserType::user());
-        $SigninResponse = UserServiceV2::signinWithForm($request->input('username'), $request->input('password'), UserType::user());
+        session::flash('html_callback', (object) [
+                    'message_type' => 'warning',
+                    'message' => $UserServiceV3->get_message()]);
 
-        $UserServiceV3 = (new UserServiceV3);
-        $SigninWithForm = $UserServiceV3->signinWithForm($request->input('username'), $request->input('password'));
-
-        $response_code = $SigninResponse['code'];
-        if ($response_code == 404) {
-            session::flash('html_callback', (object) [
-                        'message_type' => 'warning',
-                        'message' => 'Sai tài khoản hoặc mật khẩu!']);
+        if (!$BOOL_LOGGEDIN) {
             return redirect()->back();
         }
-
-        if ($response_code == 401) {
-            session::flash('html_callback', (object) [
-                        'message_type' => 'warning',
-                        'message' => 'Tài khoản chưa được kích hoạt, vui lòng kiểm tra hộp thư ' . $request->has('username') . ' để xác thực tài khoản.']);
-            return redirect()->back();
-        }
-
-        if ($response_code == 403) {
-            session::flash('html_callback', (object) [
-                        'message_type' => 'warning',
-                        'message' => 'Tài khoản của bạn không thể đăng nhập vào mục này.']);
-            return redirect()->back();
-        }
-
-        if (!$SigninResponse['response_state']) {
-            session::flash('html_callback', (object) [
-                        'message_type' => 'warning',
-                        'message' => 'Có lỗi xảy ra trong quá trình xác thực']);
-            return redirect()->back();
-        }
-
         if ($request->has('cwr')) {
             return redirect($request->input('cwr'));
         }
@@ -88,68 +53,34 @@ class LoginController extends ClientController {
     }
 
     public function get_signup() {
-        if (session::has('user')) {
-            return redirect()->route('client_index');
-        }
+        // Keep tokenData if exists
+        (new AuthServiceV3)->keep_tokenData();
+
         return view($this->RV . 'login/signup');
     }
 
     public function post_signup(Request $request) {
-        if (!$request->has('email')) {
-            session::flash('html_callback', (object) [
-                        'message_type' => 'warning',
-                        'message' => 'Địa chỉ email không hợp lệ!']);
-            return redirect()->back()->withInput();
-        }
-        $UserModel = UserModel::where([
-                    ['email', '=', $request->input('email')]
-                ])->get();
-        if (count($UserModel) > 0) {
-            session::flash('html_callback', (object) [
-                        'message_type' => 'warning',
-                        'message' => 'Email ' . $request->input('email') . ' đã được đăng ký trên hệ thống!']);
-            return redirect()->back()->withInput();
-        }
-        if (!$request->has('username')) {
-            session::flash('html_callback', (object) [
-                        'message_type' => 'warning',
-                        'message' => 'Username không được bỏ trống!']);
-            return redirect()->back()->withInput();
-        }
-        $UserModel = UserModel::where([
-                    ['username', '=', $request->input('username')]
-                ])->get();
-        if (count($UserModel) > 0) {
-            session::flash('html_callback', (object) [
-                        'message_type' => 'warning',
-                        'message' => 'Username ' . $request->input('username') . ' đã có người sử dụng!']);
-            return redirect()->back()->withInput();
-        }
-        if (!$request->has('fullname')) {
-            session::flash('html_callback', (object) [
-                        'message_type' => 'warning',
-                        'message' => 'Họ và tên không được bỏ trống!']);
-            return redirect()->back()->withInput();
-        }
-        if (strlen($request->input('fullname')) < 6) {
-            session::flash('html_callback', (object) [
-                        'message_type' => 'warning',
-                        'message' => 'Họ và tên quá ngắn!']);
-            return redirect()->back()->withInput();
-        }
-        if (!$request->has('password') || !$request->has('password2')) {
-            session::flash('html_callback', (object) [
-                        'message_type' => 'warning',
-                        'message' => 'Password không được bỏ trống!']);
-            return redirect()->back()->withInput();
-        }
-        if ($request->input('password') != $request->input('password2')) {
-            session::flash('html_callback', (object) [
-                        'message_type' => 'warning',
-                        'message' => '2 Password không khớp!']);
-            return redirect()->back()->withInput();
-        }
+        $ValidateData = $this->validate($request, [
+            'email' => 'bail|required|unique:users|min:10|max:255|email',
+            'username' => 'bail|required|unique:users|min:10|max:255',
+            'password' => 'bail|required|confirmed|min:5',
+            'password_confirmation' => 'required|max:255'
+                ], [
+            'username.min' => 'Username bắt buộc phải lớn hơn 10 ký tự',
+            'username.unique' => 'Username đã tồn tại trên hệ thống',
+            'password.confirmed' => '2 password không khớp',
+            'email.max' => 'Email phải dài hơn 10 ký tự',
+            'email.required' => 'Trường Email là trường bắt buộc',
+            'email.email' => 'Định dạng email không hợp lệ',
+            'email.unique' => 'Email đã tồn tại trên hệ thống'
+        ]);
         $UserModel = new UserModel();
+        $AuthServiceV3 = (new AuthServiceV3());
+        if ($AuthServiceV3->has_tokenData()) {
+            $TokenData = $AuthServiceV3->get_tokenData();
+            $UserModel->{'id_' . $UserModel->driver} = $TokenData->data->id;
+            $UserModel->{$UserModel->driver . '_options'} = json_encode($TokenData->data);
+        }
         $UserModel->username = $request->input('username');
         $UserModel->email = $request->input('email');
         $UserModel->password = $request->input('password');
@@ -175,7 +106,7 @@ class LoginController extends ClientController {
      */
 
     public function access_authenticate_redirect($driver) {
-        return $this->_AuthService->auth_redirect($driver);
+        return AuthServiceV3::authRedirect($driver);
     }
 
     /* =================================================================================================================
@@ -184,29 +115,24 @@ class LoginController extends ClientController {
      */
 
     public function access_authenticate_callback($driver) {
+        $AuthService = (new AuthServiceV3())
+                        ->set_driver($driver)->authWithDriver($driver);
+    
+        if ($AuthService->authState() == 2) {
+            $driverData = $AuthService->get_driverData();
 
-        $AuthService = (new AuthServiceV2($driver))
-                ->set_userType([UserType::user()])
-                ->get_authCallback();
-        if ($AuthService == null) {
-            session::flash('html_callback', (object) ['message_type' => 'warning',
-                        'message' => "Hết phiên đăng nhập, vui lòng thử lại."]);
-            return redirect()->route('client_login_index');
+            session()->flash('_old_input', [
+                'fullname' => $driverData->name,
+                'email' => $driverData->email,
+            ]);
+            return redirect()->route('client_login_signup');
         }
-        if (!$AuthService->is_social()) {
+        if ($AuthService->authState() != 1) {
             session::flash('html_callback', (object) ['message_type' => 'warning',
                         'message' => "Không thể xác thực $driver vào lúc này"]);
             return redirect()->route('client_login_index');
         }
 
-        if ($AuthService->signinWithDriver()) {
-            session::flash('html_callback', (object) ['message_type' => 'success',
-                        'message' => "Không thể xác thực $driver vào lúc này"]);
-        } else {
-            $log = $AuthService->get_log();
-            session::flash('html_callback', (object) ['message_type' => 'warning',
-                        'message' => $log['message']]);
-        }
         return redirect()->route('client_login_index');
     }
 

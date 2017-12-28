@@ -32,13 +32,13 @@ return [
     ],
     // v2.10
     'facebook' => [
-        'client_id' => '1468423126580483',
-        'client_secret' => '343edf7278319f83cc1379dd87b68762',
+        'client_id' => '552682171742827',
+        'client_secret' => '1f2cf041d156efdc9d7743643167d52b',
         'redirect' => env('APP_URL').'/login/facebook/callback',
     ],
     'google' => [
-        'client_id' => '371430001644-s38q48ldq8o57t63441pk2udkvb2f3ob.apps.googleusercontent.com',
-        'client_secret' => 'y8NfoLlpjycka3aPI_yLalJa',
+        'client_id' => '820843320850-g91ed10kpvmood4b7bb9867ga1fnbddr.apps.googleusercontent.com',
+        'client_secret' => 'kakAWcTc0gVEacV6rAPorvWu',
         'redirect' => env('APP_URL') . '/login/google/callback',
     ],
         // GOOGLE 

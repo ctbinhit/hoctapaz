@@ -2,10 +2,12 @@
 
 namespace App\Modules\Cart\Controllers\Admin;
 
-use App\Bcore\PackageServiceAD;
 use Illuminate\Http\Request;
+use App\Bcore\PackageServiceAD;
+use Illuminate\Support\Facades\DB;
 use App\Modules\Cart\Models\UserCartModel;
 use App\Modules\Cart\Services\CartService;
+use App\Modules\Cart\Models\UserCartStateModel;
 
 class CartController extends PackageServiceAD {
 
@@ -14,39 +16,28 @@ class CartController extends PackageServiceAD {
     }
 
     public function get_index(Request $request) {
+        $CartModels = DB::table('users_carts')
+                ->join('users', 'users.id', '=', 'users_carts.id_user')
+                ->select([
+            'users_carts.id', 'users_carts.id_user', 'users_carts.name',
+            'users_carts.phone', 'users_carts.seen', 'users_carts.created_at', 'users_carts.state',
+            'users.email'
+        ]);
 
+        $CartModels->orderBy('id', 'DESC');
+        $CartList = $CartModels->paginate(5);
 
-
-        if ($request->ajax()) {
-            $CartModels = UserCartModel::
-                    orderBy('id', 'DESC');
-
-            if ($request->has('keywords')) {
-                $CartModels->where('phone', 'LIKE', "%" . trim($request->input('keywords')) . "%");
-
-                $CartModels->orWhere('name', 'LIKE', "%" . trim($request->input('keywords')) . "%");
-            }
-
-            $LIST_STATE = \App\Modules\Cart\Models\UserCartStateModel::where('type', 'cart')->get();
-
-
-            $CartModels = $CartModels->paginate(5);
-            $CartModels = CartService::addColumnTotalByCartModels($CartModels);
-            $CartModels = CartService::addColumnDiffInNowByCartModels($CartModels);
-            return response()->json([
-                        'state' => true,
-                        'html' => view('Cart::/Admin/Cart/parts/component_carts', ['items' => $CartModels, 'list_state' => $LIST_STATE])->render(),
-            ]);
-        }
-
-        return view('Cart::Admin/Cart/index');
+        return view('Cart::Admin/Cart/index', [
+            'items' => $CartList,
+            'stateList' => UserCartStateModel::where('type', 'cart')->get()
+        ]);
     }
 
     public function get_cart_detail($id, Request $request) {
         $UCM = UserCartModel::find($id);
-        
-        if($UCM->seen==0){
-            $UCM->seen=1;
+
+        if ($UCM->seen == 0) {
+            $UCM->seen = 1;
             $UCM->save();
         }
 
@@ -94,25 +85,27 @@ class CartController extends PackageServiceAD {
     }
 
     public function ajax(Request $request) {
+        $data = [];
         $act = $request->input('act');
         switch ($act) {
-            case 'loadHtml':
-                return $this->loadHtml($request);
+            case 'cs':
+                $r = $this->pri_change_state($request->input('id'), $request->input('state'));
+                $data = ['state' => $r[0], 'message' => $r[1], 'type' => $r[2]];
+                break;
         }
+        return response()->json($data);
     }
 
     // ===== Private function ==========================================================================================
 
-    private function loadHtml($request) {
-
-        return response()->json([
-                    'state' => true,
-                    'html' => view('Cart::/Admin/Cart/parts/components_carts', ['items' => ''])->render()
-        ]);
+    private function pri_change_state($id_cart, $state) {
+        $CartModel = UserCartModel::find($id_cart);
+        if ($CartModel == null) {
+            return [false, 'Đơn hàng không tồn tại' , 'danger'];
+        }
+        $CartModel->state = $state;
+        return $CartModel->save() ? [true, 'Cập nhật thành công', 'success'] : [false, 'Có lỗi xảy ra, vui lòng thử lại sau', 'warning'];
     }
 
-    private function update_cartState() {
-        
-    }
 
 }

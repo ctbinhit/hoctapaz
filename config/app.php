@@ -106,7 +106,7 @@ return [
       | Available Settings: "single", "daily", "syslog", "errorlog"
       |
      */
-    'log' => env('APP_LOG', 'daily'),
+    'log' => env('APP_LOG', 'errorlog'),
     'log_level' => env('APP_LOG_LEVEL', 'debug'),
     /*
       |--------------------------------------------------------------------------
@@ -250,7 +250,7 @@ return [
         'PayService' => App\Bcore\PayService::class,
         'SeoService' => App\Bcore\Services\SeoService::class,
         'StorageService' => App\Bcore\StorageService::class,
-        'LanguageService' => App\Bcore\LanguageService::class,
+        'LanguageService' => App\Bcore\Services\LanguageService::class,
         'FileService' => App\Bcore\FileService::class,
         'ImageService' => App\Bcore\ImageService::class,
         'UserInterface' => App\Bcore\UserInterface::class,
@@ -261,6 +261,7 @@ return [
         'MailService' => App\Bcore\Services\MailService::class,
         'UserService' => App\Bcore\Services\UserService::class,
         'UserServiceV2' => App\Bcore\Services\UserServiceV2::class,
+        'UserServiceV3' => App\Bcore\Services\UserServiceV3::class,
         'SessionService' => App\Bcore\SessionService::class,
         'OrderService' => \App\Bcore\Services\OrderService::class,
         'AppService' => App\Bcore\Services\AppService::class,

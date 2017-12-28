@@ -25,6 +25,17 @@ class UserTransactionModel extends Model {
     public $_orderBy = null;
     public $_data = null;
     public $_where = null;
+    private $_models = null;
+
+    public static function softDelete($id) {
+        $UT = UserTransactionModel::find((int) $id);
+        if ($UT != null) {
+            $UT->deleted_at = \Carbon\Carbon::now();
+        } else {
+            return false;
+        }
+        return $UT->save();
+    }
 
     public function data() {
         return $this->_data;

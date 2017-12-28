@@ -12,7 +12,7 @@ use Carbon\Carbon;
 use App\Bcore\Services\UserService;
 use App\Modules\Document\Components\DocumentState;
 use App\Bcore\Services\UserServiceV2;
-use App\Bcore\System\UserType;
+use App\Bcore\SystemComponents\User\UserType;
 
 class DocController extends PackageServiceAD {
 

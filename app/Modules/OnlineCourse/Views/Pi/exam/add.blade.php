@@ -25,7 +25,6 @@
 
 <form class="form-horizontal form-label-left" onsubmit="return;" id="frm_exam_add" action="{{route('_mdle_oc_pi_exam_save')}}" method="POST" enctype="multipart/form-data">
     <div class="row">
-
         <div class="col-md-12">
             <div class="alert alert-warning">
                 <p><i class="fa fa-warning"></i> <strong>Lưu lý:</strong></p>
@@ -152,7 +151,7 @@
             </div>
         </div>
 
-        <div class="col-md-8 col-xs-12">
+        <div class="col-md-6 col-xs-12">
             <div class="x_panel">
                 <div class="x_title">
                     <h2><i class="fa fa-file-pdf-o"></i> {{__('schools.tailieu')}} <small> Upload tài liệu PDF | DOC</small></h2>
@@ -168,7 +167,7 @@
                     <div class="form-group">
                         <label class="control-label col-md-2 col-sm-2 col-xs-12"> {{__('label.mota')}}</label>
                         <div class="col-md-10 col-sm-10 col-xs-12">
-                            <textarea name="description" class="form-control" placeholder="Mô tả bài thi">{{isset($item->description)?$item->description:old('description')}}</textarea>
+                            <textarea style="max-width:100%;min-width:100%;height:300px;" name="description" class="form-control" placeholder="Mô tả bài thi">{{isset($item->description)?$item->description:old('description')}}</textarea>
                         </div>
                     </div>
                     <div class="form-group">
@@ -192,7 +191,7 @@
             </div>
         </div>
 
-        <div class="col-md-4 col-xs-12">
+        <div class="col-md-6 col-xs-12">
             <div class="x_panel">
                 <div class="x_title">
                     <h2><i class="fa fa-check-square-o"></i> {{__('schools.taotracnghiem')}} <small> Tạo câu hỏi trắc nghiệm</small></h2>
@@ -200,23 +199,24 @@
                 </div>
                 <div class="x_content">
                     <div class="exam_qcpan" id="JSExamController-pan-qc">
-                        @isset($item)
-                        @isset($item->id)
-                        @if(count($items)!=0)
+                        @isset($questions)
+                        <p class="text-info"><i class="fa fa-laptop"></i> Dữ liệu được build vào lúc <b>{{$build_at}}</b></p>
+                        @if(count($questions)!=0)
                         <ul class="JSExamController-question-ul">
-                            @foreach($items as $k=>$v)
+                            @foreach($questions as $k=>$v)
                             <li class='JSExamController-question-li'>Câu {{$k+1}}
-                                <div> A <input {{$v->result==1?'checked':''}} type="radio" class="qc_radio" name="question{{$k+1}}" value="1"/></div>
-                                <div> B <input {{$v->result==2?'checked':''}} type="radio" class="qc_radio" name="question{{$k+1}}" value="2"/></div>
-                                <div> C <input {{$v->result==3?'checked':''}} type="radio" class="qc_radio" name="question{{$k+1}}" value="3"/></div>
-                                <div> D <input {{$v->result==4?'checked':''}} type="radio" class="qc_radio" name="question{{$k+1}}" value="4"/></div>
+                                <div> A <input {{$v->answer==1?'checked':''}} type="radio" class="qc_radio" name="questions[{{$k+1}}]" value="1"/></div>
+                                <div> B <input {{$v->answer==2?'checked':''}} type="radio" class="qc_radio" name="questions[{{$k+1}}]" value="2"/></div>
+                                <div> C <input {{$v->answer==3?'checked':''}} type="radio" class="qc_radio" name="questions[{{$k+1}}]" value="3"/></div>
+                                <div> D <input {{$v->answer==4?'checked':''}} type="radio" class="qc_radio" name="questions[{{$k+1}}]" value="4"/></div>
                             </li>
                             @endforeach
                         </ul>
                         @else
                         <p>Không có dữ liệu...</p>
                         @endif
-                        @endisset
+                        @else
+                        <p class="alert alert-warning"><i class="fa fa-warning"></i> Không tìm thấy dữ liệu data hoặc dữ liệu bị lỗi phiên bản.</p>
                         @endisset
                     </div>
 
@@ -236,10 +236,7 @@
                 </div>
             </div>
         </div>
-
-        @if(@$UI->fieldGroup([
-        'seo_title','seo_keywords','seo_description'
-        ]))
+        
         <div class="col-md-12 col-xs-12">
             <div class="x_panel">
                 <div class="x_title">
@@ -247,40 +244,33 @@
                     <div class="clearfix"></div>
                 </div>
                 <div class="x_content">
-                    @if(@$UI->field('seo_title'))
                     <div class="form-group">
-                        <label class="control-label col-md-2 col-sm-2 col-xs-12">{{@$UI->field_name('seo_title')}}</label>
+                        <label class="control-label col-md-2 col-sm-2 col-xs-12">Tiêu đề</label>
                         <div class="col-md-10 col-sm-10 col-xs-12">
-                            <input type="text" class="form-control js-cedit" name="seo_title" id="seo_title" value="{{isset($item->seo_title)?$item->seo_title:old('seo_title')}}" placeholder="">
-                            <div id="suggestions-container" style="position: relative; float: left; width: 100%; margin: 10px;">
-                                {{@$UI->field_note('seo_title',true)}}</div>
+                            <input type="text" class="form-control js-cedit" name="seo_title" id="seo_title" 
+                                   value="{{isset($item->seo_title)?$item->seo_title:old('seo_title')}}" placeholder="">
                         </div>
                     </div>
-                    @endif
-                    @if(@$UI->field('seo_keywords'))
                     <div class="form-group">
-                        <label class="control-label col-md-2 col-sm-2 col-xs-12">{{@$UI->field_name('seo_keywords')}}</label>
+                        <label class="control-label col-md-2 col-sm-2 col-xs-12">Từ khóa</label>
                         <div class="col-md-10 col-sm-10 col-xs-12">
-                            <input type="text" class="tags form-control jquery-input-tag js-cedit" name="seo_keywords" value="{{isset($item->seo_keywords)?$item->seo_keywords:old('seo_keywords')}}" />
+                            <input type="text" class="tags form-control jquery-input-tag js-cedit" name="seo_keywords" 
+                                   value="{{isset($item->seo_keywords)?$item->seo_keywords:old('seo_keywords')}}" />
                             <div id="suggestions-container" style="position: relative; float: left; width: 100%; margin: 10px;">
-                                {{@$UI->field_note('seo_keywords',true)}}</div>
+                                Nên dùng những từ khóa ngắn</div>
                         </div>
                     </div>
-                    @endif
-                    @if(@$UI->field('seo_description'))
                     <div class="form-group">
-                        <label class="control-label col-md-2 col-sm-2 col-xs-12">{{$UI->field_name('seo_description')}}</label>
+                        <label class="control-label col-md-2 col-sm-2 col-xs-12">Mô tả</label>
                         <div class="col-md-10 col-sm-10 col-xs-12">
                             <textarea class="form-control js-cedit" name="seo_description" placeholder="">{{isset($item->seo_description)?$item->seo_description:old('seo_description')}}</textarea>
                             <div id="suggestions-container" style="position: relative; float: left; width: 100%; margin: 10px;">
-                                {{@$UI->field_note('seo_description',true)}}</div>
+                            Để seo được tốt nhất nên giới hạn dưới 166 ký tự</div>
                         </div>
                     </div>
-                    @endif
                 </div>
             </div>
         </div>
-        @endif
     </div>
 </form>
 <div class="clearfix"></div>
@@ -296,13 +286,23 @@
         overflow-y: scroll;
         list-style: none;
         border: 1px solid #333;
+        padding: 4px 10px 0px 0px;
 
     }
     .JSExamController-question-li{
         width: 100%;
+        display: flex;
+        
     }
     .JSExamController-question-li div{
         margin: 2px 0px;
+        flex-grow: 1;
+        text-align: center;
+    }
+    .JSExamController-question-li div:first-child{
+        padding: 4px 0px;
+        font-weight: bold;
+        color: #333;
     }
     .JSExamController-question-li input[type="radio"]{
 
@@ -311,19 +311,6 @@
 @endpush
 
 @push('scripts')
-@isset($item)
-<script>
-    $(document).ready(function () {
-        $('input').attr('disabled', '');
-        $('button[type="submit"]').attr('disabled', '');
-        $('textarea').attr('disabled', '');
-        $('select').attr('disabled', '');
-        $('input[type="radio"]').attr('disabled', '');
-        $('input[type="checkbox"]').attr('disabled', '');
-        $('.js-cedit').removeAttr('disabled');
-    });
-</script>
-@endisset
 <script>
     $(document).ready(function () {
         superplaceholder({

@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\admin;
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\AdminController;
-use App\Models\UserModel;
 use Carbon\Carbon;
+use App\Models\UserModel;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Bcore\Services\UserServiceV3;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\AdminController;
+use App\Bcore\SystemComponents\User\UserType;
 use Input,
     PhotoModel,
     View,
@@ -29,20 +32,24 @@ class UserController extends AdminController {
     }
 
     public function get_index($pType, Request $request) {
-
-
         $this->DVController = $this->registerDVC($this->ControllerName);
+        $UserModels = DB::table('users')
+                ->leftJoin('users_vip', 'users.id_vip', '=', 'users_vip.id')
+                ->where([
+                    ['users.type', $pType]
+                ])
+                ->select([
+            'users.id', 'users.fullname', 'users.email', 'users.phone', 'users.username', 'users.created_at', 'users.coin',
+            'users.tbl', 'users.lock_by',
+            'users_vip.id as vip_id', 'users_vip.name as vip_name'
+        ]);
+        $UserModels->orderBy('id', 'desc');
 
-
-
-        $UserModel = UserModel::where([
-                    ['type', '=', $pType],
-                ])->orderBy('id', 'DESC')
-                ->paginate(10);
+        $Models = UserServiceV3::find_photoURLByModels($UserModels->paginate(10));
 
         return view($this->_RV . 'user/index', [
             'type' => $pType,
-            'items' => UserModel::find_userVIPByModels($UserModel)
+            'items' => $Models
         ]);
     }
 
@@ -57,19 +64,6 @@ class UserController extends AdminController {
     }
 
     public function get_edit($pType, $pId, Request $request) {
-        // ================================== CHECK PERMISSION =========================================================
-        $CP = \App\Modules\UserPermission\Services\UPService::check_permission('per_edit', __CLASS__, $request);
-        if (!$CP->status) {
-            return $CP->view;
-        }
-        // ================================== CHECK PERMISSION =========================================================
-
-
-        if (\App\Bcore\PackageServiceAD::has_package(\App\Modules\UserPermission\Controllers\Admin\UserPermissionController::class)) {
-
-            $UserPerrmissionGroups = \App\Modules\UserPermission\Models\UserPermissionGroupsModel::
-                    get();
-        }
         $UserModel = UserModel::find($pId);
         if ($UserModel == null) {
             session::flash('message_type', 'error');

@@ -19,7 +19,7 @@ class PiMiddleware {
         if ($request->path() == 'professor/login') {
             goto nextStep;
         }
-        if (!UserServiceV2::isLoggedIn(\App\Bcore\System\UserType::professor())) {
+        if (!UserServiceV2::isLoggedIn(\App\Bcore\SystemComponents\User\UserType::professor())) {
             return redirect()->route('client_index', '404');
         }
         nextStep:

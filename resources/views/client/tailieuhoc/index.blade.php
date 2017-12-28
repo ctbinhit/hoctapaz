@@ -12,7 +12,6 @@
         @endif
     </div>
     <div class="exam-left">
-
         <div class="l_panel">
             <div class="l-title"><i class="fa fa-search faa-ring animated"></i> Tìm kiếm</div>
             <div class="l-content">
@@ -106,24 +105,24 @@
 @push('sscr')
 <script>
 
-    $(document).ready(function () {
-        $(document).on('click', '.pagination a', function (e) {
-            $(this).html('<i class="fa fa-spinner faa-spin animated"></i>');
-            $(this).parents('ul').find('a').off('click');
-            var url = $(this).attr('href');
-            $.ajax({
-                url: url,
-                type: 'ajax_view',
-                dataType: 'json',
-            }).done(function (data) {
-                $('#data-items').html(data);
-                //location.hash = page;
-            }).fail(function () {
-                //alert('Posts could not be loaded.');
-            });
-            e.preventDefault();
-        });
-    });
+//    $(document).ready(function () {
+//        $(document).on('click', '.pagination a', function (e) {
+//            $(this).html('<i class="fa fa-spinner faa-spin animated"></i>');
+//            $(this).parents('ul').find('a').off('click');
+//            var url = $(this).attr('href');
+//            $.ajax({
+//                url: url,
+//                type: 'post',
+//                dataType: 'json',
+//            }).done(function (data) {
+//                $('#data-items').html(data);
+//                //location.hash = page;
+//            }).fail(function () {
+//                //alert('Posts could not be loaded.');
+//            });
+//            e.preventDefault();
+//        });
+//    });
 
 </script>
 

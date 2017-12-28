@@ -37,14 +37,14 @@
                                     <div class="form-group">
                                         <label class="control-label col-md-2">Tên hiển thị</label>
                                         <div class="col-md-10">
-                                            <input type="text" class="form-control" name="fullname" value="{{$user->fullname}}" placeholder="Họ và tên"/>
+                                            <input type="text" class="form-control" name="fullname" value="{{$userData->fullname}}" placeholder="Họ và tên"/>
                                         </div>
                                     </div>
 
                                     <div class="form-group">
                                         <label for="phone" class="control-label col-md-2">SĐT</label>
                                         <div class="col-md-10">
-                                            <input type="text" class="form-control" name="phone" id="phone" value="{{$user->phone}}" placeholder="SĐT"/>
+                                            <input type="text" class="form-control" name="phone" id="phone" value="{{$userData->phone}}" placeholder="SĐT"/>
                                         </div>
                                     </div>
 
@@ -63,7 +63,7 @@
                                     <div class="form-group">
                                         <label for="address" class="control-label col-md-2">Địa chỉ:</label>
                                         <div class="col-md-10">
-                                            <input type="text" class="form-control" name="address" id="address" value="{{$user->address}}" placeholder="Địa chỉ..."/>
+                                            <input type="text" class="form-control" name="address" id="address" value="{{$userData->address}}" placeholder="Địa chỉ..."/>
                                         </div>
                                     </div>
                                 </div>

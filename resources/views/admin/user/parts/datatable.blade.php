@@ -29,20 +29,20 @@
         <tr>
             <td style="width:5%">{{@$k+1}}</td>
             <td style="width:20%">
-                <a href="{{route('admin_user_edit',[$type,$item->id])}}">{{$item->fullname}} <i class="fa fa-pencil"></i></a>
+                <a href="{{route('admin_user_edit',[$type,$item->id])}}">{{$item->fullname or ''}} <i class="fa fa-pencil"></i></a>
             </td>
-            <td>{{$item->email}}</td>
-            <td>{{$item->phone}}</td>
-            <td><strong>{{number_format($item->coin,0)}}</strong> VNĐ</td>
-            <td><i class="label label-warning">{{$item->data_vip->name=='0'?'':$item->data_vip->name}}</i></td>
-            <td>{{$item->created_at}}</td>
+            <td><i class="label label-info">{{$item->email}}</i></td>
+            <td><i class="label label-info">{{$item->phone}}</i></td>
+            <td><i class="label label-info"><strong>{{number_format($item->coin,0)}}</strong> VNĐ</i></td>
+            <td><i class="label label-warning">{{$item->vip_name!=null?$item->vip_name:'0'}}</i></td>
+            <td data-toggle="tooltip" data-placement="top" title="{{$item->created_at}}">{{diffInNow($item->created_at)}}</td>
             </td>
             <td>
-                <img src="{{$item->facebook_avatar}}" style="width:30px;height:30px;border-radius:50%;" title="{{$item->fullname}}"/>
+                <img src="{{html_thumbnail($item->photo_url,30,30)}}" style="width:30px;height:30px;border-radius:50%;" title="{{$item->fullname}}"/>
             </td>
 
             <td style="width: 25%">
-               <a href="{{route('admin_user_edit',[$type,$item->id])}}" data-id="{{$item->id}}" data-tbl="{{$item->tbl}}" data-action="edit" class="btn btn-default btn-xs"><i class="fa fa-edit"></i></a>
+                <a href="{{route('admin_user_edit',[$type,$item->id])}}" data-id="{{$item->id}}" data-tbl="{{$item->tbl}}" data-action="edit" class="btn btn-default btn-xs"><i class="fa fa-edit"></i></a>
                 <a href="javascript:void(0)" class="btn btn-info btn-xs"><i class="fa fa-envelope"></i></a>
                 <a href="javascript:void(0)" class="btn btn-primary btn-xs"><i class="fa fa-plus"></i> Coin</a>
                 <a href="{{route('admin_user_vip',[$type,$item->id])}}" class="btn btn-info btn-xs" title="Nâng cấp vip"><i class="fa fa-star"></i> VIP</a>

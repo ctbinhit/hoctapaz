@@ -2,7 +2,7 @@
 
 namespace App\Bcore\System;
 
-class UserType {
+class UserType1 {
 
     function __construct() {
         

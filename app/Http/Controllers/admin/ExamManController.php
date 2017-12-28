@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers\admin;
 
+use DB;
+use Session;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AdminController;
-use App\Modules\OnlineCourse\Models\ExamModel,
-    PhotoModel;
-use ImageService;
-use Session;
-use DB;
+use App\Modules\OnlineCourse\Models\ExamModel;
+use App\Modules\OnlineCourse\Models\ExamRegisteredModel;
 
 class ExamManController extends AdminController {
 
@@ -22,65 +21,114 @@ class ExamManController extends AdminController {
     }
 
     public function get_approver() {
+        $ERMS = DB::table('m1_exam_registered')
+                        ->join('categories', 'categories.id', '=', 'm1_exam_registered.id_category')
+                        ->join('categories_lang', 'categories_lang.id_category', '=', 'categories.id')
+                        ->join('users', 'users.id', '=', 'm1_exam_registered.id_user')
+                        ->where([
+                            ['m1_exam_registered.approved_by', '=', 0],
+                            ['m1_exam_registered.state', 0],
+                            ['categories_lang.id_lang', 1]
+                        ])
+                        ->select([
+                            'm1_exam_registered.id', 'm1_exam_registered.id_user', 'm1_exam_registered.id_category'
+                            , 'm1_exam_registered.name', 'm1_exam_registered.time', 'm1_exam_registered.views', 'm1_exam_registered.price',
+                            'm1_exam_registered.price2', 'm1_exam_registered.state', 'm1_exam_registered.created_at',
+                            'categories_lang.name as category_name',
+                            'users.fullname as pi_name'
+                        ])
+                        ->orderBy('created_at', 'DESC')->paginate(5);
 
-        $ExamModels = DB::table('m1_exam')
-                ->join('categories', 'categories.id', '=', 'm1_exam.id_category')
-                ->join('categories_lang', 'categories_lang.id_category', '=', 'categories.id')
-                ->join('users', 'users.id', '=', 'm1_exam.id_user')
-                ->where([
-                    ['m1_exam.approved_by', '=', null],
-                    ['m1_exam.state', '=', 'de-thi'],
-                    ['categories_lang.id_lang', 1]
-                ])
-                ->select([
-                    'm1_exam.id', 'm1_exam.id_user', 'm1_exam.id_category', 'm1_exam.name', 'm1_exam.name_meta', 'm1_exam.time',
-                    'm1_exam.ordinal_number', 'm1_exam.views', 'm1_exam.highlight', 'm1_exam.price', 'm1_exam.display',
-                    'm1_exam.created_at',
-                    'categories_lang.name as category_name',
-                    'users.fullname as pi_name'
-                ])
-                ->orderBy('created_at', 'DESC')
-                ->paginate(5);
-       
 
 
         renderViewArea:
         return view($this->_RV . 'exam/approver', [
-            'items' => $ExamModels,
-            // 'items_photo' => $items_photo,
+            'items' => $ERMS,
             'tbl' => 'm1_exam'
         ]);
     }
 
-    public function post_approver(Request $request) {
-        
+    public function get_app_registered(Request $request) {
+        $ERMS = DB::table('m1_exam_registered')
+                        ->join('categories', 'categories.id', '=', 'm1_exam_registered.id_category')
+                        ->join('categories_lang', 'categories_lang.id_category', '=', 'categories.id')
+                        ->join('users', 'users.id', '=', 'm1_exam_registered.id_user')
+                        ->where([
+                            ['m1_exam_registered.approved_by', '<>', 0],
+                            ['m1_exam_registered.state', 1],
+                            ['categories_lang.id_lang', 1]
+                        ])
+                        ->select([
+                            'm1_exam_registered.id', 'm1_exam_registered.id_user', 'm1_exam_registered.id_category'
+                            , 'm1_exam_registered.name', 'm1_exam_registered.time', 'm1_exam_registered.views', 'm1_exam_registered.price',
+                            'm1_exam_registered.price2', 'm1_exam_registered.state', 'm1_exam_registered.created_at',
+                            'm1_exam_registered.start_date', 'm1_exam_registered.expiry_date',
+                            'categories_lang.name as category_name',
+                            'users.fullname as pi_name', 'users.email as user_email'
+                        ])
+                        ->orderBy('created_at', 'DESC')->paginate(5);
+
+        renderViewArea:
+        return view($this->_RV . 'exam/app_registered', [
+            'items' => $ERMS,
+            'tbl' => 'm1_exam'
+        ]);
     }
 
     public function get_approver_reject($id) {
-        $ExamModel = ExamModel::find($id);
-        if ($ExamModel == null) {
+        $ERM = ExamRegisteredModel::find($id);
+        if ($ERM == null) {
             session::flash('message_type', 'error');
             session::flash('message', __('message.dulieukhongcothuc'));
             return redirect()->route('admin_examman_approver');
         }
 
+        $ERM->state = -1;
+        $ERM->updated_by = $this->current_admin->id;
+        if ($ERM->save()) {
+            session::flash('message', 'Xác thực thành công.');
+        } else {
+            session::flash('message_type', 'error');
+            session::flash('message', 'Xác thực không thành công.');
+        }
 
-
-        return view($this->_RV . 'exam/approver_reject', [
-            'item' => $ExamModel
-        ]);
+        return redirect()->route('admin_examman_approver');
     }
 
     public function get_approver_detail($id) {
-        $ExamModel = ExamModel::find($id);
-        if ($ExamModel == null) {
+        $ERM = DB::table('m1_exam_registered')
+                ->join('categories', 'categories.id', '=', 'm1_exam_registered.id_category')
+                ->join('categories_lang', 'categories_lang.id_category', '=', 'categories.id')
+                ->join('users', 'users.id', '=', 'm1_exam_registered.id_user')
+                ->where([
+                    ['m1_exam_registered.id', $id]
+                ])
+                ->select([
+                    'm1_exam_registered.id', 'm1_exam_registered.name', 'm1_exam_registered.description',
+                    'm1_exam_registered.price', 'm1_exam_registered.price2', 'm1_exam_registered.time',
+                    'm1_exam_registered.id_category', 'm1_exam_registered.id_user', 'm1_exam_registered.id_exam',
+                    'm1_exam_registered.seo_title', 'm1_exam_registered.seo_description', 'm1_exam_registered.seo_keywords',
+                    'm1_exam_registered.created_at',
+                    'users.fullname as user_fullname',
+                    'categories_lang.name as cate_name'
+                ])
+                ->first();
+
+        $PDF = \App\Models\FileModel::where([
+                    ['obj_id', $ERM->id_exam],
+                    ['id_user', $ERM->id_user],
+                    ['obj_table', 'm1_exam'],
+                ])->select('url')->orderBy('id', 'DESC')->first();
+        $ERM->file_pdf_url = \Illuminate\Support\Facades\Storage::disk('localhost')->url($PDF->url);
+
+        if ($ERM == null) {
             session::flash('message_type', 'error');
             session::flash('message', __('message.dulieukhongcothuc'));
             return redirect()->route('admin_examman_approver');
         }
 
         return view($this->_RV . 'exam/approver_detail', [
-            'item' => $ExamModel
+            'item' => $ERM
         ]);
     }
 
@@ -90,23 +138,23 @@ class ExamManController extends AdminController {
             session::flash('message', __('message.coloixayratrongquatrinhxuly'));
             goto redirectArea;
         }
-        $ExamModel = ExamModel::find($request->input('id'));
-        if ($ExamModel == null) {
+        $ERM = ExamRegisteredModel::find($request->input('id'));
+
+        if ($ERM == null) {
             session::flash('message_type', 'error');
             session::flash('message', __('message.dulieukhongcothuc'));
             goto redirectArea;
         }
 
-        $ExamModel->approved_by = \App\Bcore\Services\UserServiceV2::current_userId(\App\Bcore\System\UserType::admin());
-        $ExamModel->approved_date = \Carbon\Carbon::now();
-        $r = $ExamModel->save();
-        if ($r) {
+        $ERM->approved_by = $this->current_admin->id;
+        $ERM->approved_at = \Carbon\Carbon::now();
+        $ERM->state = 1;
+        if ($ERM->save()) {
             session::flash('message', 'Xác thực thành công.');
         } else {
             session::flash('message_type', 'error');
             session::flash('message', 'Có lỗi xảy ra trong quá trình xác thực');
         }
-
         redirectArea:
         return redirect()->route('admin_examman_approver');
     }

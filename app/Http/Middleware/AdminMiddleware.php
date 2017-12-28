@@ -19,7 +19,7 @@ class AdminMiddleware {
         if ($request->path() == 'admin/login') {
             goto nextStep;
         }
-        if (!UserServiceV2::isLoggedIn(\App\Bcore\System\UserType::admin())) {
+        if (!UserServiceV2::isLoggedIn(\App\Bcore\SystemComponents\User\UserType::admin())) {
             return redirect()->route('admin_page_error', '404');
         }
         if (!UserServiceV2::isAdmin()) {

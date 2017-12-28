@@ -303,7 +303,7 @@
 <script src="{!! asset('public/admin/bower_components/ckeditor/ckeditor.js') !!}"></script>
 <script>
     $('.js-ckeditor').each(function(){
-    console.log(this.id);
+
     CKEDITOR.replace($(this).attr('id'), {
     customConfig: '{!! asset("public/admin/ckeditor/articleo/config.js") !!}'
     });

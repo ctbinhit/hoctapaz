@@ -3,8 +3,6 @@
 /* =====================================================================================================================
   |                                SEARCH ENGINE OPTIMIZATION SERVICE - VER >=1.3 (09-2017)
   | --------------------------------------------------------------------------------------------------------------------
-  | Created by Bình Cao | (+84) 964 247 742 | info@binhcao.com | binhcao.toannang.com
-  | --------------------------------------------------------------------------------------------------------------------
   | Note: Easy ways to improve your website's navigation | Search engine
   | --------------------------------------------------------------------------------------------------------------------
   |                                             Developed by ToanNang Co., Ltd
@@ -14,7 +12,7 @@
 namespace App\Bcore\Services;
 
 use App\Bcore\Bcore;
-use LanguageService;
+
 use Config,
     Session,
     Cache,

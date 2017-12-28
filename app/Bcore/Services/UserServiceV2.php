@@ -8,6 +8,7 @@ use App\Bcore\SystemComponents\User\UserType;
 use App\Models\UserModel;
 use Illuminate\Support\Facades\DB;
 use App\Bcore\Type\SocialType;
+use App\Bcore\System\UserSession;
 use App\Bcore\Services\ImageService;
 
 class UserServiceV2 {
@@ -203,14 +204,18 @@ class UserServiceV2 {
     }
 
     public static function load_dbUserBySession($session_data) {
-        $sd = (object) $session_data;
-        $r = UserModel::select([
-                    'id', 'fullname', 'date_of_birth', 'email', 'coin', 'phone', 'phone_active', 'username', 'lang', 'address', 'gender',
-                    'id_card', 'id_city', 'id_district', 'status', 'id_vip', 'tbl', 'role', 'avatar', 'id_google', 'id_facebook',
-                    'google_avatar', 'facebook_avatar', 'type', 'lock_date', 'lock_by', 'lock_message', 'activated_at', 'created_at',
-                    'updated_at'
-                ])->find($sd->id);
-        return $r;
+        try {
+            $sd = (object) $session_data;
+            $r = UserModel::select([
+                        'id', 'fullname', 'date_of_birth', 'email', 'coin', 'phone', 'phone_active', 'username', 'lang', 'address', 'gender',
+                        'id_card', 'id_city', 'id_district', 'status', 'id_vip', 'tbl', 'role', 'avatar', 'id_google', 'id_facebook',
+                        'google_avatar', 'facebook_avatar', 'type', 'lock_date', 'lock_by', 'lock_message', 'activated_at', 'created_at',
+                        'updated_at'
+                    ])->find($sd->id);
+            return $r;
+        } catch (\Exception $ex) {
+            return null;
+        }
     }
 
     public static function get_sesssionData($account_type) {
@@ -221,25 +226,9 @@ class UserServiceV2 {
     protected static function setSession($account_type, $user_model) {
         try {
             $id_session = $account_type . '.user_' . $user_model->id;
-            session()->put($id_session, array(
-                'id' => $user_model->id,
-                'username' => $user_model->email,
-                'date_of_birth' => $user_model->date_of_birth,
-                'display_name' => $user_model->fullname,
-                'fullname' => $user_model->fullname,
-                'id_card' => $user_model->id_card,
-                'id_google' => $user_model->id_google,
-                'id_facebook' => $user_model->id_facebook,
-                'avatar' => $user_model->avatar,
-                'google_avatar' => $user_model->google_avatar,
-                'facebook_avatar' => $user_model->facebook_avatar,
-                'email' => $user_model->email,
-                'gender' => $user_model->gender,
-                'phone' => $user_model->phone,
-                'type' => $user_model->type,
-                'role' => $user_model->role,
-                'language' => $user_model->lang,
-            ));
+            $US = (new UserSession());
+            $US->set_model($user_model);
+            $US->set_session();
             UserServiceV2::set_currentSession($id_session, $account_type);
             return true;
         } catch (\Exception $ex) {

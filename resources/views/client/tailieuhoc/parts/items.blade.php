@@ -15,7 +15,7 @@
                     <div>MUA NGAY</div>
                 </div>
             </a>
-            <a href="javascript:;" data-toggle="modal" data-target=".bs-example-modal-lg">
+            <a href="javascript:;" data-name="{{$v->name}}" data-ud="{{$v->demo_url}}" data-toggle="modal" data-target="#fileDemoModal">
                 <div class="pan_view">
                     <i class="fa fa-eye"></i>
                     <div>XEM THỬ</div>
@@ -57,7 +57,7 @@
 </div>
 
 <!-- MODAL -->
-<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+<div id="fileDemoModal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -65,16 +65,27 @@
                 <h4 class="modal-title">Xem thử</h4>
             </div>
             <div class="modal-body">
-                <p><i class="fa fa-spinner faa-spin animated"></i> Đang tải...</p>
+
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary">Mua ngay</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
             </div>
         </div>
     </div>
 </div>
 <!-- /MODAL -->
+<script>
+    $('#fileDemoModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget); // Button that triggered the modal
+        var docName = button.data('name'); // Extract info from data-* attributes
+        var docUrl = button.data('ud');
+        // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+        // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+        var modal = $(this);
+        modal.find('.modal-title').text('Demo ' + docName);
+        modal.find('.modal-body').html('<iframe src="' + docUrl + '" style="width: 100%;height:350px"></iframe>');
+    });
+</script>
 
 <script>
     $(document).ready(function () {

@@ -4,24 +4,27 @@
 <div class="">
     <div class="page-title">
         <div class="title_left">
-            <h3>{{__('label.caidat') }}</h3>
+            <h3><i class="fa fa-google"></i> {{__('label.caidat') }}</h3>
         </div>
     </div>
     <div class="clearfix"></div>
     <div class="col-md-12 col-sm-12 col-xs-12">
         <div class="x_panel">
             <div class="x_content">
-                <a href="{{route('admin_setting_account')}}" class="btn btn-app"><i class="fa fa-arrow-left"></i> {{ __('label.cauhinhtaikhoan')}}</a>
+                <a href="{{route('admin_setting_account')}}" class="btn btn-app"><i class="fa fa-arrow-left"></i> Quay lại</a>
                 <a href="{{route('admin_setting_account_googledrive')}}" class="btn btn-app"><i class="fa fa-refresh"></i> {{__('label.tailai')}}</a>
-<!--                <a href="{{route('admin_cache_clear',['SETTING','admin_setting_index'])}}" class="btn btn-app"><i class="fa fa-remove"></i> {{ __('label.xoacache')}}</a>-->
+                <a href="{{route('admin_setting_account_googledrive_clearcache')}}" class="btn btn-app"><i class="fa fa-remove"></i> {{ __('label.xoacache')}}</a>
             </div>
         </div>
     </div>
     @if($item!=null)
+
+
+
     <div class="col-md-8 col-xs-12">
         <div class="x_panel">
             <div class="x_title">
-                <h2>{{__('label.thongtinchung')}} <small>{{__('message.cauhinhchitiet')}}</small></h2>
+                <h2><i class="fa fa-laptop"></i> {{__('label.thongtinchung')}} <small>{{__('message.cauhinhchitiet')}}</small></h2>
                 <div class="clearfix"></div>
             </div>
             <div class="x_content">
@@ -124,6 +127,32 @@
             </div>
         </div>
     </div>
+
+    <div class="col-md-4 col-xs-12">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2><i class="fa fa-gears"></i> Cấu hình đang được áp dụng</h2>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <div class="alert alert-info">
+                    <p><i class="fa fa-info"></i> Mọi thông tin cấu hình google driver sẽ được lưu vào bộ nhớ đệm (Cache) để đảm bảo tốc độ website được kết nối ổn định nhất.
+                        Nếu thay đổi cấu hình tài khoản <b>Google Drive</b> nên xóa <b>cache</b> để được áp dụng cấu hình mới.</p>
+                </div>
+                <ul class="list-group">
+                    <li class="list-group-item">Trạng thái: {{$item_cache->active?'ON':'OFF'}}</li>
+                    <li class="list-group-item" title="{{$item_cache->app_id}}"><i class="fa fa-laptop"></i> <b class="label label-info">{{str_limit($item_cache->app_id,50)}}</b></li>
+                    <li class="list-group-item"><i class="fa fa-key"></i> <b class="label label-warning">{{$item_cache->app_key}}</b></li>
+                    <li class="list-group-item"><i class="fa fa-exchange"></i> <b class="label label-info">{{$item_cache->token}}</b></li>
+                    <li class="list-group-item"><i class="fa fa-hdd-o"></i> <b class="label label-info">{{$item_cache->storage_parent}}</b></li>
+                    <li class="list-group-item"><i class="fa fa-refresh faa-spin animated"></i> <b class="label label-info">60 phút</b></li>
+                    <li class="list-group-item">
+                        <a href="{{route('admin_setting_account_googledrive_clearcache')}}" class="btn btn-danger btn-xs"><i class="fa fa-remove"></i> {{ __('label.xoacache')}}</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
     @else
     <!-- Lỗi cấu hình -->
     <div class="col-md-12 col-xs-12">
@@ -148,68 +177,57 @@
 @endsection
 
 @push('stylesheet')
-<!-- Select2 -->
-<link href="{!! asset('public/admin_assets/vendors/select2/dist/css/select2.min.css')!!}" rel="stylesheet">
 @endpush
 
 @push('scripts')
-<!-- bootstrap-progressbar -->
-<script src="{!! asset('public/admin_assets/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js')!!}"></script>
-<!-- ICheck -->
-<script src="{!! asset('public/admin_assets/vendors/iCheck/icheck.min.js')!!}"></script>
-<!-- jQuery Tags Input -->
-<script src="{!! asset('public/admin_assets/vendors/jquery.tagsinput/src/jquery.tagsinput.js')!!}"></script>
-<!-- Select2 -->
-<script src="{!! asset('public/admin_assets/vendors/select2/dist/js/select2.full.min.js')!!}"></script>
-
 <script>
-$(document).ready(function () {
-$('.js-switch').on('change', function () {
-var this_tr = $(this).parents('tr');
-var isChecked = $(this).prop('checked');
-var data = {
-action: $(this).data('action'),
-        tbl: $(this).data('tbl'),
-        id: $(this).data('id'),
-        field: $(this).data('field')
-        };
-$.ajax({
-url: '{{route("ajax_bcore_action")}}',
-        type: 'POST',
-        beforeSend: function () {
-        $(this_tr).css('background', '#CFF');
-        },
-        headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        dataType: 'json',
-        data: data,
-        success: function (data) {
+    $(document).ready(function () {
+        $('.js-switch').on('change', function () {
+            var this_tr = $(this).parents('tr');
+            var isChecked = $(this).prop('checked');
+            var data = {
+                action: $(this).data('action'),
+                tbl: $(this).data('tbl'),
+                id: $(this).data('id'),
+                field: $(this).data('field')
+            };
+            $.ajax({
+                url: '{{route("ajax_bcore_action")}}',
+                type: 'POST',
+                beforeSend: function () {
+                    $(this_tr).css('background', '#CFF');
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                dataType: 'json',
+                data: data,
+                success: function (data) {
+                    update_pan_status(isChecked);
+                    if (data.result == '1') {
+                        $(this_tr).css('background', 'none');
+                    } else {
+                        $(this_tr).css('background', '#F00');
+                    }
+                }, error: function (data) {
+                    // console.log(data.responseText);
+                }
+            });
+        });
+        init_page();
+    });
+    function init_page() {
+
+        var isChecked = $('input[name="active"]').prop('checked');
         update_pan_status(isChecked);
-        if (data.result == '1') {
-        $(this_tr).css('background', 'none');
+    }
+
+    function update_pan_status(pIsChecked) {
+        if (pIsChecked) {
+            $('#drive-status').slideDown();
         } else {
-        $(this_tr).css('background', '#F00');
+            $('#drive-status').slideUp();
         }
-        }, error: function (data) {
-// console.log(data.responseText);
-}
-});
-});
-init_page();
-});
-function init_page() {
-
-var isChecked = $('input[name="active"]').prop('checked');
-update_pan_status(isChecked);
-}
-
-function update_pan_status(pIsChecked) {
-if (pIsChecked) {
-$('#drive-status').slideDown();
-} else {
-$('#drive-status').slideUp();
-}
-}
+    }
 </script>
 @endpush

@@ -21,11 +21,11 @@
                         <div class="panel panel-default">
                             <div class="panel-heading"><i class="fa fa-user"></i> Thông tin cá nhân</div>
                             <div class="panel-body">
-                                <p>Họ và tên: {{@$userdata->fullname}}</p>
-                                <p>Email: <i class="label label-info">{{@$userdata->email}}</i></p>
-                                <p>Điện thoại: {{@$userdata->phone}}</p>
-                                <p>Giới tính: {{@$userdata->gender}}</p>
-                                <p>Ngày đăng ký: {{@$userdata->created_at}}</p>
+                                <p>Họ và tên: {{@$userData->fullname}}</p>
+                                <p>Email: <i class="label label-info">{{@$userData->email}}</i></p>
+                                <p>Điện thoại: {{@$userData->phone}}</p>
+                                <p>Giới tính: {{@$userData->gender}}</p>
+                                <p>Ngày đăng ký: {{(new Carbon\Carbon($userData->created_at))->format('d-m-Y')}}</p>
                             </div>
                             <div class="panel-footer">
                                 <div class="row">

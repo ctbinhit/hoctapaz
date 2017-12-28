@@ -13,19 +13,16 @@
 @endpush
 
 @if(isset($items))
-<table id="jquery-datatable-default" class="table table-hover table-effect">
+<table id="jquery-datatable-default" class="table table-bordered table-effect">
     <thead>
         <tr>
             <td><input class="jquery-icheck-all" data-items="item-select" type="checkbox"></td>
             <th>{{__('label.stt')}}</th>
             <th>{{__('label.ten')}}</th>
-<!--            <th><i class="fa fa-picture-o"></i></th>-->
-            <th><i class="fa fa-eye"></i></th>
-            <th><i class="fa fa-clock-o"></i></th>
-            <th><i class="fa fa-hdd-o"></i></th>
+            <th><i class="fa fa-clock-o" data-placement="top" data-toggle="tooltip" title="Thời gian làm bài"></i></th>
+            <th><i class="fa fa-hdd-o" data-placement="top" data-toggle="tooltip" title="Kích thước của bài trắc nghiệm"></i></th>
+            <th><i class="fa fa-file-pdf-o"></i></th>
             <th>{{__('label.ngaytao')}}</th>
-<!--            <th>{{__('label.noibat')}}</th>
-            <th>{{__('label.hienthi')}}</th>-->
             <th>{{__('label.trangthai')}}</th>
             <th>{{__('label.thaotac')}}</th>
         </tr>
@@ -38,24 +35,16 @@
                 <input class="jquery-icheck item-select" data-id="{{$v->id}}" type="checkbox">
             </td>
             <td style="width:2%">
-                <input style="width:100%" class="jquery-bcore-textbox" data-id="{{$v->id}}" data-field="ordinal_number" 
-                       data-tbl="{{$v->tbl}}" data-action="uf" type="number" value="{{$v->ordinal_number}}">
+                {{$k+1}}
             </td>
             <td style="width: 30%;">
-                <a href="{{ route('mdle_oc_pi_exam_edit',$v->id)}}">
-                    {{$v->name}} <i class="fa fa-pencil"></i>
-                </a>
+                <a href="{{ route('mdle_oc_pi_exam_edit',$v->id)}}" class="text-info">{{$v->name}} <i class="fa fa-pencil"></i></a>
             </td>
-<!--            <td>
-                <img src="" />
-            </td>-->
-            <td>{{$v->views}}</td>
-            <td>{{$v->time/60}} {{__('schools.phut')}}</td>
-            <td></td>
+            <td><i class="label label-info">{{$v->time/60}} {{__('schools.phut')}}</i></td>
+            <td><i class="label label-info">{{(strlen($v->app_data))}}</i></td>
+            <td>...</td>
             <td>{{diffInNow($v->created_at)}} <br>{{ Carbon\Carbon::parse($v->created_at)->format('d-m-Y h:i:s') }}</td>
-            <td style="width: 10%;">
-                {{$v->state}}
-            </td>
+            <td style="width: 10%;"><i class="label label-info">{{$v->state}}</i></td>
             <td style="width: 20%;">
                 <!-- Single button -->
                 <div class="btn-group">
@@ -67,8 +56,8 @@
                         <li><a href="{{ route('mdle_oc_pi_exam_edit',$v->id)}}"><i class="fa fa-edit"></i> Chỉnh sửa</a></li>
                         <li role="separator" class="divider"></li>
                         <li><a href="javascript:;" class="jquery-btn-createExamMode1"><i class="fa fa-plus-circle"></i> Tạo phòng thi</a></li>
-                        <li><a href="javascript:;" class="jquery-btn-createExamMode2"><i class="fa fa-plus-circle"></i> Tạo đề thi thử</a></li>
-                        <li><a href="javascript:;" class="jquery-btn-createExamMode3"><i class="fa fa-plus-circle"></i> Tạo bài trắc nghiệm</a></li>
+<!--                        <li><a href="javascript:;" class="jquery-btn-createExamMode2"><i class="fa fa-plus-circle"></i> Tạo đề thi thử</a></li>
+                        <li><a href="javascript:;" class="jquery-btn-createExamMode3"><i class="fa fa-plus-circle"></i> Tạo bài trắc nghiệm</a></li>-->
                         <li role="separator" class="divider"></li>
                         <li><a href="javascript:;" class="jquery-btn-removeExam"><i class="fa fa-trash"></i> Xóa</a></li>
                     </ul>
@@ -201,9 +190,9 @@
                             act: '779b01b6ac7f4d64459a3e1f52c0e90f',
                             id: $(tr).data('id')
                         }, success: function (res) {
-                            if(res.response_state){
+                            if (res.response_state) {
                                 $(tr).slideUp();
-                            }else{
+                            } else {
                                 $.alert(jquery_alert_options({
                                     title: 'Thông báo',
                                     content: 'Có lỗi xảy ra trong quá trình thao tác, vui lòng thử lại sau.'
@@ -223,9 +212,9 @@
                             act: 'e1e9130e17e60b2dce990bea6bb0c5da',
                             id: $(tr).data('id')
                         }, success: function (res) {
-                            if(res.response_state){
+                            if (res.response_state) {
                                 $(tr).slideUp();
-                            }else{
+                            } else {
                                 $.alert(jquery_alert_options({
                                     title: 'Thông báo',
                                     content: 'Có lỗi xảy ra trong quá trình thao tác, vui lòng thử lại sau.'
@@ -246,9 +235,9 @@
                             act: '5efd453f68aac1ffc4156e76a7aebdfa',
                             id: $(tr).data('id')
                         }, success: function (res) {
-                            if(res.response_state){
+                            if (res.response_state) {
                                 $(tr).slideUp();
-                            }else{
+                            } else {
                                 $.alert(jquery_alert_options({
                                     title: 'Thông báo',
                                     content: 'Có lỗi xảy ra trong quá trình thao tác, vui lòng thử lại sau.'
@@ -269,9 +258,9 @@
                             act: 'c98b5521a0f9123f84e93c16a12b5b2c',
                             id: $(tr).data('id')
                         }, success: function (res) {
-                            if(res.response_state){
+                            if (res.response_state) {
                                 $(tr).slideUp();
-                            }else{
+                            } else {
                                 $.alert(jquery_alert_options({
                                     title: 'Thông báo',
                                     content: 'Có lỗi xảy ra trong quá trình thao tác, vui lòng thử lại sau.'

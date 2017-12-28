@@ -1,17 +1,13 @@
-@php
 
-$TMP_EXAM_ID = $item->id;
-
-@endphp
 @push('scripts')
 <script>
     function secondsTimeSpanToHMS(s) {
-    var h = Math.floor(s/3600); //Get whole hours
-    s -= h*3600;
-    var m = Math.floor(s/60); //Get remaining minutes
-    s -= m*60;
-    return h+":"+(m < 10 ? '0'+m : m)+":"+(s < 10 ? '0'+s : s); //zero padding on minutes and seconds
-}
+        var h = Math.floor(s / 3600); //Get whole hours
+        s -= h * 3600;
+        var m = Math.floor(s / 60); //Get remaining minutes
+        s -= m * 60;
+        return h + ":" + (m < 10 ? '0' + m : m) + ":" + (s < 10 ? '0' + s : s); //zero padding on minutes and seconds
+    }
     $(document).ready(function () {
         var CEC = {
             error: {
@@ -35,7 +31,7 @@ $TMP_EXAM_ID = $item->id;
                     end: '#jquery-cec-exam-end',
                     body: '#jquery-cec-exam-body',
                     radio: '.jquery-cec-radio',
-                    radio_checked : '.jquery-cec-radio-checked',
+                    radio_checked: '.jquery-cec-radio-checked',
                     result: {
                         socaudung: '.jquery-cec-socaudung',
                         tongsocau: '.jquery-cec-tongsocau',
@@ -47,7 +43,7 @@ $TMP_EXAM_ID = $item->id;
             info: {
                 state: 0,
                 questions: [],
-                exam_code : null,
+                exam_code: null,
                 timecountdown: null
             },
             init: function ($pParent) {
@@ -75,42 +71,40 @@ $TMP_EXAM_ID = $item->id;
                     // Off sự kiện click tất cả radio button
                     CEC.deactiveEvent.radio();
                     var qchecked = [];
-                    var radio_checked = $(CEC.elements.exam.radio+'.jquery-cec-radio-checked');
-                     $.each(radio_checked, function (k, v) {
-                         var qc = $(v).data('id');
-                         var qv = $(v).data('val');
-                         qchecked.push([qc,qv]);
-                     });
+                    var radio_checked = $(CEC.elements.exam.radio + '.jquery-cec-radio-checked');
+                    $.each(radio_checked, function (k, v) {
+                        var qc = $(v).data('id');
+                        var qv = $(v).data('val');
+                        qchecked.push([qc, qv]);
+                    });
                     data = {
-                        action: 'exam_end',
+                        act: 'ee',
                         data: qchecked,
                         time: CEC.info.timecountdown,
-                        exam_code: CEC.info.exam_code,
-                        
+                        eum_code: CEC.info.exam_code,
                     };
-                    //console.log(r);
                     $.ajax({
-                        url: '{!!$client_exam_ajax!!}',
+                        url: $('#client_exam_ajaxV2').val(),
                         type: 'POST',
                         dataType: 'json',
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         },
                         beforeSend: function (xhr) {
-                            
+
                         },
-                        data: data, 
+                        data: data,
                         success: function (data) {
                             console.log(data);
                             console.log(data.status);
-                            setTimeout(function(){
-                                if(data.status==true){
+                            setTimeout(function () {
+                                if (data.state == true) {
                                     $(CEC.elements.exam.result.socaudung).html(data.data.socaudung);
                                     $(CEC.elements.exam.result.tongsocau).html(data.data.tongsocau);
                                     $(CEC.elements.exam.result.diem).html(data.data.score);
                                     $(CEC.elements.exam.result.tgthi).html(data.data.tongthoigianlambai);
                                 }
-                            },0);
+                            }, 0);
                         }, error: function (data) {
                             console.log(data);
                         }
@@ -121,49 +115,48 @@ $TMP_EXAM_ID = $item->id;
                         return false;
                     }
                     $.ajax({
-                        url: '{!!$client_exam_ajax!!}',
+                        url: $('#client_exam_ajaxV2').val(),
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         },
                         type: 'POST',
                         dataType: 'json',
                         beforeSend: function (xhr) {
-                            // Show loading...
                             $($pButton).find('i').removeClass('fa-sign-in')
                                     .addClass('fa-spinner faa-spin animated');
                         },
                         data: {
-                            action: 'exam_start',
-                            id: {{$TMP_EXAM_ID}}
+                            act: 'es',
+                            id: $('#erm_id').val()
                         }, success: function (data, status) {
                             console.log(data);
                             if (data.status == false) {
                                 CEC.error.message = "Có lỗi xảy ra trong quá trình tải dữ liệu.";
                             } else {
-                                if(data.exam_code!=null){
-                                      CEC.info.exam_code = data.exam_code;
-                                      CEC.error.status = true;
-                                        CEC.info.timecountdown = data.exam.time;
-                                        // SHOW DOCUMENT
-                                        $(CEC.elements.exam.document).html('<embed src="' + data.exam.file_pdf + '" />');
-                                        var str = '';
-                                        $.each(data.exam_detail,function(k,v){
-                                            var tmp_c = k+1;
-                                            CEC.info.questions.push('jquery-cec-question-'+tmp_c);
-                                            str+= '<div class="jquery-cec-question">';
-                                            str+= '<span>Câu '+tmp_c+':</span>';
-                                            str+= '<button class="jquery-cec-radio" data-id="'+ tmp_c +'" data-val="1" type="button">A</button>';
-                                            str+= '<button class="jquery-cec-radio" data-id="'+ tmp_c +'" data-val="2" type="button">B</button>';
-                                            str+= '<button class="jquery-cec-radio" data-id="'+ tmp_c +'" data-val="3" type="button">C</button>';
-                                            str+= '<button class="jquery-cec-radio" data-id="'+ tmp_c +'" data-val="4" type="button">D</button>';
-                                            str+= '</div>';
-                                        });
-                                        $(CEC.elements.exam.pan_check).html(str);
-                                        CEC.registerEvent.radio();
-                                }else{
+                                if (data.eum_code != null) {
+                                    CEC.info.exam_code = data.eum_code;
+                                    CEC.error.status = true;
+                                    CEC.info.timecountdown = data.erm.time;
+                                    // SHOW DOCUMENT
+                                    $(CEC.elements.exam.document).html('<embed src="' + data.erm.file_url + '#toolbar=0&navpanes=0" />');
+                                    var str = '';
+                                    $.each(data.app_data, function (k, v) {
+                                        var tmp_c = k + 1;
+                                        CEC.info.questions.push('jquery-cec-question-' + tmp_c);
+                                        str += '<div class="jquery-cec-question">';
+                                        str += '<span>Câu ' + tmp_c + ':</span>';
+                                        str += '<button class="jquery-cec-radio" data-id="' + tmp_c + '" data-val="1" type="button">A</button>';
+                                        str += '<button class="jquery-cec-radio" data-id="' + tmp_c + '" data-val="2" type="button">B</button>';
+                                        str += '<button class="jquery-cec-radio" data-id="' + tmp_c + '" data-val="3" type="button">C</button>';
+                                        str += '<button class="jquery-cec-radio" data-id="' + tmp_c + '" data-val="4" type="button">D</button>';
+                                        str += '</div>';
+                                    });
+                                    $(CEC.elements.exam.pan_check).html(str);
+                                    CEC.registerEvent.radio();
+                                } else {
                                     CEC.error.message = "Có lỗi xảy ra trong quá trình tải dữ liệu.";
                                 }
-                              
+
                             }
 
 
@@ -171,33 +164,31 @@ $TMP_EXAM_ID = $item->id;
                             //console.log(data.responseText);
                         }, complete: function (jqXHR, textStatus) {
                             // Nếu error = false => run
-                            if (CEC.error.status==true) {
+                            if (CEC.error.status == true) {
                                 CEC.display.overflow(false);
                                 CEC.info.state = 1;
                                 CEC.timer = setInterval(function () {
                                     CEC.listen.running();
                                 }, 1 * 1000);
                             } else {
-                                
+
                             }
                         }
                     });
                     // END Exam->start
                 }
             },
-            
             listen: {
                 running: function () {
                     console.log(CEC.info.timecountdown);
                     if (CEC.info.state == 1 && CEC.info.timecountdown > 0) {
                         CEC.info.timecountdown--;
                     }
-                  
-                    
+
+
                     $(CEC.elements.exam.info.time.count_down).html(secondsTimeSpanToHMS(CEC.info.timecountdown));
                     if (CEC.info.timecountdown == 0) {
                         CEC.exam.end();
-
                     }
                 }
             },
@@ -221,14 +212,13 @@ $TMP_EXAM_ID = $item->id;
                     // START
                     $(CEC.elements.exam.start).on('click', function () {
                         console.log('Button start exam clicked');
-                        CEC.exam.start({{$TMP_EXAM_ID}}, this);
+                        CEC.exam.start($('#erm_id').val(), this);
                     });
-
                     $(CEC.elements.exam.end).on('click', function () {
                         console.log('Button end exam clicked');
                         var tongcau = $('.jquery-cec-question').length;
-                        var radio_checked = $(CEC.elements.exam.radio+'.jquery-cec-radio-checked').length;
-                        if(radio_checked<tongcau){
+                        var radio_checked = $(CEC.elements.exam.radio + '.jquery-cec-radio-checked').length;
+                        if (radio_checked < tongcau) {
                             $.confirm({
                                 title: 'Lưu ý!',
                                 content: 'Tổng số câu hỏi là ' + tongcau + ', số câu chọn là ' + radio_checked + '! Bạn có muốn kết thúc bài thi?',
@@ -236,19 +226,19 @@ $TMP_EXAM_ID = $item->id;
                                     confirm: {
                                         text: 'Nộp bài ngay',
                                         btnClass: 'btn btn-warning',
-                                        action: function(){
+                                        action: function () {
                                             CEC.exam.end();
                                         }
                                     },
                                     cancel: {
                                         text: 'Tiếp tục bài thi',
                                         btnClass: 'btn btn-default',
-                                        action: function(){
+                                        action: function () {
                                         }
                                     }
                                 }
                             });
-                        }else{
+                        } else {
                             $.confirm({
                                 title: 'Thông báo',
                                 content: 'Bạn có chắc là muốn kết thúc bài thi?',
@@ -256,27 +246,24 @@ $TMP_EXAM_ID = $item->id;
                                     confirm: {
                                         text: 'Có, tôi đã làm xong',
                                         btnClass: 'btn btn-warning',
-                                        action: function(){
+                                        action: function () {
                                             CEC.exam.end();
                                         }
                                     },
                                     cancel: {
                                         text: 'Tiếp tục bài thi',
                                         btnClass: 'btn btn-default',
-                                        action: function(){
+                                        action: function () {
                                         }
                                     }
                                 }
                             });
                         }
                         return;
-                        
                     });
-                    
-                    
                 },
-                radio: function(){
-                    $(CEC.elements.exam.radio).on('click',function(){
+                radio: function () {
+                    $(CEC.elements.exam.radio).on('click', function () {
                         $(this).parents('.jquery-cec-question')
                                 .find('button').removeClass('jquery-cec-radio-checked');
                         $(this).addClass('jquery-cec-radio-checked');
@@ -284,12 +271,11 @@ $TMP_EXAM_ID = $item->id;
                 }
             },
             deactiveEvent: {
-                radio: function(){
+                radio: function () {
                     $(CEC.elements.exam.radio).off('click');
                 }
             }
         };
-
         CEC.init('#jquery-app-exam');
     });
 </script>

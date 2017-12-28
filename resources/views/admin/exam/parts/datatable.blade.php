@@ -16,12 +16,13 @@
     <thead>
         <tr>
             <th width="30px"><input class="jquery-icheck-all" data-items="item-select" type="checkbox"></th>
-            <th><i class="fa fa-user"></i> Đối tác</th>
-            <th width="25%">Tên đề thi</th>
-            <th>Danh mục</th>
-            <th>Thời gian</th>
-            <th>Giá</th>
-            <th><i class="fa fa-clock-o"></i> {{__('label.ngaytao')}}</th>
+            <th data-toggle="tooltip" data-placement="top" title="Đối tác"><i class="fa fa-user"></i></th>
+            <th width="25%" data-toggle="tooltip" data-placement="top" title="Tên đề thi">Tên đề thi</th>
+            <th data-toggle="tooltip" data-placement="top" title="Danh mục"><i class="fa fa-list"></i></th>
+            <th data-toggle="tooltip" data-placement="top" title="Thời gian làm bài"><i class="fa fa-clock-o"></i></th>
+            <th data-toggle="tooltip" data-placement="top" title="Phí dự thi"><i class="fa fa-money"></i> L1</th>
+            <th data-toggle="tooltip" data-placement="top" title="Phí ôn tập"><i class="fa fa-money"></i> L2</th>
+            <th data-toggle="tooltip" data-placement="top" title="Ngày đăng ký"><i class="fa fa-calendar-o"></i></th>
             <th>{{__('label.trangthai')}}</th>
             <th width="200px">{{__('label.thaotac')}}</th>
         </tr>
@@ -37,6 +38,7 @@
             <td><div class="label label-info">{{str_limit($v->category_name,30)}}</div></td>
             <td><div class="label label-info">{{$v->time/60}} phút</div></td>
             <td><div class="label label-info">{{number_format($v->price,0,'.',',')}} VNĐ</div></td>
+            <td><div class="label label-info">{{number_format($v->price2,0,'.',',')}} VNĐ</div></td>
             <td>{{ Carbon\Carbon::parse($v->created_at)->format('d-m-Y h:i:s') }}</td>
             <td style="width: 10%;"><div class="label label-warning">{{__('label.dangcho')}}</div></td>
             <td>
@@ -50,7 +52,7 @@
                         Thao tác <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a href="{{route('admin_examman_approver_detail',$v->id)}}" class=""><i class="fa fa-eye"></i> Xem chi tiết</a></li>
+                        <li><a href="{{route('admin_examman_approver_detail',$v->id)}}" class=""><i class="fa fa-eye"></i> Xét duyệt</a></li>
                         <li role="separator" class="divider"></li>
                         <li><a href="javascript:;" class="jquery-btn-removeExam"><i class="fa fa-trash"></i> Xóa</a></li>
                     </ul>

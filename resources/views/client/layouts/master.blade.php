@@ -125,6 +125,20 @@
 
             @include('client.layouts.header')
 
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        @if($current_user!=null)
+                        @if($current_user->phone==null)
+                        <div class="alert alert-warning">
+                            <p><i class="fa fa-user"></i> Thiếu thông tin tài khoản, vui lòng bổ sung đầy đủ thông tin để được hỗ trợ tốt nhất.</p>
+                        </div>
+                        @endif
+                        @endif
+                    </div>
+                </div>
+            </div>
+
             <!-- SECTION CONTENT -->
             <section id="jquery-pjax-content" class="container-fluid">
                 @stack('scss')
@@ -142,7 +156,7 @@
 
         <!-- Bootstrap -->
         <script src="{{public_bower('bootstrap/dist/js/bootstrap.min.js')}}"></script>
-        
+
         <!-- SLICK -->
         <script src="{{public_bower('slick-carousel/slick/slick.min.js')}}"></script>
 

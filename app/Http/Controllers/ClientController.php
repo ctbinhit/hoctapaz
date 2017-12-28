@@ -7,25 +7,20 @@ use View,
     Config;
 use Illuminate\Support\Facades\Cache;
 // Module Background
-use App\Modules\Background\Models\BackgroundModel;
 use App\Modules\Background\Services\BackgroundService;
 use App\Bcore\Services\AppService;
 use App\Bcore\Services\UserServiceV2;
-use App\Bcore\System\UserType;
-use App\Models\UserModel;
+use App\Bcore\Services\UserServiceV3;
+use App\Bcore\SystemComponents\User\UserType;
 
 class ClientController extends ControllerService {
 
     public $RV = 'client/';
+    public $current_user;
     public $_USER = null;
 
     public function __construct() {
         parent::__construct();
-        
-        $this->middleware(function($request, $next) {
-            $this->_USER = UserServiceV2::get_currentSessionData(UserType::user());
-            return $next($request);
-        });
 
 
         $website_info = AppService::get_info(UserServiceV2::get_currentLangId(UserType::user()));
@@ -37,21 +32,30 @@ class ClientController extends ControllerService {
 
         // THÔNG BÁO ĐẦU TRANG
         if (class_exists('\App\Modules\PMN\Models\PMNModel')) {
-            $PMN_HEADER = \App\Modules\PMN\Models\PMNModel::where([
-                        ['type', '=', 'header']
-                    ])->first();
+            $PMN_HEADER = \App\Modules\PMN\Models\PMNModel::where('type', 'header')->first();
             if ($PMN_HEADER != null) {
                 View::share('pmn_header', $PMN_HEADER);
             }
         }
+
+        $this->middleware(function($request, $next) {
+            $this->load_userSession();
+            //  dd(  $this->current_user);
+            return $next($request);
+        });
     }
 
-    public function get_currentDBUserData() {
-        if ($this->_USER == null) {
-            return null;
-        }
-        return UserModel::find($this->_USER['id']);
+    public function load_userSession() {
+        $UserSession = (new UserServiceV3)->user()->load_session()->get_session();
+        $this->current_user = $UserSession != null ? (object) json_decode(json_encode($UserSession)) : null;
+        View::share('current_user', $this->current_user != null ? (object) $this->current_user : null);
+        return $this->current_user;
     }
-    
 
+//    public function get_currentDBUserData() {
+//        if ($this->_USER == null) {
+//            return null;
+//        }
+//        return UserModel::find($this->_USER['id']);
+//    }
 }

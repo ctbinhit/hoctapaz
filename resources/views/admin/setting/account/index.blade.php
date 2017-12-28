@@ -66,17 +66,7 @@
 @endsection
 
 @push('stylesheet')
-<!-- Select2 -->
-<link href="public/admin_assets/vendors/select2/dist/css/select2.min.css" rel="stylesheet">
 @endpush
 
 @push('scripts')
-<!-- bootstrap-progressbar -->
-<script src="public/admin_assets/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
-<!-- ICheck -->
-<script src="public/admin_assets/vendors/iCheck/icheck.min.js"></script>
-<!-- jQuery Tags Input -->
-<script src="public/admin_assets/vendors/jquery.tagsinput/src/jquery.tagsinput.js"></script>
-<!-- Select2 -->
-<script src="public/admin_assets/vendors/select2/dist/js/select2.full.min.js"></script>
 @endpush

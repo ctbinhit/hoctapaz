@@ -18,7 +18,6 @@
 
 
 Route::get('/binhcao.html', function() {
-
     dd(session()->all());
 });
 
@@ -133,6 +132,9 @@ Route::group(['middleware' => 'web'], function() {
         Route::post('/donate' . config('bcore.PageExtension'), ['uses' => 'client\UserController@post_donate'])
                 ->name('_client_user_donate')->middleware('ClientMiddleware');
 
+        Route::get('/profile-picture' . config('bcore.PageExtension'), ['uses' => 'client\UserController@get_update_profilepicture'])
+                ->name('client_user_profilepicture')->middleware('ClientMiddleware');
+
         Route::get('/cai-dat' . config('bcore.PageExtension'), ['uses' => 'client\UserController@get_caidat'])
                 ->name('client_user_caidat')->middleware('ClientMiddleware');
         Route::post('/cai-dat' . config('bcore.PageExtension'), ['uses' => 'client\UserController@post_caidat'])
@@ -160,10 +162,10 @@ Route::group(['middleware' => 'web'], function() {
     Route::get('/phong-thi/{name_meta}' . config('bcore.PageExtension'), ['uses' => 'client\ExamController@get_exam_phongthi_danhmuc'])
             ->name('client_exam_phongthi_danhmuc');
 
-    Route::get('/phong-thi/redirect/{examMeta}' . config('bcore.PageExtension'), ['uses' => 'client\ExamController@get_exam_phongthi_redirect'])
+    Route::get('/phong-thi/chi-tiet/{examMeta}' . config('bcore.PageExtension'), ['uses' => 'client\ExamController@get_exam_phongthi_redirect'])
             ->name('client_exam_phongthi_redirect');
 
-    Route::post('/phong-thi/redirect/{examMeta}' . config('bcore.PageExtension'), ['uses' => 'client\ExamController@post_exam_phongthi_redirect'])
+    Route::post('/phong-thi/chi-tiet/{examMeta}' . config('bcore.PageExtension'), ['uses' => 'client\ExamController@post_exam_phongthi_redirect'])
             ->name('_client_exam_phongthi_redirect');
 
     Route::get('/thi-online/app' . config('bcore.PageExtension'), ['uses' => 'client\ExamController@get_exam_thionline_token'])
@@ -267,7 +269,6 @@ Route::group(['middleware' => 'web'], function() {
 
             Route::get('/{type}' . config('bcore.PageExtension'), ['uses' => 'admin\NewsletterController@get_index'])
                     ->name('admin_newsleeter_index');
-            
         });
 
         // ===== SYSTEMS ===============================================================================================
@@ -354,10 +355,12 @@ Route::group(['middleware' => 'web'], function() {
                         ->name('admin_setting_account_googledrive');
                 Route::post('/google-drive', ['uses' => 'admin\SettingController@post_account_googledrive'])
                         ->name('_admin_setting_account_googledrive');
+                Route::get('/google-drive/clearcache', ['uses' => 'admin\SettingController@get_account_googledrive_clearcache'])
+                        ->name('admin_setting_account_googledrive_clearcache');
 
                 Route::get('/google-drive/storage', ['uses' => 'admin\SettingController@get_account_googledrive_path'])
                         ->name('admin_setting_account_googledrive_path');
-                Route::post('/google-drive/storage/save', ['uses' => 'admin\SettingController@post_account_googledrive_path'])
+                Route::post('/google-drive/storage', ['uses' => 'admin\SettingController@post_account_googledrive_path'])
                         ->name('_admin_setting_account_googledrive_path');
             });
 
@@ -508,6 +511,9 @@ Route::group(['middleware' => 'web'], function() {
 
             Route::post('/approver', ['uses' => 'admin\ExamManController@post_approver'])
                     ->name('_admin_examman_approver');
+            
+            Route::get('/registered-app', ['uses' => 'admin\ExamManController@get_app_registered'])
+                    ->name('admin_examman_registered');
 
             Route::get('/approver/reject/{id}', ['uses' => 'admin\ExamManController@get_approver_reject'])
                     ->name('admin_examman_approver_reject');
@@ -550,7 +556,7 @@ Route::group(['middleware' => 'web'], function() {
     //================================================== PI AREA =======================================================
     //==================================================================================================================
 
-    Route::group(['prefix' => 'professor'], function() {
+    Route::group(['prefix' => App\Bcore\System\RouteArea::collaborator()], function() {
 
         Route::get('/', 'pi\IndexController@get_index')->name('pi_index_index')->middleware('PiMiddleware');
 
@@ -582,7 +588,7 @@ Route::group(['middleware' => 'web'], function() {
         Route::post('login', ['uses' => 'pi\LoginController@post_index'])->name('pi_login_signin');
 
         Route::get('logout', function() {
-            App\Bcore\Services\UserServiceV2::drop_currentSession(\App\Bcore\System\UserType::professor());
+            App\Bcore\Services\UserServiceV2::drop_currentSession(App\Bcore\SystemComponents\User\UserType::professor());
             return redirect()->route('pi_index_index');
         })->name('pi_logout');
 

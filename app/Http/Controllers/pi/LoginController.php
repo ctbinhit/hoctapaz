@@ -8,7 +8,8 @@ use UserModel;
 use AuthService;
 use Session;
 use App\Bcore\Services\UserServiceV2;
-use App\Bcore\System\UserType;
+use App\Bcore\Services\UserServiceV3;
+use App\Bcore\SystemComponents\User\UserType;
 
 class LoginController extends ProfessorController {
 
@@ -21,12 +22,16 @@ class LoginController extends ProfessorController {
     }
 
     public function post_index(Request $request) {
+        $this->validate($request,[
+            'username' => 'required',
+            'password' => 'required'
+        ]);
         $input_username = $request->input('username');
         $input_password = $request->input('password');
+        
+        $UserServiceV3 = (new UserServiceV3())->collaborator()->signinWithForm($input_username, $input_password);
 
-        $singin = UserServiceV2::signinWithForm($input_username, $input_password, UserType::professor());
-
-        if (!$singin) {
+        if (!$UserServiceV3) {
             return back()->withInput();
         }
 

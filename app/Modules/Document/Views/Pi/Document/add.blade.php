@@ -18,26 +18,36 @@
             </div>
         </div>
 
+        @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
+
         <div class="x_panel">
             <div class="x_title">
                 <h2>Thông tin file</h2>
                 <div class="clearfix"></div>
             </div>
             <div class="x_content">
-                
+
                 {{csrf_field()}}
                 <input type="hidden" name="id" id="id" value="{{@$item->id}}" />
-                <input type="hidden" name="type" id="type" value="{{@$type}}" />
+                <input type="hidden" name="type" id="type" value="{{$type}}" />
                 <input type="hidden" name="allow_uservip" id="allow_uservip" value="" />
 
                 <div class="form-group">
                     <label for="name" class="control-label col-lg-2 col-md-2 col-sm-3 col-xs-12">Tên file:</label>
                     <div class="col-lg-10 col-md-10 col-sm-9 col-xs-12">
                         <input type="text" name="name" id="name" class="form-control"
-                               value="{{@$item->name}}" placeholder="Tên file" required=""/>
+                               value="{{old('name', @$item->name)}}" placeholder="Tên file" required=""/>
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="name" class="control-label col-lg-2 col-md-2 col-sm-3 col-xs-12">Danh mục:</label>
                     <div class="col-lg-10 col-md-10 col-sm-9 col-xs-12">
@@ -48,12 +58,12 @@
                             @else
                             <option value="{{$v->id}}">{!!$v->name!!}</option>
                             @endif
-                            
+
                             @endforeach
                         </select>
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="description" class="control-label col-lg-2 col-md-2 col-sm-3 col-xs-12">VIP:</label>
                     <div class="col-lg-10 col-md-10 col-sm-9 col-xs-12">
@@ -75,7 +85,7 @@
                     <div class="col-lg-10 col-md-10 col-sm-9 col-xs-12">
                         <div class="js-summernote"></div>
                         <textarea class="form-control hidden" name="description" id="description"
-                                  placeholder="Mô tả..." rows="5" id="description" required="">{{@$item->description}}</textarea>
+                                  placeholder="Mô tả..." rows="5" id="description" required="">{{old('description', @$item->description)}}</textarea>
                     </div>
                 </div>
 
@@ -84,7 +94,7 @@
                     <div class="col-lg-10 col-md-10 col-sm-9 col-xs-12">
                         <div class="js-summernote"></div>
                         <textarea class="form-control hidden" name="content" id="content"
-                                  placeholder="Nội dung..." rows="8" id="description" required="">{{@$item->content}}</textarea>
+                                  placeholder="Nội dung..." rows="8" id="description" required="">{{old('content', @$item->content)}}</textarea>
                     </div>
                 </div>
 
@@ -92,20 +102,31 @@
         </div>
 
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-6">
                 <div class="x_panel">
                     <div class="x_title">
                         <h2>Thông tin file</h2>
                         <div class="clearfix"></div>
                     </div>
                     <div class="x_content">
-
                         <div class="form-group">
                             <label for="price" class="control-label col-lg-2 col-md-2 col-sm-3 col-xs-12">Giá:</label>
                             <div class="col-lg-10 col-md-10 col-sm-9 col-xs-12 input-group">
                                 <input type="number" name="price" id="price" class="form-control"
-                                       value="{{@$item->price}}" placeholder="Giá tài liệu..." required=""/>
+                                       value="{{old('price', @$item->price)}}" placeholder="Giá tài liệu..." required=""/>
                                 <span class="input-group-addon">VNĐ</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="file_demo" class="control-label col-lg-2 col-md-2 col-sm-3 col-xs-12">File demo:</label>
+                            <div class="col-lg-10 col-md-10 col-sm-9 col-xs-12">
+                                <input type="file" name="file_demo" id="file_demo" accept=".pdf"/>
+                            </div>
+                            <div class="col-lg-10 col-md-10 col-sm-9 col-xs-12 col-lg-offset-2 col-md-offset-2">
+                                <div class="alert alert-info">
+                                    <strong>Lưu ý!</strong> File này được trích 1 đoạn từ file tài liệu và không vượt quá 5Mb <b>Download</b>.
+                                </div>
                             </div>
                         </div>
 
@@ -128,19 +149,19 @@
                             <div class="col-lg-10 col-md-10 col-sm-9 col-xs-12">
                                 <embed style="width: 100%;height: 500px;" src="{{route('document',$item->url_encode)}}#toolbar=0&navpanes=0&scrollbar=0"></embed>
                                 @if($item->mimetype=='application/pdf')
-<!--                                <div class="jquery-tnviewer">
-                                    <div class="jquery-bviewer-toolbar">
-                                        <i id="prev" class="fa fa-arrow-left"></i>
-                                        <i id="next" class="fa fa-arrow-right"></i>
-                                        <span>Page: <span id="page_num"></span> / <span id="page_count"></span></span>
-
-                                        <div class="jquery-bviewer-brand"><i class="icon-tnco"></i> TNViewer</div>
-                                    </div>
-                                    <canvas oncontextmenu="return false;" id="the-canvas"></canvas>
-                                    <span class="jquery-tnviewer-footer">Developed by ToanNang Co., Ltd</span>
-                                </div>-->
+                                <!--                                <div class="jquery-tnviewer">
+                                                                    <div class="jquery-bviewer-toolbar">
+                                                                        <i id="prev" class="fa fa-arrow-left"></i>
+                                                                        <i id="next" class="fa fa-arrow-right"></i>
+                                                                        <span>Page: <span id="page_num"></span> / <span id="page_count"></span></span>
+                                
+                                                                        <div class="jquery-bviewer-brand"><i class="icon-tnco"></i> TNViewer</div>
+                                                                    </div>
+                                                                    <canvas oncontextmenu="return false;" id="the-canvas"></canvas>
+                                                                    <span class="jquery-tnviewer-footer">Developed by ToanNang Co., Ltd</span>
+                                                                </div>-->
                                 @else
-<!--                                <embed style="width: 100%;height: 500px;" src="https://docs.google.com/viewer?url{{route('document',$item->url_encode)}}"></embed>-->
+                                <!--                                <embed style="width: 100%;height: 500px;" src="https://docs.google.com/viewer?url{{route('document',$item->url_encode)}}"></embed>-->
                                 @endif
                             </div>
                         </div>
@@ -173,8 +194,8 @@
                     </div>
                 </div>
             </div>
-            
-            <div class="col-md-12">
+
+            <div class="col-md-6">
                 <div class="x_panel">
                     <div class="x_title">
                         <h2>Nội dung SEO</h2><div class="clearfix"></div>
@@ -185,7 +206,7 @@
                             <label for="seo_title" class="control-label col-lg-2 col-md-2 col-sm-3 col-xs-12">Title:</label>
                             <div class="col-lg-10 col-md-10 col-sm-9 col-xs-12">
                                 <input type="text" name="seo_title" id="seo_title" class="form-control"
-                                       value="{{@$item->seo_title}}" placeholder="Seo title..." />
+                                       value="{{old('seo_title', @$item->seo_title)}}" placeholder="Seo title..." />
                             </div>
                         </div>
 
@@ -193,7 +214,7 @@
                             <label for="seo_keywords" class="control-label col-lg-2 col-md-2 col-sm-3 col-xs-12">Keywords:</label>
                             <div class="col-lg-10 col-md-10 col-sm-9 col-xs-12">
                                 <input type="text" name="seo_keywords" id="seo_keywords" class="form-control jquery-input-tag"
-                                       value="{{@$item->seo_keywords}}" />
+                                       value="{{old('seo_keywords', @$item->seo_keywords)}}" />
                             </div>
                         </div>
 
@@ -201,7 +222,7 @@
                             <label for="seo_description" class="control-label col-lg-2 col-md-2 col-sm-3 col-xs-12">Description:</label>
                             <div class="col-lg-10 col-md-10 col-sm-9 col-xs-12">
                                 <textarea class="form-control" id="seo_description" rows="5" placeholder="Seo description..."
-                                          name="seo_description">{{@$item->seo_description}}</textarea>
+                                          name="{{old('seo_description', @$item->seo_description)}}">{{@$item->seo_description}}</textarea>
                             </div>
                         </div>
 
@@ -229,110 +250,104 @@
 <!-- jQuery multiple select -->
 <script src="{!! asset('public/admin/bower_components/jQuery-MultiSelect/jquery.multiselect.js')!!}"></script>
 <script>
-$(document).ready(function(){
+    $(document).ready(function(){
     $('#js-mselect').multiselect({
-        columns  : 2,
-        search   : true,
-        selectAll: true,
-        texts    : {
+    columns  : 2,
+            search   : true,
+            selectAll: true,
+            texts    : {
             placeholder: 'Chọn loại vip',
-            search     : 'Tìm kiếm vip'
-        }
+                    search     : 'Tìm kiếm vip'
+            }
     });
-});
-</script>
+    });</script>
 
 <!-- jQuery Tags Input -->
 <script src="{!! asset('public/admin/bower_components/jquery.tagsinput/src/jquery.tagsinput.js')!!}"></script>
 <!-- SUMMERNOTE -->
 <script src="{!! asset('public/admin/node_modules/summernote/dist/summernote.min.js') !!}"></script>
 <script>
-    $(document).ready( function()  {
-        $('.js-summernote').summernote({
-            height: 400,
+    $(document).ready(function()  {
+    $('.js-summernote').summernote({
+    height: 250,
             callbacks: {
-                onInit: function () {
-                    $(this).summernote('code', $('#' + $(this).data('textarea')).val());
-                },
-                onChange: function () {
+            onInit: function () {
+            $(this).summernote('code', $('#' + $(this).data('textarea')).val());
+            },
+                    onChange: function () {
                     var textarea = $('#' + $(this).data('textarea'));
                     $(textarea).val($(this).summernote('code'));
-                },
-                onImageUpload: function (files, editor, welEditable) {
+                    },
+                    onImageUpload: function (files, editor, welEditable) {
                     for (var i = files.length - 1; i >= 0; i--) {
-                        uploadFile(files[i], this);
+                    uploadFile(files[i], this);
                     }
-                }
+                    }
             },
             //tabsize: 2,
             //airMode: true,
             map: {
-                apiKey: 'AIzaSyBJfmJjzVn3S9HamEOrD8mTvRixaOgU1Dw',
-                center: {
-                    lat: -33.8688,
-                    lng: 151.2195
-                },
-                zoom: 13
+            apiKey: 'AIzaSyBJfmJjzVn3S9HamEOrD8mTvRixaOgU1Dw',
+                    center: {
+                    lat: - 33.8688,
+                            lng: 151.2195
+                    },
+                    zoom: 13
             }
 //            toolbar: [
 //                //['insert',  'map']
 //            ]
-        });
     });
-
+    });
     $(document).ready(function(){
-        $('.jquery-btn-submit').on('click', function(){
-            var this_form = $(this).parents('form');
-            var btn_text = $(this).text();
-            var e_id = $(this_form).find('#id').val();
-            var e_file = $(this_form).find('#file').val();
-            var e_name = $(this_form).find('#name').val();
+    $('.jquery-btn-submit').on('click', function(){
+    var this_form = $(this).parents('form');
+    var btn_text = $(this).text();
+    var e_id = $(this_form).find('#id').val();
+    var e_file = $(this_form).find('#file').val();
+    var e_name = $(this_form).find('#name').val();
 //            var e_description = CKEDITOR.instances.description.getData();
 //            var e_content = CKEDITOR.instances.content.getData();
-            var e_price = $(this_form).find('#price').val();
-            var e_seo_title = $(this_form).find('#seo_title').val();
-            var e_seo_description = $(this_form).find('#seo_description').val();
-            var e_seo_keywords = $(this_form).find('#seo_keywords').val();
-            
-            var e_uservip = $('#js-mselect').val();
-  
-            $('#allow_uservip').val(e_uservip);
-         
-            if(e_uservip == null){
-                $.alert(jquery_alert_options({title: 'Thông báo',type:'red',content: 'Vui lòng chọn danh sách loại VIP.'}));
-                return;
-            }
-         
-            var form_input = [
-                e_name,e_uservip,
-                //e_description,
-                //e_content,
-                e_price,e_seo_title,e_seo_description,e_seo_keywords
-            ];
-            
-            if(e_id==''){
-                if(e_file==''){
-                    $.alert(jquery_alert_options({title: 'Thông báo',type:'red',content: 'Vui lòng chọn file.'}));
-                    return;
-                }
-            }
-            
-            var flag = true;
-            $.each(form_input,function(k,v){
-                console.log(v);
-                if(v==''){
-                    flag = false;
-                }
-            });
-            if(flag==false){
-                $.alert(jquery_alert_options({title: 'Thông báo',type:'red',content: 'Vui lòng nhập đầy đủ thông tin trước khi lưu.'}));
-                return;
-            }
-            
-            $(this_form).find('button,a').attr('disabled','').off('click');
-            $(this).html('<i class="fa fa-spinner faa-spin animated"></i> Đang lưu...').attr('disabled','');
-            $(this_form).submit();
-        });
+    var e_price = $(this_form).find('#price').val();
+    var e_seo_title = $(this_form).find('#seo_title').val();
+    var e_seo_description = $(this_form).find('#seo_description').val();
+    var e_seo_keywords = $(this_form).find('#seo_keywords').val();
+    var e_uservip = $('#js-mselect').val();
+    $('#allow_uservip').val(e_uservip);
+    if (e_uservip == null){
+    $.alert(jquery_alert_options({title: 'Thông báo', type:'red', content: 'Vui lòng chọn danh sách loại VIP.'}));
+    return;
+    }
+
+    var form_input = [
+            e_name, e_uservip,
+            //e_description,
+            //e_content,
+            e_price, e_seo_title, e_seo_description, e_seo_keywords
+    ];
+    if (e_id == ''){
+    if (e_file == ''){
+    $.alert(jquery_alert_options({title: 'Thông báo', type:'red', content: 'Vui lòng chọn file.'}));
+    return;
+    }
+    }
+
+    var flag = true;
+    $.each(form_input, function(k, v){
+    console.log(v);
+    if (v == ''){
+    flag = false;
+    }
+    });
+    if (flag == false){
+    $.alert(jquery_alert_options({title: 'Thông báo', type:'red', content: 'Vui lòng nhập đầy đủ thông tin trước khi lưu.'}));
+    return;
+    }
+
+    $(this_form).find('button,a').attr('disabled', '').off('click');
+    $(this).html('<i class="fa fa-spinner faa-spin animated"></i> Đang lưu...').attr('disabled', '');
+    $(this_form).submit();
+    });
     });
 </script>
 

@@ -5,7 +5,7 @@ namespace App\Bcore;
 use Session;
 use LanguageModel;
 
-class LanguageService extends Bcore {
+class LanguageService1 extends Bcore {
 
     function __construct() {
         

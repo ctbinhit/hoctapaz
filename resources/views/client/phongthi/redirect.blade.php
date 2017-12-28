@@ -12,40 +12,22 @@
             <div class="col-md-6 col-md-offset-3">
                 @if($redirect->paid==true && $redirect->state)
                 <div class="panel panel-success">
-                    <div class="panel-heading">Đề thi {{$exam->name}}</div>
+                    <div class="panel-heading">Đề thi {{$erm->name}}</div>
                     <div class="panel-body">
                         <form action="" method="POST">
                             {{ csrf_field() }}
-                            <input type="hidden" name="id_exam" value="{{$exam->id}}" />
+                            <input type="hidden" name="erm_id" value="{{$erm->id}}" />
                             <a href="{{route('client_index')}}" class="btn btn-default"><i class="fa fa-home"></i> Trang chủ</a> 
                             <button type="submit" class="btn btn-success"><i class="fa fa-sign-in"></i> Vào phòng thi</button>
                         </form>
                     </div>
                 </div>
                 @elseif($redirect->state && $redirect->paid==false)
-                <div class="panel panel-success">
-                    <div class="panel-heading">Khởi tạo dữ liệu bài thi</div>
-                    <div class="panel-body">
-                        <form onsubmit="return false;" action="{{route('client_exam_ajaxV2')}}" class="jquery-exam-payment">
-                            {{ csrf_field() }}
-                            <input type="hidden" name="id_exam" id="id_exam" value="{{$id_exam}}" />
-                            <p>Đề thi: <strong>{{$redirect->exam_data->name}}</strong></p>
-                            <p>Số dư: <strong>{{number_format($redirect->user_data->coin,0)}}</strong> VNĐ</p>
-                            <p>Số tiền cần thanh toán: <strong>{{number_format($redirect->exam_data->price,0)}}</strong> VNĐ</p> <hr>
-                            <p>Số dư còn lại sau thanh toán: <strong>{{number_format($redirect->user_data->coin - $redirect->exam_data->price,0)}}</strong> VNĐ</p>
-                            <a href="{{route('client_index')}}" class="btn btn-default"><i class="fa fa-home"></i> Trang chủ</a>
-                            <button type="submit" class="btn btn-success"><i class="fa fa-check"></i> <span>Thanh toán</span></button>
-                        </form>
-                    </div>
-                    <div class="panel-footer">
-                        <h6 class="text-info">Sản phẩm của ToanNang Co., Ltd</h6>
-                    </div>
-                </div>
+                @include('client.phongthi.parts.erm_detail')
                 @else
                 <div class="panel panel-info">
                     <div class="panel-heading">{{$redirect->title}}</div>
                     <div class="panel-body">
-
                         @if($redirect->error_type=='chuadangnhap')
                         <p class="text-warning">Bạn chưa đăng nhập, vui lòng đăng nhập để tiếp tục thao tác.</p>
                         @include('client/components/form/signin',['action'=>route('_client_login_index'),'cwr'=> url()->full()])
@@ -72,7 +54,6 @@
 @if($redirect->state)
 <script>
     $(document).ready(function () {
-
         var JEP = {
             debug: true,
             log: function (data) {
@@ -121,7 +102,7 @@
                         },
                         data: {
                             act: 'paying',
-                            id_exam: $('#id_exam').val()
+                            id_exam: $('#erm_id').val()
                         }, success: function (data) {
                             console.log(data);
                             $.alert({

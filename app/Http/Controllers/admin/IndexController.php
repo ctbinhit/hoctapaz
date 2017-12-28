@@ -12,9 +12,16 @@ class IndexController extends AdminController {
 
     public function index() {
         $this->load_chartMobileCard();
-
         return view($this->_RV . 'index/index', [
+            'today_count_naprut' => $this->today_count_naprut()
         ]);
+    }
+
+    private function today_count_naprut() {
+        return DB::table('users_transactions')
+                        ->whereIn('type', ['ycr', 'ycn'])
+                        ->whereDate('created_at', DB::raw('CURDATE()'))
+                        ->count();
     }
 
     private function load_chartMobileCard() {

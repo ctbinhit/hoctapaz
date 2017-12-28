@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers\admin;
 
-use Illuminate\Http\Request;
 use AdminController;
-use App\Bcore\System\UserType;
-use App\Bcore\Services\UserServiceV2;
+use Illuminate\Http\Request;
+use App\Bcore\Services\UserServiceV3;
 use Illuminate\Support\Facades\Session;
+use App\Bcore\SystemComponents\User\UserType;
 
 class LoginController extends AdminController {
 
     public function index() {
-       
-        
-        
+
+
+
 //        if (session()->has('user')) {
 //            return redirect()->route('admin_index');
 //        }
@@ -21,9 +21,7 @@ class LoginController extends AdminController {
     }
 
     public function signin(Request $request) {
-        $signin_response = UserServiceV2::signinWithForm($request->input('username'), $request->input('password'), UserType::admin());
-
-
+        $signin_response = (new UserServiceV3())->admin()->signinWithForm($request->input('username'), $request->input('password'));
         if (!$signin_response) {
             $request->session()->flash('message', 'Thông tin đăng nhập chưa chính xác!');
             return redirect()->route('admin_login_index')->with('message', 'Thông tin đăng nhập chưa chính xác!');

@@ -14,6 +14,7 @@ namespace App\Bcore;
 use UserModel;
 use Socialite;
 use Session;
+use App\Bcore\SystemComponents\User\UserType;
 
 class AuthService extends Bcore {
 
@@ -131,7 +132,7 @@ class AuthService extends Bcore {
 
     public function user_info() {
         if ($this->is_user()) {
-            $USER_ID = Services\UserServiceV2::current_userId(System\UserType::user());
+            $USER_ID = Services\UserServiceV2::current_userId(UserType::user());
             $UserModel = UserModel::find($USER_ID);
             if ($UserModel == null) {
                 return false;
@@ -144,7 +145,7 @@ class AuthService extends Bcore {
     }
 
     public function is_user() {
-        if (Services\UserServiceV2::isLoggedIn(System\UserType::user())) {
+        if (Services\UserServiceV2::isLoggedIn(UserType::user())) {
             if (Services\UserServiceV2::isUser()) {
                 return true;
             } else {

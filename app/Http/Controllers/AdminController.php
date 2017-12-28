@@ -13,7 +13,8 @@ use App\Models\SettingAccountModel;
 use Cache,
     SettingModel;
 use App\Bcore\Services\UserServiceV2;
-use App\Bcore\System\UserType;
+use App\Bcore\Services\UserServiceV3;
+use App\Bcore\SystemComponents\User\UserType;
 
 class AdminController extends ControllerService {
 
@@ -26,6 +27,7 @@ class AdminController extends ControllerService {
     protected $guarded_variables = [
         '_RV', '_FKEY', '_ML', '_LISTLANG', '_FORMPREFIX'
     ];
+    public $current_admin = null;
 
     public function __construct() {
         parent::__construct();
@@ -41,16 +43,22 @@ class AdminController extends ControllerService {
         // Share list lang cho tất cả các view
         View::share('_LISTLANG', $this->_LISTLANG);
         // ===== DECLARE FORM KEY ======================================================================================
-        $this->_FKEY = env('APP_FORM_KEY');
-        View::share('_FKEY', $this->_FKEY);
+//        $this->_FKEY = env('APP_FORM_KEY');
+//        View::share('_FKEY', $this->_FKEY);
 
         $this->middleware(function ($request, $next) {
-            $user_info = UserServiceV2::get_currentSessionData(UserType::admin());
-            $this->current_admin = $user_info;
-            View::share('current_admin', (object) $user_info);
-
+//            $user_info = UserServiceV2::get_currentSessionData(UserType::admin());
+//            $this->current_admin = $user_info;
+//            View::share('current_admin', (object) $user_info);
+            $this->load_userSession();
             return $next($request);
         });
+    }
+
+    public function load_userSession() {
+        $this->current_admin = (object) json_decode(json_encode((new UserServiceV3)->admin()->load_session()->get_session()));
+        View::share('current_admin', (object) $this->current_admin);
+        return $this->current_admin;
     }
 
     public function __call($method, $parameters) {

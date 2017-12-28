@@ -1,7 +1,15 @@
-
+@if ($errors->any())
+<div class="alert alert-danger">
+    <ul>
+        @foreach ($errors->all() as $error)
+        <li>{{ $error }}</li>
+        @endforeach
+    </ul>
+</div>
+@endif
 <div class="from-group">
     <label class="control-label col-md-3 col-sm-4 col-xs-12">Họ và tên</label>
-    <div class         ="col-md-9 col-sm-8 col-xs-12">
+    <div class="col-md-9 col-sm-8 col-xs-12">
         <input type="text" class="form-control" name="fullname" placeholder="Họ và tên..." value="{{old('fullname')}}"/>
     </div>                             
     <div class="clearfix"></div>
@@ -22,9 +30,9 @@
 </div>
 
 <div class="from-group">
-    <label class="control-label col-md-3 col-sm-4 col-xs-12">Nhập lại</label>
+    <label for="password_confirmation" class="control-label col-md-3 col-sm-4 col-xs-12">Nhập lại</label>
     <div class="col-md-9 col-sm-8 col-xs-12">
-        <input type="password" class="form-control" name="password2" placeholder="Nhập lại mật khẩu..."/>
+        <input type="password" class="form-control" name="password_confirmation" placeholder="Nhập lại mật khẩu..."/>
     </div><div class="clearfix"></div>
 </div>
 

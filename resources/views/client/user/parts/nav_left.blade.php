@@ -28,23 +28,25 @@
 </style>
 @endpush
 <div class="row stl-nav-left">
-    <div class="col-md-12">
-        <a href="#" class="thumbnail">
-            <img alt="100%x180" style="border-radius: 50%;width: 100%;" data-src="holder.js/100%x180" style="height: 180px; width: 100%; display: block;" 
-                 src="" data-holder-rendered="true"> </a>
+    <div class="col-md-12 text-center">
+        <a href="#" class="">
+            <img class="thumbnail" alt="100%x180" style="border-radius: 50%;width: 250px;height: 250px;" 
+                 data-src="holder.js/100%x180" style="height: 180px; width: 100%; display: block;" 
+                 src="{{$current_user->avatar}}" data-holder-rendered="true"> </a>
+        <a href="{{route('client_user_profilepicture')}}" class="btn btn-default btn-xs"><i class="fa fa-edit"></i> Cập nhật ảnh</a>
     </div>
     <div class="col-md-12">
-        <h1 class="personal-name"></h1>
+        <h1 class="personal-name">{{@$userData->fullname}}</h1>
         <div class="panel panel-default">
             <div class="panel-heading">Thông tin cá nhân</div>
             <!-- List group -->
             <ul class="list-group">
-                <li class="list-group-item list-group-item-warning">Số dư: {{number_format(($userdata->coin or 0),0)}} VNĐ</li>
-                <li class="list-group-item">VIP: {{($userdata->id_vip or null) == null ? 'Không có':''}}</li>
-                <li class="list-group-item">SĐT: {{$userdata->phone or ''}}</li>
-                <li class="list-group-item">Email: <i class="label label-info">{{$userdata->email or ''}}</i></li>
-                <li class="list-group-item">Địa chỉ: {{$userdata->address or ''}}</li>  
-                <li class="list-group-item">Sống tại: {{$userdata->address or ''}}</li>
+                <li class="list-group-item list-group-item-warning">Số dư: {{number_format(($userData->coin),0)}} VNĐ</li>
+                <li class="list-group-item">VIP: {{($userData->id_vip ) == null ? 'Không có':''}}</li>
+                <li class="list-group-item">SĐT: {{$userData->phone or 'Không có'}}</li>
+                <li class="list-group-item">Email: <i class="label label-info">{{$userData->email}}</i></li>
+                <li class="list-group-item">Địa chỉ: {{$userData->address or 'Không có'}}</li>  
+                <li class="list-group-item">Sống tại: {{$userData->address or 'Không có'}}</li>
             </ul>
         </div>
     </div>

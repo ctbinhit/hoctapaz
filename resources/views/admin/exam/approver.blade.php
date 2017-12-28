@@ -14,7 +14,7 @@
                     <a href="{{route('admin_index')}}" class="btn btn-app"><i class="fa fa-dashboard"></i> Dashboard</a>
                     <a href="{{url()->full()}}" class="btn btn-app"><i class="fa fa-refresh"></i> Tải lại</a>
                     <a href="javascript:void(0)" onclick="PNotify.removeAll();" class="btn btn-app"><i class="fa fa-bell"></i> {{__('label.xoathongbao')}}</a>
-                    <a href="javascript:void(0)" class="btn btn-app"><i class="fa fa-check"></i> Bài đã xác thực</a>
+                    <a href="{{route('admin_examman_registered')}}" class="btn btn-app"><i class="fa fa-check"></i> Bài đã xác thực</a>
                 </div>
             </div>
         </div>

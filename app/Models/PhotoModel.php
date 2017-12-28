@@ -34,6 +34,14 @@ class PhotoModel extends Model {
         return $this->_data->get();
     }
 
+    // SET FUNCTIONS =====
+
+    public function set_file($File) {
+        $this->name = $File->getClientOriginalName();
+        $this->mimetype = $File->getMimetype();
+        $this->size = $File->getSize();
+    }
+
     // ===== STATIC FUNCTIONS ==========================================================================================
 
     public static function findByModel($array_type, $model) {
