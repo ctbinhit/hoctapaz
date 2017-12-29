@@ -190,7 +190,7 @@ class DocController extends PackageServicePI {
 
     public function get_index_approved($type, Request $request) {
         $FileModel = FileModel::where([
-                    ['obj_type', $type],
+                    ['type', $type],
                     ['deleted_at', null],
                     ['state', DocumentState::approve()],
                     ['id_user', UserServiceV2::current_userId(UserType::professor())]

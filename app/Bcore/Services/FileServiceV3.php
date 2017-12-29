@@ -14,6 +14,7 @@ class FileServiceV3 {
         'lang' => null,
         'select' => null,
         'where' => [],
+        'whereIn' => [],
         'orderBy' => [],
         'pagination' => null
     ];
@@ -60,6 +61,11 @@ class FileServiceV3 {
         return $this;
     }
 
+    public function set_whereIn($field, $array) {
+        $this->_options->whereIn[] = [$field, $array];
+        return $this;
+    }
+
     public function set_lang($id_lang) {
         $this->_options->lang = $id_lang;
         return $this;
@@ -82,6 +88,9 @@ class FileServiceV3 {
 
     public function get_models() {
         $this->parseOptions();
+        foreach ($this->_options->whereIn as $v) {
+            $this->_object->whereIn($v[0], $v[1]);
+        }
         if ($this->_options->pagination) {
             return $this->_object->paginate($this->_options->pagination);
         }
@@ -101,6 +110,7 @@ class FileServiceV3 {
             $FileModel->where('id_user', $v->id_user);
             $FileModel->where('tbl', $v->tbl);
             $FileModel->where('obj_type', $v->type);
+
             $file = $FileModel->first();
             if ($file == null) {
                 $v->demo_url = null;

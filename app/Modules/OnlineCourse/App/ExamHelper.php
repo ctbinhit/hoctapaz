@@ -130,7 +130,13 @@ class ExamHelper {
     public function set_where($field, $val, $op = '=') {
         if (in_array($op, $this->_options['operator'])) {
             $this->_examRegisteredModels->where($field, $op, $val);
-        } return $this;
+        } return $this; 
+    }
+
+    public function set_whereIn($field, $array) {
+        if (is_array($array))
+            $this->_examRegisteredModels->whereIn($field, $array);
+        return $this;
     }
 
     public function set_options($options) {

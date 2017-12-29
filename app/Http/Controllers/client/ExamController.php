@@ -14,6 +14,7 @@ use App\Bcore\Services\SeoService;
 use Illuminate\Support\Facades\DB;
 use App\Bcore\Services\UserServiceV2;
 use App\Bcore\Services\UserServiceV3;
+use App\Bcore\Services\CategoryService;
 use App\Http\Controllers\ClientController;
 use App\Modules\OnlineCourse\App\ExamHelper;
 use App\Bcore\SystemComponents\User\UserType;
@@ -66,10 +67,10 @@ class ExamController extends ClientController {
     // PHÒNG THI
 
     public function get_exam_phongthi(Request $request) {
-        $Categories = \App\Bcore\Services\CategoryService::get_baseCategories('hoctap', 'exam');
+        $Categories = CategoryService::get_baseCategories('hoctap', 'exam');
         SeoService::seo_title('Phòng thi online');
 
-        $ExamHelper = (new \App\Modules\OnlineCourse\App\ExamHelper())
+        $ExamHelper = (new ExamHelper())
                 ->load_models()
                 ->set_request($request)
                 ->filter(['keywords', 'username'])
@@ -87,53 +88,20 @@ class ExamController extends ClientController {
     }
 
     public function get_exam_phongthi_danhmuc($name_meta, Request $request) {
-        $ArrayId = [];
+
         $this_cate = \App\Bcore\Services\CategoryService::find_byNameMeta($name_meta);
         $sub_cate_ = \App\Bcore\Services\CategoryService::get_childCateByIdParent($this_cate->id);
-        $ArrayId[] = $this_cate->id;
+        $ArrayId = array_prepend(array_pluck($sub_cate_, 'id'), $this_cate->id);
 
-        if (count($sub_cate_) != 0) {
-            foreach ($sub_cate_ as $k => $v) {
-                $ArrayId[] = $v->id;
-                $items = DB::table('m1_exam')
-                                ->join('users', 'users.id', '=', 'm1_exam.id_user')
-                                ->where([
-                                    ['users.type', 'professor'],
-                                    ['m1_exam.deleted', null],
-                                    ['m1_exam.approved_by', '>', 0],
-                                    ['m1_exam.state', \App\Modules\OnlineCourse\Components\ExamState::de_thi()]
-                                ])->whereIn('m1_exam.id_category', [$v->id])
-                                ->select([
-                                    'users.google_avatar', 'users.facebook_avatar',
-                                    'users.fullname', 'm1_exam.name', 'm1_exam.name_meta', 'm1_exam.id_category', 'm1_exam.description',
-                                    'm1_exam.time', 'm1_exam.price', 'm1_exam.seo_description', 'm1_exam.created_at'
-                                ])->orderBy('m1_exam.id', 'DESC')->paginate(4);
-                foreach ($items as $k1 => $v1) {
-                    $v1->avatar = $v1->google_avatar != null ? $v1->google_avatar : $v1->facebook_avatar;
-                    $tmp = new Carbon($v1->created_at);
-                    $v1->created_at = $tmp->format('d/m/Y');
-                }
-                $v->html_list_items = view('client/phongthi/components/list_exam', [
-                    'items' => @$items
-                        ])->render();
-            }
-        }
-
-        $ExamModel = DB::table('m1_exam')
-                ->join('users', 'users.id', '=', 'm1_exam.id_user')
-                ->where([
-                    ['users.type', 'professor'],
-                    ['m1_exam.deleted', null],
-                    ['m1_exam.approved_by', '>', 0],
-                    ['m1_exam.state', \App\Modules\OnlineCourse\Components\ExamState::de_thi()]
-                ])
-                ->whereIn('m1_exam.id_category', $ArrayId)
-                ->select([
-                    'users.google_avatar', 'users.facebook_avatar',
-                    'users.fullname', 'm1_exam.name', 'm1_exam.name_meta', 'm1_exam.id_category', 'm1_exam.description',
-                    'm1_exam.time', 'm1_exam.price', 'm1_exam.seo_description', 'm1_exam.created_at'
-                ])
-                ->orderBy('m1_exam.id', 'DESC');
+        $ExamHelper = (new \App\Modules\OnlineCourse\App\ExamHelper())
+                ->load_models()
+                ->set_request($request)
+                ->filter(['keywords', 'username'])
+                ->set_where('m1_exam_registered.state', 1)
+                ->set_whereIn('m1_exam_registered.id_category', $ArrayId)
+                ->set_options([
+            'paginate' => 5
+        ]);
 
         if ($request->has('keywords')) {
             if ($request->has('filterBy')) {
@@ -142,21 +110,86 @@ class ExamController extends ClientController {
                         goto defaultFilterArea;
                         break;
                     case 'username':
-                        $ExamModel->where('users.fullname', 'LIKE', '%' . $request->input('keywords') . '%');
+                        $ExamHelper->set_where('users.fullname', 'LIKE', '%' . $request->input('keywords') . '%');
                         break;
                     default:
                         goto defaultFilterArea;
                 }
             } else {
                 defaultFilterArea:
-                $ExamModel->where('m1_exam.seo_keywords', 'LIKE', '%' . $request->input('keywords') . '%');
+                $ExamHelper->set_where('m1_exam_registered.seo_keywords', 'LIKE', '%' . $request->input('keywords') . '%');
             }
         }
-        $ExamModel = $ExamModel->paginate(10);
-        foreach ($ExamModel as $k => $v) {
-            $v->avatar = $v->google_avatar != null ? $v->google_avatar : $v->facebook_avatar;
-            $tmp = new Carbon($v->created_at);
-            $v->created_at = $tmp->format('d/m/Y');
+
+
+//        if (count($sub_cate_) != 0) {
+//            foreach ($sub_cate_ as $k => $v) {
+//                $ArrayId[] = $v->id;
+//                $items = DB::table('m1_exam')
+//                                ->join('users', 'users.id', '=', 'm1_exam.id_user')
+//                                ->where([
+//                                    ['users.type', 'professor'],
+//                                    ['m1_exam.deleted', null],
+//                                    ['m1_exam.approved_by', '>', 0],
+//                                    ['m1_exam.state', \App\Modules\OnlineCourse\Components\ExamState::de_thi()]
+//                                ])->whereIn('m1_exam.id_category', [$v->id])
+//                                ->select([
+//                                    'users.google_avatar', 'users.facebook_avatar',
+//                                    'users.fullname', 'm1_exam.name', 'm1_exam.name_meta', 'm1_exam.id_category', 'm1_exam.description',
+//                                    'm1_exam.time', 'm1_exam.price', 'm1_exam.seo_description', 'm1_exam.created_at'
+//                                ])->orderBy('m1_exam.id', 'DESC')->paginate(4);
+//                foreach ($items as $k1 => $v1) {
+//                    $v1->avatar = $v1->google_avatar != null ? $v1->google_avatar : $v1->facebook_avatar;
+//                    $tmp = new Carbon($v1->created_at);
+//                    $v1->created_at = $tmp->format('d/m/Y');
+//                }
+//                $v->html_list_items = view('client/phongthi/components/list_exam', [
+//                    'items' => @$items
+//                        ])->render();
+//            }
+//        }
+//
+//        $ExamModel = DB::table('m1_exam')
+//                ->join('users', 'users.id', '=', 'm1_exam.id_user')
+//                ->where([
+//                    ['users.type', 'professor'],
+//                    ['m1_exam.deleted', null],
+//                    ['m1_exam.approved_by', '>', 0],
+//                    ['m1_exam.state', \App\Modules\OnlineCourse\Components\ExamState::de_thi()]
+//                ])
+//                ->whereIn('m1_exam.id_category', $ArrayId)
+//                ->select([
+//                    'users.google_avatar', 'users.facebook_avatar',
+//                    'users.fullname', 'm1_exam.name', 'm1_exam.name_meta', 'm1_exam.id_category', 'm1_exam.description',
+//                    'm1_exam.time', 'm1_exam.price', 'm1_exam.seo_description', 'm1_exam.created_at'
+//                ])
+//                ->orderBy('m1_exam.id', 'DESC');
+//
+//        if ($request->has('keywords')) {
+//            if ($request->has('filterBy')) {
+//                switch ($request->input('filterBy')) {
+//                    case 'keywords':
+//                        goto defaultFilterArea;
+//                        break;
+//                    case 'username':
+//                        $ExamModel->where('users.fullname', 'LIKE', '%' . $request->input('keywords') . '%');
+//                        break;
+//                    default:
+//                        goto defaultFilterArea;
+//                }
+//            } else {
+//                defaultFilterArea:
+//                $ExamModel->where('m1_exam.seo_keywords', 'LIKE', '%' . $request->input('keywords') . '%');
+//            }
+//        }
+//        $ExamModel = $ExamModel->paginate(10);
+
+        $items = $ExamHelper->get_models();
+        foreach ($items as $k => $v) {
+            $v->avatar = \App\Bcore\Services\ImageService::no_userPhoto();
+//            $v->avatar = $v->google_avatar != null ? $v->google_avatar : $v->facebook_avatar;
+//            $tmp = new Carbon($v->created_at);
+//            $v->created_at = $tmp->format('d/m/Y');
         }
 
 
@@ -164,7 +197,7 @@ class ExamController extends ClientController {
 
         return view('client/phongthi/category', [
             'this_cate' => $this_cate,
-            'items' => $ExamModel,
+            'items' => $items,
             'sub_cates' => $sub_cate_,
             'categories' => \App\Bcore\Services\CategoryService::get_baseCategories('hoctap', 'exam')
         ]);
@@ -176,30 +209,40 @@ class ExamController extends ClientController {
         $Categories = \App\Bcore\Services\CategoryService::get_baseCategories('hoctap', 'exam');
         SeoService::seo_title('Phòng thi online');
 
-        $ExamModel = DB::table('m1_exam')
-                ->join('users', 'users.id', '=', 'm1_exam.id_user')
-                ->where([
-                    ['users.type', 'professor'],
-                    //['m1_exam.id_user','<>', \App\Bcore\Services\UserService::id()],
-                    ['m1_exam.deleted', null],
-                    ['m1_exam.approved_by', '>', 0],
-                    ['m1_exam.state', \App\Modules\OnlineCourse\Components\ExamState::trac_nghiem_online()]
-                ])
-                ->select([
-                    'users.google_avatar', 'users.facebook_avatar',
-                    'users.fullname', 'm1_exam.name', 'm1_exam.name_meta', 'm1_exam.id_category', 'm1_exam.description',
-                    'm1_exam.time', 'm1_exam.price', 'm1_exam.seo_description', 'm1_exam.created_at'
-                ])
-                ->orderBy('m1_exam.id', 'DESC')
-                ->paginate(10);
-        foreach ($ExamModel as $k => $v) {
-            $v->avatar = $v->google_avatar != null ? $v->google_avatar : $v->facebook_avatar;
-            $tmp = new Carbon($v->created_at);
-            $v->created_at = $tmp->format('d/m/Y');
-        }
+        $ExamHelper = (new \App\Modules\OnlineCourse\App\ExamHelper())
+                ->load_models()
+                ->set_request($request)
+                ->filter(['keywords', 'username'])
+                ->set_where('m1_exam_registered.state', 1)
+                ->set_whereIn('m1_exam_registered.id_category', $ArrayId)
+                ->set_options([
+            'paginate' => 5
+        ]);
+
+//        $ExamModel = DB::table('m1_exam')
+//                ->join('users', 'users.id', '=', 'm1_exam.id_user')
+//                ->where([
+//                    ['users.type', 'professor'],
+//                    //['m1_exam.id_user','<>', \App\Bcore\Services\UserService::id()],
+//                    ['m1_exam.deleted', null],
+//                    ['m1_exam.approved_by', '>', 0],
+//                    ['m1_exam.state', \App\Modules\OnlineCourse\Components\ExamState::trac_nghiem_online()]
+//                ])
+//                ->select([
+//                    'users.google_avatar', 'users.facebook_avatar',
+//                    'users.fullname', 'm1_exam.name', 'm1_exam.name_meta', 'm1_exam.id_category', 'm1_exam.description',
+//                    'm1_exam.time', 'm1_exam.price', 'm1_exam.seo_description', 'm1_exam.created_at'
+//                ])
+//                ->orderBy('m1_exam.id', 'DESC')
+//                ->paginate(10);
+//        foreach ($ExamModel as $k => $v) {
+//            $v->avatar = $v->google_avatar != null ? $v->google_avatar : $v->facebook_avatar;
+//            $tmp = new Carbon($v->created_at);
+//            $v->created_at = $tmp->format('d/m/Y');
+//        }
 
         return view('client/phongthi/tracnghiemtructuyen', [
-            'items' => $ExamModel,
+            'items' => [],
             'categories_hoctap' => $Categories
         ]);
     }
@@ -567,7 +610,7 @@ class ExamController extends ClientController {
                 if (session::has('_TOKEN_EXAM')) {
                     session::keep('_TOKEN_EXAM');
                 } else {
-                   
+                    
                 }
                 goto responseArea;
             }
@@ -619,7 +662,7 @@ class ExamController extends ClientController {
         $EUM->type = $ERM->app_type;
         $r = $EUM->save();
         if ($r) {
-           
+            
         } else {
             if (session::has('_TOKEN_EXAM')) {
                 session::keep('_TOKEN_EXAM');
@@ -627,7 +670,6 @@ class ExamController extends ClientController {
                 
             }
             goto responseArea;
-           
         }
         responseArea:
         return response()->json([

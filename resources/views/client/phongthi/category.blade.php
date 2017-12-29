@@ -95,9 +95,9 @@
                             <ul>
                                 <li><i class="fa fa-clock-o"></i> <strong>{{ number_format($v->time/60,1)}}</strong> Phút</li>  
                                 <li><i class="fa fa-calendar"></i> {{$v->created_at}}</li>
-                                <li><i class="fa fa-user"></i> <span>{{$v->fullname}}</span></li>
+                                <li><i class="fa fa-user"></i> <span>{{$v->user_fullname}}</span></li>
                                 <li>Giá: {{number_format($v->price,0)}} VNĐ</li>
-                                <li><div class="label label-info">{{CategoryService::getNameById($v->id_category)}}</div></li>
+                                <li><div class="label label-info">{{$v->cate_name}}</div></li>
                                 <!--                                <li>{{$v->description}}</li>-->
                             </ul>
 

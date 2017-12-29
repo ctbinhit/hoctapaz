@@ -102,7 +102,6 @@
                 </div>
                 @else
                 <div class="alert alert-info">
-
                     <p class="text-info"><i class="fa fa-warning"></i> Không tìm thấy phòng thi nào khả dụng.</p>
                 </div>
                 @endif
@@ -119,9 +118,7 @@
             <div class="r-content">
                 <p>Chưa có dữ liệu</p>
             </div>
-
         </div>
-
         @endforeach
 
     </div>
@@ -130,4 +127,19 @@
 
 @push('stylesheet')
 
+@endpush
+
+@push('scripts')
+<script>
+    $(document).ready(function () {
+        $('.exams').slick({
+            dots: false,
+            infinite: true,
+            slidesToShow: 2,
+            slidesToScroll: 1,
+            autoplay: true,
+            speed: 900,
+        });
+    });
+</script>
 @endpush

@@ -54,7 +54,7 @@ class DocController extends PackageService {
                 ->set_orderBy('approved_date', 'DESC')
                 ->set_pagination(5);
         $this->filter_mimeTypeByModels($FileModels, $mime_type);
-        
+
         if ($request->has('keywords')) {
             $FileModels->search($request->input('keywords'));
         }
@@ -63,7 +63,7 @@ class DocController extends PackageService {
         $Models = $FileModels->get_models();
 
         $Models = \App\Bcore\Services\FileServiceV3::findFileByModels($Models);
-     
+
 
         responseArea:
         return view('client/tailieuhoc/index', [
@@ -81,20 +81,26 @@ class DocController extends PackageService {
 
         SeoService::seo_title('Danh mục ' . $this_category->name);
 
-        $FileModels = $this->load_fileByType($type);
-        $FileModels = $this->file_orderBy($FileModels);
-        $FileModels = $this->file_filter($FileModels, $mime_type);
+        $FileModels = (new \App\Bcore\Services\FileServiceV3())
+                ->set_where('files.type', $type)
+                ->set_where('files.state', DocumentState::approve())
+                ->set_where('files.display', true)
+                ->set_where('files.deleted_at', null)
+                ->set_where('files.obj_type', 'base')
+                ->set_where('files.id_category', $this_category->id)
+                ->set_orderBy('approved_date', 'DESC')
+                ->set_pagination(5);
+        $this->filter_mimeTypeByModels($FileModels, $mime_type);
+        $Models = $FileModels->get_models();
 
-        $FileModels->where('files.id_category', $this_category->id);
-
-        $FileModels = $FileModels->paginate(8);
+        $Models = \App\Bcore\Services\FileServiceV3::findFileByModels($Models);
 
         $Categories = $this->load_baseCategory();
 
 
         return view('client/tailieuhoc/index', [
             'this_cate' => $this_category,
-            'items' => $FileModels,
+            'items' => $Models,
             'categories_hoctap' => $Categories
         ]);
     }
@@ -134,23 +140,18 @@ class DocController extends PackageService {
 
     private function payment($request) {
         $FILE_ID = $request->input('id');
-
         $FileModel = FileModel::find($FILE_ID);
         if ($FileModel == null) {
             $JsonResponse = AjaxResponse::dataNotFound();
             goto responseArea;
         }
-
         $UserCoinOld = \App\Models\UserModel::find($this->current_user->id);
-
         $UserCoinOld->coin = $UserCoinOld->coin - $FileModel->price;
-
         if (!$UserCoinOld->save()) {
             // Thanh toán không thành công.
             $JsonResponse = AjaxResponse::fail(['msg' => 'Có lỗi xảy ra, thanh toán thất bại!']);
             goto responseArea;
         }
-
         $r = UserDataService::save_dataByModel($FileModel);
         if ($r) {
             $JsonResponse = AjaxResponse::success();
@@ -229,7 +230,11 @@ class DocController extends PackageService {
                 break;
             case 'word':
                 SeoService::seo_title('Tài liệu WORD');
-                $FileModels->set_where('mimetype', 'application/word');
+                //$FileModels->set_where('mimetype', 'application/word');
+                $FileModels->set_whereIn('mimetype', [
+                    'application/word', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    'application/msword'
+                ]);
                 $FileModels->set_where('price', 0);
                 break;
             case 'pdf-tinh-phi':
@@ -239,7 +244,11 @@ class DocController extends PackageService {
                 break;
             case 'word-tinh-phi':
                 SeoService::seo_title('Tài liệu WORD tính phí');
-                $FileModels->set_where('mimetype', 'application/word');
+                $FileModels->set_whereIn('mimetype', [
+                    'application/word', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    'application/msword'
+                ]);
+                //$FileModels->set_where('mimetype', 'application/word');
                 $FileModels->set_where('price', 0, '<>');
                 break;
         }

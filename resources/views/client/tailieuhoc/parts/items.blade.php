@@ -83,7 +83,14 @@
         // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
         var modal = $(this);
         modal.find('.modal-title').text('Demo ' + docName);
-        modal.find('.modal-body').html('<iframe src="' + docUrl + '" style="width: 100%;height:350px"></iframe>');
+        
+        if(docUrl==''){
+              modal.find('.modal-body').html('Không có bản xem trước');
+        }else{
+              modal.find('.modal-body').html('<iframe src="' + docUrl + '" style="width: 100%;height:350px"></iframe>');
+        }
+        
+      
     });
 </script>
 

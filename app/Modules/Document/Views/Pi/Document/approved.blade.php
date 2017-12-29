@@ -18,7 +18,7 @@
 
     <div class="x_panel">
         <div class="x_title">
-            <h2>Quản lý file</h2>
+            <h2><i class="fa fa-hdd-o"></i> Quản lý file</h2>
             <div class="clearfix"></div>
         </div>
         <div class="x_content">
@@ -28,12 +28,12 @@
                         <th style="width: 8%;"><i class="fa fa-sort-numeric-asc"></i></th>
                         <th>File</th>
                         <th>Giá</th>
-                        <th>Danh mục</th>
+                        <th data-toggle="tooltip" data-placement="top" title="Danh mục"><i class="fa fa-list"></i></th>
                         <th><i class="fa fa-users"></i></th>
                         <th><i class="fa fa-eye"></i></th>
-                        <th>Tổng thu</th>
-                        <th>Ngày bán</th>
-                        <th>Ngày kết thúc</th>
+                        <th data-toggle="tooltip" data-placement="top" title="Tổng thu"><i class="fa fa-money"></i></th>
+                        <th data-toggle="tooltip" data-placement="top" title="Ngày đăng"><i class="fa fa-calendar"></i></th>
+                        <th data-toggle="tooltip" data-placement="top" title="Ngày hết hạn"><i class="fa fa-calendar"></i></th>
                         <th>Thao tác</th>
                     </tr>
                 </thead>
@@ -67,6 +67,11 @@
                     </tr>
                     @endif
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="10">{{$items->links()}}</td>
+                    </tr>
+                </tfoot>
             </table>
 
         </div>
