@@ -120,6 +120,8 @@ return [
      */
     'providers' => [
         App\Modules\ModuleProvider::class,
+        // Zizaco/entrust
+        //Zizaco\Entrust\EntrustServiceProvider::class,
         /*
          * Laravel Framework Service Providers...
          */
@@ -269,6 +271,7 @@ return [
         'UserDataService' => App\Bcore\Services\UserDataService::class,
         // Platform
         'Bcore' => App\Bcore\Bcore::class,
+        //'Entrust'   => Zizaco\Entrust\EntrustFacade::class,
     // Traits
     ],
 ];

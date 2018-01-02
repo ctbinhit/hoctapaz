@@ -13,7 +13,6 @@
         <div class="x_panel">
             <div class="x_content">
                 <a href="{{route('mdle_pi_doc_index',$type)}}" class="btn btn-app"><i class="fa fa-arrow-left"></i> Quay lại</a>
-
                 <button class="btn btn-app"><i class="fa fa-save"></i> Lưu</button>
             </div>
         </div>
@@ -83,8 +82,7 @@
                 <div class="form-group">
                     <label for="description" class="control-label col-lg-2 col-md-2 col-sm-3 col-xs-12">Mô tả:</label>
                     <div class="col-lg-10 col-md-10 col-sm-9 col-xs-12">
-                        <div class="js-summernote"></div>
-                        <textarea class="form-control hidden" name="description" id="description"
+                        <textarea class="form-control js-ckeditor" name="description" id="description"
                                   placeholder="Mô tả..." rows="5" id="description" required="">{{old('description', @$item->description)}}</textarea>
                     </div>
                 </div>
@@ -92,9 +90,8 @@
                 <div class="form-group">
                     <label for="content" class="control-label col-lg-2 col-md-2 col-sm-3 col-xs-12">Nội dung:</label>
                     <div class="col-lg-10 col-md-10 col-sm-9 col-xs-12">
-                        <div class="js-summernote"></div>
-                        <textarea class="form-control hidden" name="content" id="content"
-                                  placeholder="Nội dung..." rows="8" id="description" required="">{{old('content', @$item->content)}}</textarea>
+                        <textarea class="form-control js-ckeditor" name="content" id="content"
+                                  placeholder="Nội dung..." rows="8" id="description" required="">1{{old('content', @$item->content)}}</textarea>
                     </div>
                 </div>
 
@@ -148,21 +145,6 @@
                             <label for="file" class="control-label col-lg-2 col-md-2 col-sm-3 col-xs-12">File đã upload:</label>
                             <div class="col-lg-10 col-md-10 col-sm-9 col-xs-12">
                                 <embed style="width: 100%;height: 500px;" src="{{route('document',$item->url_encode)}}#toolbar=0&navpanes=0&scrollbar=0"></embed>
-                                @if($item->mimetype=='application/pdf')
-                                <!--                                <div class="jquery-tnviewer">
-                                                                    <div class="jquery-bviewer-toolbar">
-                                                                        <i id="prev" class="fa fa-arrow-left"></i>
-                                                                        <i id="next" class="fa fa-arrow-right"></i>
-                                                                        <span>Page: <span id="page_num"></span> / <span id="page_count"></span></span>
-                                
-                                                                        <div class="jquery-bviewer-brand"><i class="icon-tnco"></i> TNViewer</div>
-                                                                    </div>
-                                                                    <canvas oncontextmenu="return false;" id="the-canvas"></canvas>
-                                                                    <span class="jquery-tnviewer-footer">Developed by ToanNang Co., Ltd</span>
-                                                                </div>-->
-                                @else
-                                <!--                                <embed style="width: 100%;height: 500px;" src="https://docs.google.com/viewer?url{{route('document',$item->url_encode)}}"></embed>-->
-                                @endif
                             </div>
                         </div>
                         @endisset
@@ -190,7 +172,6 @@
                                 <button type="button" class="btn btn-success jquery-btn-submit"><i class="fa fa-save"></i> Lưu</button>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -201,7 +182,6 @@
                         <h2>Nội dung SEO</h2><div class="clearfix"></div>
                     </div>
                     <div class="x_content">
-
                         <div class="form-group">
                             <label for="seo_title" class="control-label col-lg-2 col-md-2 col-sm-3 col-xs-12">Title:</label>
                             <div class="col-lg-10 col-md-10 col-sm-9 col-xs-12">
@@ -209,7 +189,6 @@
                                        value="{{old('seo_title', @$item->seo_title)}}" placeholder="Seo title..." />
                             </div>
                         </div>
-
                         <div class="form-group">
                             <label for="seo_keywords" class="control-label col-lg-2 col-md-2 col-sm-3 col-xs-12">Keywords:</label>
                             <div class="col-lg-10 col-md-10 col-sm-9 col-xs-12">
@@ -217,21 +196,17 @@
                                        value="{{old('seo_keywords', @$item->seo_keywords)}}" />
                             </div>
                         </div>
-
                         <div class="form-group">
                             <label for="seo_description" class="control-label col-lg-2 col-md-2 col-sm-3 col-xs-12">Description:</label>
                             <div class="col-lg-10 col-md-10 col-sm-9 col-xs-12">
                                 <textarea class="form-control" id="seo_description" rows="5" placeholder="Seo description..."
-                                          name="{{old('seo_description', @$item->seo_description)}}">{{@$item->seo_description}}</textarea>
+                                          name="{{old('seo_description', @$item->seo_description)}}">{{old('seo_description',@$item->seo_description)}}</textarea>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
         </div>
-
-
     </div>
 </form>
 <input type="hidden" id="pdf_url" value="{{route('document',@$item->url_encode)}}"/>
@@ -264,41 +239,19 @@
 
 <!-- jQuery Tags Input -->
 <script src="{!! asset('public/admin/bower_components/jquery.tagsinput/src/jquery.tagsinput.js')!!}"></script>
-<!-- SUMMERNOTE -->
-<script src="{!! asset('public/admin/node_modules/summernote/dist/summernote.min.js') !!}"></script>
+
+<!-- CK Editor & CK Finder -->
+<script src="{!! asset('public/admin/bower_components/ckeditor/ckeditor.js') !!}"></script>
 <script>
-    $(document).ready(function()  {
-    $('.js-summernote').summernote({
-    height: 250,
-            callbacks: {
-            onInit: function () {
-            $(this).summernote('code', $('#' + $(this).data('textarea')).val());
-            },
-                    onChange: function () {
-                    var textarea = $('#' + $(this).data('textarea'));
-                    $(textarea).val($(this).summernote('code'));
-                    },
-                    onImageUpload: function (files, editor, welEditable) {
-                    for (var i = files.length - 1; i >= 0; i--) {
-                    uploadFile(files[i], this);
-                    }
-                    }
-            },
-            //tabsize: 2,
-            //airMode: true,
-            map: {
-            apiKey: 'AIzaSyBJfmJjzVn3S9HamEOrD8mTvRixaOgU1Dw',
-                    center: {
-                    lat: - 33.8688,
-                            lng: 151.2195
-                    },
-                    zoom: 13
-            }
-//            toolbar: [
-//                //['insert',  'map']
-//            ]
+    $('.js-ckeditor').each(function(){
+
+    CKEDITOR.replace($(this).attr('id'), {
+    customConfig: '{!! asset("public/admin/ckeditor/articleo/config.js") !!}',
     });
-    });
+    });</script>
+
+<script>
+
     $(document).ready(function(){
     $('.jquery-btn-submit').on('click', function(){
     var this_form = $(this).parents('form');
@@ -306,8 +259,8 @@
     var e_id = $(this_form).find('#id').val();
     var e_file = $(this_form).find('#file').val();
     var e_name = $(this_form).find('#name').val();
-//            var e_description = CKEDITOR.instances.description.getData();
-//            var e_content = CKEDITOR.instances.content.getData();
+    var e_description = CKEDITOR.instances.description.getData();
+    var e_content = CKEDITOR.instances.content.getData();
     var e_price = $(this_form).find('#price').val();
     var e_seo_title = $(this_form).find('#seo_title').val();
     var e_seo_description = $(this_form).find('#seo_description').val();
@@ -321,8 +274,8 @@
 
     var form_input = [
             e_name, e_uservip,
-            //e_description,
-            //e_content,
+            e_description,
+            e_content,
             e_price, e_seo_title, e_seo_description, e_seo_keywords
     ];
     if (e_id == ''){

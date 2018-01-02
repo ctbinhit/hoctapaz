@@ -2,6 +2,7 @@
 
 namespace App\Modules\Document\Controllers\Pi;
 
+use Validator;
 use App\Models\FileModel;
 use Illuminate\Http\Request;
 use App\Bcore\PackageServicePI;
@@ -79,19 +80,19 @@ class DocController extends PackageServicePI {
     }
 
     public function post_save($type, Request $request) {
-        $this->validate($request, [
-            'name' => 'required|min:5',
-            'file' => 'required|mimes:pdf,doc,docx',
-            'file_demo' => 'required|mimes:pdf|max:5000',
-            'price' => 'required|numeric'
-                ], [
-            'name.required' => 'Tên tài liệu là trường bắt buộc',
-            'file.mimes' => 'File tài liệu chỉ được upload dạng PDF,WORD',
-            'file_demo.mimes' => 'File demo chỉ được upload dạng PDF'
+        $validator = Validator::make($request->all(), [
+                    'name' => 'required|min:5',
+                    'price' => 'required|numeric'
+                        ], [
+                    'name.required' => 'Tên tài liệu là trường bắt buộc',
+                    'file.mimes' => 'File tài liệu chỉ được upload dạng PDF,WORD',
+                    'file_demo.mimes' => 'File demo chỉ được upload dạng PDF'
         ]);
-        if ($type != $request->input('type')) {
-            abort(500);
+
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
         }
+
         $OLD_DATA_DEMO = null;
         $OLD_DATA = null;
         if ($request->has('id')) {
@@ -106,8 +107,16 @@ class DocController extends PackageServicePI {
                     ])->orderBy('id', 'desc')->first();
             $OLD_DATA_DEMO = $FileDemoModel;
         } else {
+            $validator2 = Validator::make($request->all(), [
+                        'file' => 'required|mimes:pdf,doc,docx',
+                        'file_demo' => 'required|mimes:pdf|max:5000',
+            ]);
+            if($validator2->fails()){
+                return back()->withErrors($validator)->withInput();
+            }
+
             $FileModel = new \App\Models\FileModel();
-            $FileModel->id_user = UserServiceV2::current_userId(UserType::professor());
+            $FileModel->id_user = $this->current_user->id;
             $FileModel->obj_type = 'base';
             $FileModel->type = $type;
         }
@@ -118,9 +127,8 @@ class DocController extends PackageServicePI {
             $local_file = $StorageServiceV2->disk('localhost')
                             ->folder('documents/tailieuhoc')->set_file($request->file)->upload();
             if ($local_file == null) {
-                NotificationService::alertRight('Có lỗi xảy ra, không thể upload file lên server,'
-                        . 'vui lòng thử lại sau ít phút.', 'danger');
-                goto responseArea;
+                $validator->errors()->add('error', 'Có lỗi xảy ra, không thể upload file lên server, vui lòng thử lại sau ít phút.');
+                return back()->withErrors($validator)->withInput();
             }
             // GOOGLE DRIVE
             $google_data = $local_file->sync_google('1KedkIv6FmxhA4BdZJ6InXu1XWuNB6eJp');
@@ -141,9 +149,7 @@ class DocController extends PackageServicePI {
         $FileModel->price = $request->input('price');
         $FileModel->state = DocumentState::free();
         $FileModel->allow_uservip = json_encode($request->input('allow_uservip'));
-
         $FileModel->id_category = $request->input('id_category');
-
         $FileModel->seo_description = $request->input('seo_description');
         $FileModel->seo_keywords = $request->input('seo_keywords');
         $FileModel->seo_title = $request->input('seo_title');
@@ -151,7 +157,6 @@ class DocController extends PackageServicePI {
         $r = $FileModel->save();
 
         if ($r) {
-
             // ----- Upload file demo ----------------------------------------------------------------------------------
             if ($request->hasFile('file_demo')) {
                 $FileDemoPath = (new StorageServiceV2())
@@ -183,6 +188,8 @@ class DocController extends PackageServicePI {
         } else {
             NotificationService::alertRight('Cập nhật không thành công, vui lòng thử lại.', 'danger');
         }
+
+
 
         responseArea:
         return redirect()->route('mdle_pi_doc_index', $type);
