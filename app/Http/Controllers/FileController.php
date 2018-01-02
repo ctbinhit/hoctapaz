@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Bcore\PackageService;
 use Illuminate\Support\Facades\Storage;
 use App\Bcore\Services\GoogleStorageServiceV2;
 use App\Models\FileModel;
 use DB;
 
-class FileController {
+class FileController extends PackageService {
 
     function __construct() {
         
@@ -17,9 +18,9 @@ class FileController {
         $UserDataModel = \App\Models\UserDataModel::find($id_file);
         $UserDataModel->do = json_decode($UserDataModel->data_object);
         
-        if ($UserDataModel->id_user != \App\Bcore\Services\UserService::id()) {
-            return "File không tồn tại!";
-        }
+//        if ($UserDataModel->id_user != $this->current_user->id) {
+//            return "File không tồn tại!";
+//        }
         header('Content-Type:' . $UserDataModel->do->mimetype . ';Content-Disposition: attachment; filename="' . $UserDataModel->do->name . '"');
         $DISK_LOCAL = Storage::disk('localhost');
         $FILE_LOCAL = $UserDataModel->do->url;

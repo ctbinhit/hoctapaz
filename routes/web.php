@@ -1,9 +1,6 @@
 <?php
 
 /* =============================================== TOANNANG Co., Ltd ===================================================
-  | Version: 1.0 - TOANNANG FRAMEWORK - http://toannang.com.vn
-  | Developed by ToanNang Group
-  | Author: BinhCao | Phone: (+84) 964 247 742 | Email: info@binhcao.com or binhcao.toannang@gmail.com
   |---------------------------------------------------------------------------------------------------------------------
   |                                                    WEB ROUTES
   |---------------------------------------------------------------------------------------------------------------------
@@ -459,6 +456,7 @@ Route::group(['middleware' => 'web'], function() {
             Route::post('save', ['uses' => 'admin\CategoryController@post_save'])->name('admin_category_save_post');
             // AJAX
             Route::post('ajax_', ['uses' => 'admin\CategoryController@ajax_'])->name('admin_category_ajax');
+            Route::post('ajax', ['uses' => 'admin\CategoryController@ajax'])->name('_admin_category_ajax');
         });
 
         // ===== Article page ==========================================================================================

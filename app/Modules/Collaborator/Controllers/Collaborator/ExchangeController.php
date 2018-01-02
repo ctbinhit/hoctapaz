@@ -70,7 +70,7 @@ class ExchangeController extends PackageServicePI {
             'message' => 'Đơn yêu cầu của bạn đã được gửi đi thành công, chúng tôi sẽ xử lý trong thời gian sớm nhất. Thân!'
         ]);
         redirectArea:
-        return redirect()->route('mdle_collaborator_rf');
+        return redirect()->route('mdle_pi_collaborator_rf');
     }
 
     public function ajax(Request $request) {

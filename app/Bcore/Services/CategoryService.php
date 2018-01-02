@@ -2,6 +2,7 @@
 
 namespace App\Bcore\Services;
 
+use App\Models\CategoryLangModel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
@@ -10,10 +11,6 @@ class CategoryService {
     private $_type = null;
     private $_lang = null;
     private $_data = null;
-
-    public static function version() {
-        return 1.3;
-    }
 
     public static function data_cache($obj_table, $obj_type) {
         Cache::forget('CACHE_CATEGORY_' . $obj_type . '_' . $obj_table);

@@ -75,7 +75,7 @@ return [
         ),
         'display' => array(
             'visible' => true,
-            'title' => 'label.noibat',
+            'title' => 'label.hienthi',
             'width' => '2%',
             'className' => 'dt-body-center',
         ),

@@ -4,7 +4,10 @@ namespace App\Modules\Cart\Controllers\Client;
 
 use App\Bcore\PackageService;
 use Illuminate\Http\Request;
+use Validator;
 use Illuminate\Support\Facades\DB;
+use App\Bcore\Services\UserServiceV3;
+use App\Bcore\Services\OrderService;
 
 class CartController extends PackageService {
 
@@ -17,18 +20,21 @@ class CartController extends PackageService {
     }
 
     public function get_payment() {
-        if (\App\Bcore\Services\OrderService::cart() == null) {
+        if (!$this->current_user) {
+            return redirect()->route('client_login_index', ['cwr' => url()->full()]);
+        }
+
+        if (OrderService::cart() == null) {
             return redirect()->route('mdle_cart_index');
         }
 
-
-        $UserInfo = \App\Models\UserModel::find(\App\Bcore\Services\UserService::id());
+        $UserInfo = (new UserServiceV3())->user()->current()->loadFromDatabase()->get_userModel();
 
         if ($UserInfo == null) {
             \App\Bcore\Services\UserService::logout();
         }
 
-        if (\App\Bcore\Services\OrderService::cartCount() == 0) {
+        if (OrderService::cartCount() == 0) {
             return redirect()->route('mdle_cart_index');
         }
 
@@ -41,46 +47,61 @@ class CartController extends PackageService {
     }
 
     public function post_payment(Request $request) {
-
-        if (!\App\Bcore\Services\UserService::isLoggedIn()) {
-            return redirect()->route('mdle_cart_payment');
+        $validator = Validator::make($request->all(), [
+                    'fullname' => 'required',
+                    'email' => 'required|max:255',
+                    'address' => 'required',
+                    'httt' => 'required',
+                    'phone' => 'required|min:8'
+        ]);
+        // User chưa đăng nhập || phiên session hết hạn
+        if (!$this->current_user) {
+            return redirect()->route('client_login_index', ['cwr' => url()->full()]);
         }
-
-        if (!$request->has('httt')) {
-
-
-            return back()->withInput();
-        }
-
-        if (!$request->has('email') || !$request->has('address')) {
-
-            return back()->withInput();
-        }
-
-        $CartInfo = \App\Bcore\Services\OrderService::cartAnalyze();
+        $CurrentUser = $this->load_user();
+        $TotalAmount = OrderService::cartSum();
+        $PAID = false;
+        $CartInfo = OrderService::cartAnalyze();
 
         switch ($request->input('httt')) {
-            case 'thanh-toan-tien-mat':
+            case '993da28babb425eca88aca91184c752e': // Thanh toán sau khi nhận hàng
+                $PAID = true;
+                break;
+            case '07d5b024ba9a8a78210f3df6f07db0fe': // Thanh toán bằng ví AZ
 
                 break;
-            case 'thanh-toan-vi-az':
-                $UserInfo = \App\Bcore\Services\UserService::db_info();
-                $user_coin = $UserInfo->coin;
-                $cart_sum = (int) $CartInfo['sum'];
-                if ($user_coin < $cart_sum) {
-                    // User không đủ tiền mua đồ T.T
-
-                    return back()->withInput();
-                }
-                $UserInfo->coin -= $cart_sum;
-                $r = $UserInfo->save();
-                if (!$r) {
-                    // Có lỗi xảy ra trong quá trình trừ tiền user & không thực hiện bất kì thao tác nào ( Chưa trừ tiền là chưa mua )
-                    return back()->withInput();
-                }
+            case '97b01ce40e54ca5bc2c9da5e2ad58e75': // Thanh toán bằng thẻ ngân hàng
+                // Đang cập nhật...
                 break;
             default:
-                return back()->withInput();
+                $validator->errors()->add('httt', 'Hình thức thanh toán không xác định');
+        }
+
+        $CartModel = new \App\Modules\Cart\Models\UserCartModel();
+        $CartModel->id_user = @$this->current_user->id;
+        $CartModel->note = $request->input('note');
+        $CartModel->method = $request->input('httt');
+        $CartModel->phone = $request->input('phone');
+        $CartModel->phone2 = $request->input('phone2');
+        $CartModel->name = $request->input('fullname');
+        $CartModel->address = $request->input('address');
+
+        $CartModel->state = 'pending';
+        $r = $CartModel->save();
+        if (!$r) {
+            $validator->errors()->add('form', 'Có lỗi xảy ra trong quá trình thao tác.');
+        }
+
+        $data = OrderService::generate_cartDetailModels($CartModel->id);
+
+        DB::table('users_carts_detail')->insert($data);
+        // Xóa session
+        OrderService::dropCart();
+        redirectArea:
+        if ($validator->passes()) {
+            return redirect()->route('mdle_cart_payment_success', $CartModel->id);
+        } else {
+            return back()->withErrors($validator)->withInput();
         }
     }
 
@@ -91,7 +112,7 @@ class CartController extends PackageService {
             return redirect()->route('client_index');
         }
 
-        if ($OrderModel->id_user != \App\Bcore\Services\UserService::id()) {
+        if ($OrderModel->id_user != $this->current_user->id) {
             return redirect()->route('client_index');
         }
 
@@ -127,26 +148,16 @@ class CartController extends PackageService {
     // ===== PRIVATE FUNCTION ==========================================================================================
 
     private function paying($request) {
-        $state = false;
-        $message = '';
-        $form_data = $this->parseFormSerializeArray($request->input('data'));
+        //  $form_data = $this->se
+        // $validator = Validator::make([], []);
 
-        if (!\App\Bcore\Services\UserService::isLoggedIn()) {
-            $state = false;
-            $message = 'Có lỗi xảy ra, phiên đăng nhập hết hạn';
+        if (!$this->current_user) {
+            $validator->errors()->add('user', 'Có lỗi xảy ra, phiên đăng nhập hết hạn');
             goto responseArea;
         }
-
-        if (\App\Bcore\Services\UserService::isLocked()) {
-            $state = false;
-            $message = 'Tài khoản đang bị khóa, không thể thực hiện giao dịch.';
-            goto responseArea;
-        }
-
-        $UserInfo = \App\Bcore\Services\UserService::db_info();
+        $UserInfo = $this->load_user();
         if ($UserInfo == null) {
-            $state = false;
-            $message = 'Lỗi xử lý dữ liệu người dùng, thao tác thất bại.';
+            $validator->errors()->add('user', 'Lỗi xử lý dữ liệu người dùng, thao tác thất bại.');
             goto responseArea;
         }
 
@@ -168,19 +179,17 @@ class CartController extends PackageService {
                 }
                 break;
             case '97b01ce40e54ca5bc2c9da5e2ad58e75': // Thanh toán bằng thẻ ngân hàng
-
                 break;
             default: // Hình thức thanh toán không được hỗ trợ
         }
 
         if (!$PAID) {
-            $state = false;
-            $message = 'Thanh toán thất bại, có lỗi xảy ra!';
+            $validator->errors()->add('user', 'Thanh toán thất bại, có lỗi xảy ra!');
             goto responseArea;
         }
 
         $CartModel = new \App\Modules\Cart\Models\UserCartModel();
-        $CartModel->id_user = \App\Bcore\Services\UserService::id();
+        $CartModel->id_user = $this->current_user->id;
         $CartModel->name = $form_data['txt_hovaten'];
         $CartModel->method = $form_data['httt'];
         $CartModel->address = $form_data['txt_diachi'];
@@ -189,26 +198,22 @@ class CartController extends PackageService {
         $r = $CartModel->save();
         $ID_CART = $CartModel->id;
         if ($r) {
-
             $data = \App\Bcore\Services\OrderService::generate_cartDetailModels($ID_CART);
             $r1 = DB::table('users_carts_detail')->insert($data);
             if (!$r1) {
                 // Xóa đơn hàng & trả lại tiền
                 $r->delete();
-                \App\Bcore\Services\UserService::returnMoneyBack($cart_sum);
-                $state = false;
-                $message = 'Lỗi hệ thống, thao tác thất bại!';
+                $validator->errors()->add('user', 'Lỗi hệ thống, thao tác thất bại!');
                 goto responseArea;
             }
         }
-        $state = true;
         $message = 'Đặt hàng thành công!';
         $url = route('mdle_cart_payment_success', $ID_CART);
         \App\Bcore\Services\OrderService::dropCart();
         responseArea:
         return response()->json([
-                    'state' => $state,
-                    'data' => null,
+                    'state' => $validator->passes() ? true : false,
+                    'validate' => $validator->errors()->all(),
                     'message' => $message,
                     'request' => $form_data,
                     'redirect' => @$url,

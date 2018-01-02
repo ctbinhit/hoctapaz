@@ -198,7 +198,7 @@
             }
         };
         $('#sortable_categories').nestable({
-            maxDepth: 2,
+            maxDepth: 3,
             callback: function (l, e) {
                 // l is the main container
                 // e is the element that was moved

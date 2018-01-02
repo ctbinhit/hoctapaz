@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\admin;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Config;
@@ -10,6 +11,7 @@ use CategoryModel,
     PhotoModel;
 use View;
 use Input;
+use App\Bcore\Services\ViewService;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 
@@ -33,6 +35,7 @@ class CategoryController extends AdminController {
     }
 
     public function get_index($pTable = null, $pType = null, Request $request) {
+
         // -------------------------------------------------------------------------------------------------------------
         switch ($pTable) {
             case 'san-pham':$pTable = 'products';
@@ -72,11 +75,11 @@ class CategoryController extends AdminController {
         // ----- FILTER ------------------------------------------------------------------------------------------------
         if (Input::has('id_category')) {
             $filter[] = ['categories.id_category', '=', $request->input('id_category')];
-        }else{
-            $filter[] = ['categories.id_category','=', null];
+        } else {
+            $filter[] = ['categories.id_category', '=', null];
         }
-        
-        
+
+
         $Model->set_where($filter);
         $Model->set_perPage($PERPAGE);
         $Model->set_orderBy(['ordinal_number', $SORT]); // Sort theo stt
@@ -130,6 +133,7 @@ class CategoryController extends AdminController {
     }
 
     public function post_save(Request $request) {
+        dd($request->all());
         if ($request->input('type') === null || $request->input('type') === null)
             return redirect()->route('admin_index');
         if (Input::get('id') == null) {
@@ -316,6 +320,25 @@ class CategoryController extends AdminController {
     }
 
     // ===== AJAX REQUEST ==============================================================================================
+
+    public function ajax(Request $request) {
+        $act = $request->input('act');
+        switch ($act) {
+            case 'load_childrens':
+                return response()->json($this->load_childsByIdParent($request->input('id')));
+        }
+    }
+
+    public function load_childsByIdParent($id_parent) {
+        $CategoryModels = DB::table('categories')
+                        ->join('categories_lang', 'categories_lang.id_category', '=', 'categories.id')
+                        ->where([
+                            ['categories.id_category', $id_parent], ['categories_lang.id_lang', 1]
+                        ])
+                        ->select(['categories.id', 'categories_lang.name'])
+                        ->orderBy('categories.ordinal_number', 'asc')->get();
+        return ['state' => true, 'data' => $CategoryModels];
+    }
 
     public function ajax_(Request $request) {
         $requestAction = $request->input('bcore_action');

@@ -14,8 +14,7 @@
             <th data-toggle="tooltip" data-placement="top" title="Người đặt hàng"><i class="fa fa-user"></i></th>
             <th data-toggle="tooltip" data-placement="top" title="Email"><i class="fa fa-envelope"></i></th>
             <th data-toggle="tooltip" data-placement="top" title="Số điện thoại"><i class="fa fa-phone"></i></th>
-            <th data-toggle="tooltip" data-placement="top" title="Tổng giá trị đơn hàng">Tổng tiền</th>
-            <th data-toggle="tooltip" data-placement="top" title="VIP"><i class="fa fa-star"></i></th>
+            <th data-toggle="tooltip" data-placement="top" title="Tổng giá trị đơn hàng"><i class="fa fa-money"></i></th>
             <th class="tr_trangthai" width="15%" data-toggle="tooltip" data-placement="top" title="Trạng thái đơn hàng">Trạng thái</th>
             <th>Thao tác</th>
         </tr>
@@ -30,8 +29,7 @@
             <td data-toggle="tooltip" data-placement="top" title="{{$v->phone}}">{{$v->name}}</td>
             <td><i class="label label-info">{{$v->email}}</i></td>
             <td><i class="label label-info">{{$v->phone}}</i></td>
-            <td></td>
-            <td></td>
+            <td>{{number_format($v->total_amount,0)}} VNĐ</td>
             <td>
                 <select class="form-control js-selectChangeState" name="state">
                     @foreach($stateList as $state)

@@ -30,10 +30,11 @@ Route::group(['module' => $module_name, 'middleware' => 'web', 'namespace' => $n
 
         Route::get('/thanh-toan', ['uses' => 'Client\\' . $module_name . 'Controller@get_payment'])
                 ->name($module_prefix . 'cart_payment');
+        Route::post('/thanh-toan', ['uses' => 'Client\\' . $module_name . 'Controller@post_payment'])
+                ->name($post . $module_prefix . 'cart_payment');
 
         Route::get('/don-hang/{id}', ['uses' => 'Client\\' . $module_name . 'Controller@get_payment_success'])
                 ->name($module_prefix . 'cart_payment_success');
-
 
         Route::post('/ajax', ['uses' => 'Client\\' . $module_name . 'Controller@ajax'])
                 ->name($module_prefix . 'client_order_ajax');

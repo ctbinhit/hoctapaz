@@ -20,8 +20,16 @@
             <div class="panel panel-default" style="width: 500px;margin: 0 auto;">
                 <div class="panel-heading"><i class="fa fa-users"></i> Đăng nhập</div>
                 <div class="panel-body">
+                    @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    @endif
                     {{ csrf_field() }}
-
                     <div class="from-group">
                         <label class="control-label col-md-2 col-sm-4 col-xs-12"><i class="fa fa-user"></i></label>
                         <div class="col-md-10 col-sm-8 col-xs-12">
@@ -35,13 +43,7 @@
                             <input type="password" class="form-control" name="password" placeholder="Mật khẩu..."/>
                         </div><div class="clearfix"></div>
                     </div>
-                    @if(Session::has('html_callback'))
-                    <div class="from-group">
-                        <div class="col-md-10 col-md-offset-2">
-                            <p class="text-{{isset(Session::get('html_callback')->message_type)?Session::get('html_callback')->message_type:'warning'}}">{{Session::get('html_callback')->message}}</p>
-                        </div>
-                    </div>
-                    @endif
+
 
                     <div class="from-group">
                         <div class="col-md-10 col-sm-10 col-xs-6 col-md-offset-2">

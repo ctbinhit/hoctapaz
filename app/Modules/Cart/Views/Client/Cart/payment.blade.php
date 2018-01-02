@@ -11,99 +11,62 @@
         <div class="row">
             <div class="col-md-6">
                 <h3>Thông tin giao hàng</h3>
-                @if(!UserService::isLoggedIn())
-                <div class="alert alert-warning">
-                    <p><strong>Thông báo!</strong> Bạn chưa đăng nhập vào hệ thống 
-                        <strong><span class="main-color-second text-bold">A</span><span class="main-color-first text-bold">Z</span></strong>, vui lòng đăng nhập
-                        để nhận được điểm tích lũy và có thể theo dõi đơn hàng 1 cách dễ dàng.</p>
-                    <p>Nếu bạn chưa có tài khoản thì bấm vào <a href="{{route('client_login_signup')}}" class="label label-info">đây</a> để đăng ký. (Miễn phí)</p>
+                @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
                 </div>
-                <div class="panel panel-info">
-                    <div class="panel-heading"><i class="fa fa-sign-in"></i> Đăng nhập</div>
-                    <div class="panel-body">
-                        <form class="form form-horizontal" method="POST" action="{{route('_client_login_index')}}">
-                            {{csrf_field()}}
-                            <input type="hidden" name="cwr" value="{{url()->full()}}">
-
-                            <div class="form-group">
-                                <label for="username" class="control-label col-lg-4 col-md-4 col-sm-3 col-xs-12">Tên đăng nhập:</label>
-                                <div class="col-lg-8 col-md-8 col-sm-9 col-xs-12">
-                                    <input type="text" name="username" id="username" class="form-control" placeholder="Tên đăng nhập..." />
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="password" class="control-label col-lg-4 col-md-4 col-sm-3 col-xs-12">Mật khẩu:</label>
-                                <div class="col-lg-8 col-md-8 col-sm-9 col-xs-12">
-                                    <input type="password" name="password" id="username" class="form-control" placeholder="Mật khẩu..." />
-                                </div>
-                            </div>
-                            @if(Session::has('html_callback'))
-                            <div class="form-group">
-                                <div class="col-lg-8 col-md-8 col-sm-9 col-xs-12 col-md-offset-4">
-                                    <p class="text-{{Session('html_callback')->message_type}}">{{Session('html_callback')->message}}</p>
-                                </div>
-                            </div>
-                            @endif
-
-                            <div class="form-group">
-                                <div class="col-lg-8 col-md-8 col-sm-9 col-xs-12 col-md-offset-4">
-                                    <button type="submit" class="btn btn-success">Đăng nhập</button>
-                                    <a href="javascript:void(0)" class="links"> Quên mật khẩu?</a>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                @else
-
-                <form class="form form-horizontal" name="frm_payment_info" id="frm_payment_info" method="POST" onsubmit="return false;" action="">
-
+                @endif
+                <form class="form form-horizontal" name="frm_payment_info" id="frm_payment_info" method="POST" onsubmit="" action="">
+                    {{csrf_field()}}
                     <div class="form-group">
-                        <label for="nameOfTheInput" class="control-label col-lg-4 col-md-4 col-sm-3 col-xs-12">Họ và tên:</label>
+                        <label for="fullname" class="control-label col-lg-4 col-md-4 col-sm-3 col-xs-12">Họ và tên:</label>
                         <div class="col-lg-8 col-md-8 col-sm-9 col-xs-12">
-                            <input type="text" name="txt_hovaten" class="form-control" value="{{$ui->fullname}}" placeholder="Họ và tên..."/>
+                            <input type="text" name="fullname" id="fullname" class="form-control" value="{{$ui->fullname}}" placeholder="Họ và tên..."/>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="nameOfTheInput" class="control-label col-lg-4 col-md-4 col-sm-3 col-xs-12">Địa chỉ giao hàng:</label>
+                        <label for="address" class="control-label col-lg-4 col-md-4 col-sm-3 col-xs-12">Địa chỉ giao hàng:</label>
                         <div class="col-lg-8 col-md-8 col-sm-9 col-xs-12">
-                            <input type="text" name="txt_diachi" class="form-control" value="{{$ui->address}}" placeholder="Địa chỉ giao hàng..." />
+                            <input type="text" name="address" id="address" class="form-control" value="{{$ui->address}}" placeholder="Địa chỉ giao hàng..." />
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label for="email" class="control-label col-lg-4 col-md-4 col-sm-3 col-xs-12">Email:</label>
                         <div class="col-lg-8 col-md-8 col-sm-9 col-xs-12">
-                            <input type="text" name="txt_email" class="form-control" value="{{$ui->email}}" placeholder="Email người đặt..." />
+                            <input type="text" name="email" id="email" class="form-control" value="{{$ui->email}}" placeholder="Email người đặt..." />
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="nameOfTheInput" class="control-label col-lg-4 col-md-4 col-sm-3 col-xs-12">SĐT:</label>
+                        <label for="phone" class="control-label col-lg-4 col-md-4 col-sm-3 col-xs-12">SĐT:</label>
                         <div class="col-lg-8 col-md-8 col-sm-9 col-xs-12">
-                            <input type="text" name="txt_phone" class="form-control" value="{{$ui->phone}}" placeholder="Số điện thoại..." />
+                            <input type="text" name="phone" id="phone" class="form-control" value="{{$ui->phone}}" placeholder="Số điện thoại..." />
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label for="nameOfTheInput" class="control-label col-lg-4 col-md-4 col-sm-3 col-xs-12">SĐT dự phòng:</label>
                         <div class="col-lg-8 col-md-8 col-sm-9 col-xs-12">
-                            <input type="text" name="txt_phone2" class="form-control" placeholder="Điện thoại dự phòng (Nếu có)..." />
+                            <input type="text" name="phone2" class="form-control" placeholder="Điện thoại dự phòng (Nếu có)..." />
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="nameOfTheInput" class="control-label col-lg-4 col-md-4 col-sm-3 col-xs-12">Ghi chú:</label>
+                        <label for="note" class="control-label col-lg-4 col-md-4 col-sm-3 col-xs-12">Ghi chú:</label>
                         <div class="col-lg-8 col-md-8 col-sm-9 col-xs-12">
-                            <textarea class="form-control" name="txt_note" rows="4" 
+                            <textarea class="form-control" name="note" id="note" rows="4" 
                                       placeholder="Viết 1 vài ghi chú cho shipper hoặc quản trị, vd: Nhà bạn gần trường học, bệnh viện..."></textarea>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="nameOfTheInput" 
+                        <label for="httt" 
                                class="control-label col-lg-4 col-md-4 col-sm-3 col-xs-12">Hình thức thanh toán:</label>
                         <div class="col-lg-8 col-md-8 col-sm-9 col-xs-12">
                             <input type="radio" name="httt" value="993da28babb425eca88aca91184c752e" checked> Thanh toán khi nhận hàng. <br>
@@ -182,7 +145,7 @@
                                             data: form_data
                                         }, success: function (data) {
                                             var timeDelay = 0;
-                                            if ( typeof  (data.redirect_delay) != 'undefined') {
+                                            if (typeof (data.redirect_delay) != 'undefined') {
                                                 timeDelay = data.redirect_delay;
                                             }
                                             if (data.state) {
@@ -191,7 +154,7 @@
                                                     content: data.message
                                                 });
                                                 setTimeout(function () {
-                                                   window.location.assign(data.redirect);
+                                                    window.location.assign(data.redirect);
                                                 }, timeDelay);
                                             } else {
                                                 $.alert({
@@ -201,13 +164,13 @@
                                                         cancel: {
                                                             text: 'OK',
                                                             btnClass: 'btn btn-default',
-                                                            keys: ['enter','esc']
+                                                            keys: ['enter', 'esc']
                                                         },
-                                                        somethingElse:{
-                                                            text : 'Nạp thêm',
+                                                        somethingElse: {
+                                                            text: 'Nạp thêm',
                                                             btnClass: 'btn btn-primary',
                                                             keys: ['n'],
-                                                            action: function(){
+                                                            action: function () {
                                                                 window.location.assign('{{route("mdle_bkp_napthe")}}');
                                                             }
                                                         }
@@ -222,8 +185,8 @@
                                                 content: 'Có lỗi xảy ra trong quá trình xử lý đơn hàng!'
                                             });
                                             PaymentController.log(data);
-                                        }, complete: function(){
-                                            
+                                        }, complete: function () {
+
                                         }
                                     });
                                 }
@@ -240,16 +203,13 @@
                                 }
                             }
                         };
-                        PaymentController.init('#frm_payment_info');
+                        //PaymentController.init('#frm_payment_info');
                     });
                 </script>
-
-                @endif
 
             </div>
             <div class="col-md-6">
                 <h3>Thông tin đơn hàng</h3>
-
                 <table class="table table-bordered">
                     <thead>
                         <tr>

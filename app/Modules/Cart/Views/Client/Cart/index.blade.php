@@ -255,7 +255,7 @@
                     });
                 },
                 dc: function () {
-                    $.post($('#route_cart_ajax').val(),{act: '6e9d25362c485bc3c90c818dfac5dc49'});
+                    $.post($('#route_cart_ajax').val(), {act: '6e9d25362c485bc3c90c818dfac5dc49'});
                     JCC.action.loadCartHTML();
                 }
             },

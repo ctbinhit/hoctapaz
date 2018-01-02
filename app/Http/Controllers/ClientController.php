@@ -52,10 +52,13 @@ class ClientController extends ControllerService {
         return $this->current_user;
     }
 
-//    public function get_currentDBUserData() {
-//        if ($this->_USER == null) {
-//            return null;
-//        }
-//        return UserModel::find($this->_USER['id']);
-//    }
+    public function load_user($use_cache = true) {
+        if ($use_cache) {
+            return (new UserServiceV3())->user()->current()->loadFromDatabase()->get_userModel();
+        } else {
+            // Chữa cháy
+            return (new UserServiceV3())->user()->current()->loadFromDatabase()->get_userModel();
+        }
+    }
+
 }

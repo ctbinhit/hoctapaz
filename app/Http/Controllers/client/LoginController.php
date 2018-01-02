@@ -30,21 +30,14 @@ class LoginController extends ClientController {
     }
 
     public function post_index(Request $request) {
-        if (!$request->has('username') || !$request->has('password')) {
-            session::flash('html_callback', (object) [
-                        'message_type' => 'warning',
-                        'message' => 'Vui lòng nhập tài khoản & mật khẩu!']);
-            return redirect()->back();
-        }
+        $this->validate($request, [
+            'username' => 'required',
+            'password' => 'required'
+                ], ['username.required' => 'Username không được để rỗng', 'password.required' => 'Password không được để rỗng']);
         $UserServiceV3 = (new UserServiceV3())->user();
         $BOOL_LOGGEDIN = $UserServiceV3->signinWithForm($request->input('username'), $request->input('password'));
-
-        session::flash('html_callback', (object) [
-                    'message_type' => 'warning',
-                    'message' => $UserServiceV3->get_message()]);
-
         if (!$BOOL_LOGGEDIN) {
-            return redirect()->back();
+            return back()->withErrors(['msg' => $UserServiceV3->get_message()]);
         }
         if ($request->has('cwr')) {
             return redirect($request->input('cwr'));
@@ -55,12 +48,11 @@ class LoginController extends ClientController {
     public function get_signup() {
         // Keep tokenData if exists
         (new AuthServiceV3)->keep_tokenData();
-
         return view($this->RV . 'login/signup');
     }
 
     public function post_signup(Request $request) {
-        $ValidateData = $this->validate($request, [
+        $this->validate($request, [
             'email' => 'bail|required|unique:users|min:10|max:255|email',
             'username' => 'bail|required|unique:users|min:10|max:255',
             'password' => 'bail|required|confirmed|min:5',
@@ -117,7 +109,7 @@ class LoginController extends ClientController {
     public function access_authenticate_callback($driver) {
         $AuthService = (new AuthServiceV3())
                         ->set_driver($driver)->authWithDriver($driver);
-    
+
         if ($AuthService->authState() == 2) {
             $driverData = $AuthService->get_driverData();
 
