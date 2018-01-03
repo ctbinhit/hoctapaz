@@ -8,12 +8,12 @@ use Input,
     File,
     View;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Lang;
 use App\Models\ArticleOModel,
     LanguageModel,
     App\Models\PhotoModel;
 use ImageService,
     App\Bcore\StorageService;
+use Illuminate\Support\Facades\Lang;
 
 class ArticleOController extends AdminController {
 
@@ -89,7 +89,7 @@ class ArticleOController extends AdminController {
             foreach ($LIST_LANGS as $k => $v) {
                 if (!isset($ArticleOModel[$v])) {
                     $ArticleOModel = new ArticleOModel();
-                    $ArticleOModel->id_user = \App\Bcore\Services\UserServiceV2::current_userId(\App\Bcore\System\UserType::admin());
+                    $ArticleOModel->id_user = $this->current_admin->id;
                     $ArticleOModel->id_lang = $v;
                     $ArticleOModel->type = $pType;
                     $ArticleOModel->title = 'Tiêu đề mẫu';
@@ -108,26 +108,22 @@ class ArticleOController extends AdminController {
     }
 
     public function post_index(Request $request) {
-        $form_fields = $this->form_field_generator($request->all(), [], true);
-        $r = false;
-        foreach ($form_fields as $k => $v) {
-            if (isset($v->id)) {
-                $tmp_id = $v->id;
-                unset($v->id);
-                $ArticleOModel = ArticleOModel::where('id', '=', $tmp_id)->first();
-                unset($v->id_lang);
-                $r = $ArticleOModel->update((array) $v);
+        $formdata = $request->input('formdata');
+
+        foreach ($formdata as $k => $v) {
+            if (isset($v['id'])) {
+                $ArticleOModel = ArticleOModel::where('id', '=', $v['id'])->first();
+                $r = $ArticleOModel->update([
+                    'title' => $v['title'],
+                    'content' => $v['content'],
+                    'seo_title' => $v['seo_title'],
+                    'seo_keywords' => $v['seo_keywords'],
+                    'seo_description' => $v['seo_description']
+                ]);
             }
         }
-
-        if ($r === true) {
-            $request->session()->flash('message', __('message.capnhatthanhcong'));
-        } else {
-            $request->session()->flash('message_type', 'error');
-            $request->session()->flash('message', __('message.capnhatkhongthanhcong'));
-        }
+        $request->session()->flash('message', __('message.capnhatthanhcong'));
         return redirect()->route('admin_articleo_index', $request->input('type'));
     }
-
 
 }

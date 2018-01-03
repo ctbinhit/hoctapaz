@@ -19,7 +19,6 @@
             </ul>
         </li>
         <li><a href="{{route('mdle_uservip_index')}}"><i class="fa fa-star"></i> User VIP</a></li>
-        <li><a href="{{route('mdle_ug_index')}}"><i class="fa fa-users"></i> Nhóm & Phân quyền</a></li>
     </ul>
 
 </div>

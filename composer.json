@@ -28,7 +28,6 @@
     },
     "autoload": {
         "files": [
-            "app/Helper/AdminHelper.php",
             "app/Helper/ViewData.php"
         ],
         "classmap": [

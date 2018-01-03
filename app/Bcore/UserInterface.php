@@ -5,7 +5,7 @@ namespace App\Bcore;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Session;
 
-class UserInterface extends UserPermission {
+class UserInterface {
 
     private $_ROOT = "ViewController";
     private $_ViewData = null;
@@ -15,7 +15,7 @@ class UserInterface extends UserPermission {
 
     function __construct($pOption = null) {
         $pOption = (object) $pOption;
-        parent::__construct();
+        
         if ($pOption !== null) {
             if (!is_object($pOption)) {
                 $this->_ERR = true;
@@ -42,8 +42,6 @@ class UserInterface extends UserPermission {
             }
         }
     }
-
-
 
     public function set_defaultValue($pValue, $Default) {
         if (!isset($pValue)) {

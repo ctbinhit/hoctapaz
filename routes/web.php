@@ -200,10 +200,10 @@ Route::group(['middleware' => 'web'], function() {
     Route::get('/dang-xuat' . config('bcore.PageExtension'), ['uses' => 'client\LoginController@access_signout'])
             ->name('client_login_signout');
 
-    Route::get('/kich-hoat' . config('bcore.PageExtension'), ['uses' => 'client\LoginController@get_active'])
-            ->name('client_login_active');
-    Route::get('/kich-hoat/{code}' . config('bcore.PageExtension'), ['uses' => 'client\LoginController@get_active_o'])
-            ->name('client_login_active_o');
+//    Route::get('/kich-hoat' . config('bcore.PageExtension'), ['uses' => 'client\LoginController@get_active'])
+//            ->name('client_login_active');
+//    Route::get('/kich-hoat/{code}' . config('bcore.PageExtension'), ['uses' => 'client\LoginController@get_active_o'])
+//            ->name('client_login_active_o');
 
     Route::group(['prefix' => 'login'], function() {
 
@@ -226,11 +226,6 @@ Route::group(['middleware' => 'web'], function() {
 
     Route::get('/u/files/{id}/{url_encode}', ['uses' => 'FileController@file_private'])->name('file_private');
 
-    Route::group(['prefix' => 'api'], function() {
-        Route::get('/licensetext', function() {
-            return "<center><h1>TOANNANG Co., Ltd</h1>Invalid license error | Hotline: 08 38911719 - 08 38911720</center>";
-        });
-    });
 
     //==================================================================================================================
     //================================================== ADMIN AREA ====================================================
@@ -509,7 +504,7 @@ Route::group(['middleware' => 'web'], function() {
 
             Route::post('/approver', ['uses' => 'admin\ExamManController@post_approver'])
                     ->name('_admin_examman_approver');
-            
+
             Route::get('/registered-app', ['uses' => 'admin\ExamManController@get_app_registered'])
                     ->name('admin_examman_registered');
 
@@ -662,117 +657,3 @@ Route::group(['middleware' => 'web'], function() {
         
     });
 });
-
-//Route::get('/thumb_p/{filename}/{x?}x{y?}', function($filename, $w = null, $h = null) {
-//    try {
-//        reloadThumb:
-//        $thumbnail_url = 'thumbnails/' . $w . '_' . $h . '/' . $filename . '.png';
-//        if (Storage::disk('localhost')->exists($thumbnail_url)) {
-//            $mimetype = Storage::disk('localhost')->mimeType($thumbnail_url);
-//            header('Content-Type:' . $mimetype . ';Content-Disposition: attachment; filename="' . $filename . '"');
-//            $raw = Storage::disk('localhost')->get($thumbnail_url);
-//            echo $raw;
-//        } else {
-//            $a = PhotoModel::where([
-//                        ['url_encode', '=', $filename]
-//                    ])->first();
-//            $thumb_url = 'public/thumbnails/' . $w . '_' . $h . '/';
-//
-//            if (!Storage::disk('localhost')->exists($thumb_url)) {
-//                Storage::makeDirectory($thumb_url);
-//            }
-//            $url = Storage::disk('localhost')->url($a->url);
-//            if (!Storage::disk('localhost')->exists($thumbnail_url)) {
-//                $thumb = Image::make($url);
-//                $thumb->fit($w, $h);
-//                $thumb->save('storage/app/' . $thumb_url . $filename . '.png');
-//            }
-//            goto reloadThumb;
-//        }
-//    } catch (\Exception $ex) {
-//        return null;
-//    }
-//})->name('thumb_product');
-
-    /* =================================================================================================================
-      |                                                 TEST AREA
-      | ================================================================================================================
-     */
-
-//    Route::group(['prefix' => 'test'], function() {
-//
-//        Route::get('/carbon', function() {
-//            $a = new Carbon\Carbon('2017-09-22 03:38:42');
-//            $b = Carbon\Carbon::now();
-//
-//            echo $b->diffInSeconds($a, false);
-//        });
-//        // Socialite
-//        Route::group(['prefix' => 'login'], function() {
-//
-//
-//            Route::get('/google', ['uses' => 'admin\TestController@get_login_google'])
-//                    ->name('test_login_google');
-//
-//            Route::get('/google/callback', ['uses' => 'admin\TestController@get_login_google_callback'])
-//                    ->name('test_login_google_callback');
-//
-//            Route::get('/fb', ['uses' => 'admin\TestController@get_login_fb'])
-//                    ->name('test_login_fb');
-//
-//            Route::get('/fb/callback', ['uses' => 'admin\TestController@get_login_fb_callback'])
-//                    ->name('test_login_fb_callback');
-//        });
-//
-//        Route::get('/thi-online', ['uses' => 'admin\TestController@get_thionline'])
-//                ->name('test_thionline');
-//
-//        Route::get('/thi-online/{id}', ['uses' => 'admin\TestController@get_exam'])
-//                ->name('test_thionline_exam');
-//
-//        Route::post('/ajax', ['uses' => 'admin\TestController@_ajax'])
-//                ->name('test_ajax');
-//    });
-
-
-//    Route::get('/file/{key}', function($key) {
-//        try {
-//            $PathDecode = \Illuminate\Support\Facades\Crypt::decryptString($key);
-//            if (Storage::disk('public')->exists($PathDecode)) {
-//                $mimetype = Storage::mimeType('public/' . $PathDecode);
-//                $raw = (Storage::disk('public')->get($PathDecode));
-//                header('Content-Type:' . $mimetype . ';Content-Disposition: attachment;');
-//                echo $raw;
-//            } else {
-//                return "ERROR 404!";
-//            }
-//        } catch (\Exception $ex) {
-//            return 'ERROR!';
-//        }
-//    })->name('file');
-//
-//    Route::get('/file/{folder?}/{filename?}', function($folder = null, $filename = null) {
-//        if (Storage::disk('public')->exists($folder . '/' . $filename)) {
-//            $mimetype = Storage::mimeType('public/' . $folder . '/' . $filename);
-//            $raw = (Storage::disk('public')->get($folder . '/' . $filename));
-//            header('Content-Type:' . $mimetype . ';Content-Disposition: attachment; filename="' . $filename . '"');
-//            echo $raw;
-//        } else {
-//            return "ERROR 404";
-//        }
-//    })->name('storage');
-// Route::get('/files/clo/gg/{id?}', function($id = null) {
-//        if ($id != null) {
-//            // $path = @Crypt::decryptString($id);
-//            $path = $id;
-//            $StorageService = new \App\Bcore\StorageService();
-//            $res = $StorageService->getFile($path, 'google');
-//
-//            if ($res != null) {
-//                header('Content-Type:' . $res['mimetype'] . ';Content-Disposition: attachment; filename="' . $path . '"');
-//                echo $res['raw'];
-//            } else {
-//                echo "<center>ERROR 404!</center>";
-//            }
-//        }
-//    })->name('storage_google');

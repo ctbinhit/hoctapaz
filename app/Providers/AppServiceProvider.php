@@ -18,15 +18,6 @@ class AppServiceProvider extends ServiceProvider {
      */
     public function boot() {
         Schema::defaultStringLength(191);
-        // ===== REMEMBER CACHE ========================================================================================
-//        $SETTING = Cache::remember('SETTING', 120, function() {
-//                    $Model = new SettingModel();
-//                    $tmp1 = SettingModel::find('info');
-//                    $tmp = $Model->db_get_itemsByType('info', 1);
-//                    $a = $this->eloquent_merge($tmp1, $tmp);
-//                    return $a[0];
-//                });
-//        View::share('TNSITE', $SETTING);
     }
 
     public function eloquent_merge($pObj1, $pObj2) {

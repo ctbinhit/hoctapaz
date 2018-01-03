@@ -32,6 +32,7 @@ class UserController extends AdminController {
     }
 
     public function get_index($pType, Request $request) {
+
         $this->DVController = $this->registerDVC($this->ControllerName);
         $UserModels = DB::table('users')
                 ->leftJoin('users_vip', 'users.id_vip', '=', 'users_vip.id')
@@ -157,155 +158,32 @@ class UserController extends AdminController {
     }
 
     public function get_info() {
-//        $ip = '42.119.1.201';
-//        $user_location = json_decode(file_get_contents("http://www.geoplugin.net/php.gp?ip={$ip}"));
-//        $geoPlugin_array = unserialize(file_get_contents('http://www.geoplugin.net/php.gp?ip=' . $ip));
-        $UserModel = UserModel::find(session('user')['id']);
+        $UserModel = UserModel::find($this->current_admin->id);
 
-        $StorageService = new \App\Bcore\StorageService();
-
-        $PhotoModel = new PhotoModel();
-        $PhotoOptions = array(
-            'table' => 'users',
-            'id' => session('user')['id']
-        );
-        $Lst_photo = $PhotoModel->db_getAllDataByIdObject($PhotoOptions);
-        $Lst_photo = $PhotoModel->GroupByType($Lst_photo);
         return $this->render_view('me.info', array(
                     'item' => $UserModel,
-                    'data_photos' => $Lst_photo
                         ), false);
     }
 
     public function updatePassword(Request $request) {
-        if (Input::has('password_old') && Input::has('password_new') && Input::has('password_new2')) {
-            $Model = UserModel::find(session('user')['id']);
-            if ($Model != null) {
-                if ($Model->password == $request->input('password_old')) {
-                    if ($request->input('password_new') == $request->input('password_new2')) {
-                        $Model->password = $request->input('password_new');
-                        $r = $Model->save();
-                        if ($r) {
-                            $request->session()->flash('message', 'Cập nhật thành công!');
-                        } else {
-                            $request->session()->flash('message_type', 'error');
-                            $request->session()->flash('message', 'Không thể cập nhật, vui lòng thử lại sau!');
-                        }
-                        goto resultArea;
-                    } else {
-                        $request->session()->flash('message_type', 'error');
-                        $request->session()->flash('message', '2 Mật khẩu không khớp!');
-                        goto resultArea;
-                    }
-                } else {
-                    $request->session()->flash('message_type', 'error');
-                    $request->session()->flash('message', 'Mật khẩu sai!');
-                    goto resultArea;
-                }
-            } else {
-                goto Err;
-            }
-        } else {
-            Err:
-            $request->session()->flash('message_type', 'error');
-            $request->session()->flash('message', 'Lỗi không xác định!');
-            goto resultArea;
-        }
-
-        resultArea:
-
-        redirectArea:
-        return redirect()->route('admin_me_info');
+//        $this->validate($request, [
+//            'password_old' => 'required',
+//            'password_new' => 'required',
+//            'password_new2' => 'required'
+//        ]);
+//        if (!$this->current_admin) {
+//            return redirect()->route('client_index');
+//        }
+//        redirectArea:
+//        return redirect()->route('admin_me_info');
     }
 
     public function post_info(Request $request) {
-        if (!Input::hasFile('photo')) {
-            return;
-        }
-        // Lấy thông tin file upload từ form
-        $file = $request->file('photo');
-        // Nếu file không có => out
-        if ($file == null) {
-            
-        } else {
-            goto StorageAccessArea;
-        }
 
-        StorageAccessArea:
-
-        $StorageService = new \App\Bcore\StorageService();
-
-        // Sử dụng Storage Service để kiểm tra thư mục có tồn tại trên 1 server
-        // C1 ----------------------------------------------------------------------------------------------------------
-        //        $StorageService->setOptions(array(
-        //            'storageName' => 'google',
-        //            'dir_name' => $this->storage_folder,
-        //            'dir_autocreate' => true
-        //        ));
-        //        $FolderPath = $StorageService->checkFolderExists();
-        // -------------------------------------------------------------------------------------------------------------
-        // C2 (Nên dùng bởi vì ngắn gọn --------------------------------------------------------------------------------
-        // @Param: disk name (Server muốn kiểm tra, vd: google, public (host), dropbox, s3...)
-        // @Param: folder name (Tên thư mục muốn kiểm tra )
-        // @Param: autocreate (Tự động tạo mới nếu không tồn tại )
-        // 
-        // Syntax: $FolderPath = $StorageService->checkFolderExists('google', $this->storage_folder, true);
-        // Return: Mảng thông tin của folder đó
-        // -------------------------------------------------------------------------------------------------------------
-        // Kiểm tra thư mục có tồn tại trên google
-        // Chỉ cần kiểm tra trên google, vì local trong quá trình upload nếu không có thư mục sẽ tự động tạo mới
-        $FolderPath = $StorageService->checkFolderExists('google', $this->storage_folder, true);
-
-        if ($FolderPath == null) {
-            // Write log, ...
-            return;
-        }
-
-        // Result look like:
-        //  {#275 ▼
-        //      +"type": "dir"
-        //      +"path": "0B76IYXdgtJXfNUUwd05vdXd3ajg"
-        //      +"filename": "users"
-        //      +"extension": ""
-        //      +"timestamp": 1504462874
-        //      +"size": 0
-        //      +"dirname": ""
-        //      +"basename": "0B76IYXdgtJXfNUUwd05vdXd3ajg"
-        //  }
-        // Khởi tạo tên file (* Google, Dropbox,... đều lưu theo tên này)
-        $filename = 'photo_' . md5(Carbon::now() . $file->getClientOriginalName()) . '.' . $file->extension();
-
-        $local_path = $StorageService->upload_file('public', $filename, $file);
-
-
-        // Put file lên server thành công
-        if ($local_path != null) {
-            // Put file lên google drive
-            // Lưu ý khi put file lên google thì $file->path()
-            $tmp_gg_folder_name = $StorageService->createFolderIfNotExitst('google', 'users');
-            $google_path = $StorageService->upload_file('google', $tmp_gg_folder_name . '/' . $filename, file_get_contents($file->path()));
-        }
-        $PhotoModel = new PhotoModel();
-        $PhotoModel->obj_id = session('user')['id'];
-        $PhotoModel->obj_table = 'users';
-        $PhotoModel->obj_type = 'photo';
-        $PhotoModel->url = $filename;
-        $PhotoModel->sync_google = @$google_path;
-        $PhotoModel->name = $file->getClientOriginalName();
-        $PhotoModel->id_user = session('user')['id'];
-        $r = $PhotoModel->save();
-
-        if ($r) {
-            $request->session()->flash('message', 'Cập nhật thành công!');
-        } else {
-            $request->session()->flash('message_type', 'error');
-            $request->session()->flash('message', 'Cập nhật không thành công!');
-        }
         return redirect()->route('admin_me_info');
     }
 
     public function get_user_vip($pType, $id, Request $request) {
-
         $Model = UserModel::find($id);
         if ($Model == null) {
             \App\Bcore\Services\NotificationService::alertRight('Dữ liệu không có thực!', 'danger');

@@ -22,7 +22,6 @@
                 </div>
             </div>
 
-
             {{ csrf_field() }}
             <input type="hidden" name="id" value="{{ @$item->id }}" />
             <input type="hidden" name="type" value="{{ @$type }}" />
@@ -105,12 +104,12 @@
                             <div id="myTabContent" class="tab-content">
                                 @foreach($_LISTLANG as $_LANGKEY => $_LANGVAL)
                                 <div role="tabpanel" class="tab-pane fade {{$_LANGKEY==0?'active in':''}}" id="tab_content{{$_LANGKEY+1}}" aria-labelledby="home-tab">
-                                    <input type="hidden" name="id{{ $_FKEY . $_LANGVAL->id }}" value="{{@$item_lang[$_LANGVAL->id]->id}}"/>
+                                    <input type="hidden" name="formdata[{{$_LANGVAL->id}}][id]" value="{{@$item_lang[$_LANGVAL->id]->id}}"/>
                                     @if($UI->field('name'))
                                     <div class="form-group">
                                         <label class="control-label col-md-2 col-sm-2 col-xs-12">{{@$UI->field_name('name')}}</label>
                                         <div class="col-md-10 col-sm-10 col-xs-12">
-                                            <input type="text" class="form-control" name="name{{ $_FKEY . $_LANGVAL->id }}" value="{{@$item_lang[$_LANGVAL->id]->name}}" 
+                                            <input type="text" class="form-control" name="formdata[{{$_LANGVAL->id}}][name]" value="{{@$item_lang[$_LANGVAL->id]->name}}" 
                                                    placeholder="{!! ucfirst(__('placeholder.nhap',['name'=> __('label.ten') ]))!!}">
                                             <div id="suggestions-container" style="position: relative; float: left; width: 100%; margin: 10px;">
                                                 {!!@$UI->field_note('name',true)!!}</div>
@@ -121,7 +120,7 @@
                                     <div class="form-group">
                                         <label class="control-label col-md-2 col-sm-2 col-xs-12">{{@$UI->field_name('title')}}</label>
                                         <div class="col-md-10 col-sm-10 col-xs-12">
-                                            <input type="text" class="form-control" name="title{{ $_FKEY . $_LANGVAL->id }}" value="{{@$item_lang[$_LANGVAL->id]->title}}" 
+                                            <input type="text" class="form-control" name="formdata[{{$_LANGVAL->id}}][title]" value="{{@$item_lang[$_LANGVAL->id]->title}}" 
                                                    placeholder="{!! ucfirst(__('placeholder.nhap',['name'=> __('label.ten') ]))!!}">
                                             <div id="suggestions-container" style="position: relative; float: left; width: 100%; margin: 10px;">
                                                 {!!@$UI->field_note('title',true)!!}</div>
@@ -132,7 +131,7 @@
                                     <div class="form-group">
                                         <label class="control-label col-md-2 col-sm-2 col-xs-12">{{@$UI->field_name('name_meta')}}</label>
                                         <div class="col-md-10 col-sm-10 col-xs-12">
-                                            <input type="text" class="form-control" name="name_meta{{ $_FKEY . $_LANGVAL->id }}" value="{{@$item_lang[$_LANGVAL->id]->name_meta}}" placeholder="{!! ucfirst(__('placeholder.nhap',['name'=> __('label.tenkhongdau') ]))!!}">
+                                            <input type="text" class="form-control" name="formdata[{{$_LANGVAL->id}}][name_meta]" value="{{@$item_lang[$_LANGVAL->id]->name_meta}}" placeholder="{!! ucfirst(__('placeholder.nhap',['name'=> __('label.tenkhongdau') ]))!!}">
                                             <div id="suggestions-container" style="position: relative; float: left; width: 100%; margin: 10px;">
                                                 {!!@$UI->field_note('name_meta',true)!!}</div>
                                         </div>
@@ -144,7 +143,7 @@
                                     </div>
                                     <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <textarea rows="5" class="form-control {{@$UI->ckeditor('description')}}" name="description{{ $_FKEY . $_LANGVAL->id }}" 
+                                            <textarea rows="5" class="form-control {{@$UI->ckeditor('description')}}" name="formdata[{{$_LANGVAL->id}}][description]" 
                                                       placeholder="{!! ucfirst(__('placeholder.nhap',['name'=> __('label.mota') ]))!!}">{{@$item_lang[$_LANGVAL->id]->description}}</textarea>
                                             <div id="suggestions-container" style="position: relative; float: left; width: 100%; margin: 10px;">
                                                 {!!@$UI->field_note('description',true)!!}</div>
@@ -157,7 +156,7 @@
                                     </div>
                                     <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <textarea rows="5" class="form-control {{@$UI->ckeditor('description2')}}" name="description2{{ $_FKEY . $_LANGVAL->id }}" 
+                                            <textarea rows="5" class="form-control {{@$UI->ckeditor('description2')}}" name="formdata[{{$_LANGVAL->id}}][description2]" 
                                                       placeholder="{!! ucfirst(__('placeholder.nhap',['name'=> __('label.mota') ]))!!}">{{@$item_lang[$_LANGVAL->id]->description2}}</textarea>
                                             <div id="suggestions-container" style="position: relative; float: left; width: 100%; margin: 10px;">
                                                 {!!@$UI->field_note('description2',true)!!}</div>
@@ -170,7 +169,7 @@
                                     </div>
                                     <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <textarea rows="5" class="form-control js-ckeditor" name="content{{ $_FKEY . $_LANGVAL->id }}" id="content{{ $_FKEY . $_LANGVAL->id }}"
+                                            <textarea rows="5" class="form-control js-ckeditor" name="formdata[{{$_LANGVAL->id}}][content]" id="formdata[{{$_LANGVAL->id}}][content]"
                                                       placeholder="{!! ucfirst(__('placeholder.nhap',['name'=> __('label.noidung') ]))!!}">{{@$item_lang[$_LANGVAL->id]->content}}</textarea>
                                             <div id="suggestions-container" style="position: relative; float: left; width: 100%; margin: 10px;">
                                                 {!!@$UI->field_note('content',true)!!}</div>
@@ -211,7 +210,7 @@
                                     <div class="form-group">
                                         <label class="control-label col-md-2 col-sm-2 col-xs-12">{{@$UI->field_name('seo_title')}}</label>
                                         <div class="col-md-10 col-sm-10 col-xs-12">
-                                            <input type="text" class="form-control" name="seo_title{{ @$_FKEY . @$_LANGVAL->id}}" 
+                                            <input type="text" class="form-control" name="formdata[{{$_LANGVAL->id}}][seo_title]" 
                                                    value="{{@$item_lang[$_LANGVAL->id]->seo_title}}" placeholder="{!! ucfirst(__('placeholder.nhap',['name'=> __('label.tieude') ]))!!}">
                                             <div id="suggestions-container" style="position: relative; float: left; width: 100%; margin: 10px;">
                                                 {{@$UI->field_note('seo_title',true)}}</div>
@@ -222,7 +221,7 @@
                                     <div class="form-group">
                                         <label class="control-label col-md-2 col-sm-2 col-xs-12">{{@$UI->field_name('seo_keywords')}}</label>
                                         <div class="col-md-10 col-sm-10 col-xs-12">
-                                            <input type="text" class="tags form-control jquery-input-tag" name="seo_keywords{{ @$_FKEY . @$_LANGVAL->id}}" 
+                                            <input type="text" class="tags form-control jquery-input-tag" name="formdata[{{$_LANGVAL->id}}][seo_keywords]" 
                                                    value="{{@$item_lang[$_LANGVAL->id]->seo_keywords}}" />
                                             <div id="suggestions-container" style="position: relative; float: left; width: 100%; margin: 10px;">
                                                 {{@$UI->field_note('seo_keywords',true)}}</div>
@@ -233,7 +232,7 @@
                                     <div class="form-group">
                                         <label class="control-label col-md-2 col-sm-2 col-xs-12">{{$UI->field_name('seo_description')}}</label>
                                         <div class="col-md-10 col-sm-10 col-xs-12">
-                                            <textarea class="form-control" name="seo_description{{ @$_FKEY . @$_LANGVAL->id}}" 
+                                            <textarea class="form-control" name="formdata[{{$_LANGVAL->id}}][seo_description]" 
                                                       placeholder="{!! ucfirst(__('placeholder.nhap',['name'=> __('label.mota') ]))!!}">{{@$item_lang[$_LANGVAL->id]->seo_description}}</textarea>
                                             <div id="suggestions-container" style="position: relative; float: left; width: 100%; margin: 10px;">
                                                 {{@$UI->field_note('seo_description',true)}}</div>

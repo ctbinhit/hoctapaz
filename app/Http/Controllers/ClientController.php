@@ -6,7 +6,6 @@ use App\Bcore\ControllerService;
 use View,
     Config;
 use Illuminate\Support\Facades\Cache;
-// Module Background
 use App\Modules\Background\Services\BackgroundService;
 use App\Bcore\Services\AppService;
 use App\Bcore\Services\UserServiceV2;
@@ -21,8 +20,7 @@ class ClientController extends ControllerService {
 
     public function __construct() {
         parent::__construct();
-
-
+        
         $website_info = AppService::get_info(UserServiceV2::get_currentLangId(UserType::user()));
         View::share('website_info', $website_info);
 
